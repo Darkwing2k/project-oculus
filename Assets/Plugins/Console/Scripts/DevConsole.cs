@@ -4,55 +4,53 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 
-public class DevConsole {
+public class DevConsole
+{
 	private static readonly Logger logger = LoggerFactory.GetLogger(typeof(DevConsole));
-	private static DevConsole instance;
 
-	public static DevConsole Instance {
-		get {
-			if (instance == null) {
-				instance = new DevConsole();
-				instance.initStandardCmds();
-				instance.initStandardCVars();
-			}
-			return instance; 
+	private static Dictionary<string, ConsoleCmd> cmdList;
+	private static Dictionary<string, ICVar> cvarList;
+	//private static Queue<string> cmdQueue;
+	private static LinkedList<string> inputHistory;
+
+	private static bool isInitialized = false;
+
+	static DevConsole() {
+		if (!isInitialized) {
+			Initialize();
 		}
 	}
 
-
-	private Dictionary<string, ConsoleCmd> cmdList;
-	private Dictionary<string, ICVar> cvarList;
-	//private Queue<string> cmdQueue;
-	private LinkedList<string> inputHistory;
-
-	protected DevConsole() {
-		this.cmdList = new Dictionary<string, ConsoleCmd>();
-		this.cvarList = new Dictionary<string, ICVar>();
-		//this.cmdQueue = new Queue<string>();
-		this.inputHistory = new LinkedList<string>();
+	public static void Initialize() {
+		if (!isInitialized) {
+			cmdList = new Dictionary<string, ConsoleCmd>();
+			cvarList = new Dictionary<string, ICVar>();
+			//this.cmdQueue = new Queue<string>();
+			inputHistory = new LinkedList<string>();
+			initStandardCmds();
+			initStandardCVars();
+			isInitialized = true;
+		}
 	}
 
-	protected void initStandardCmds() {
+	protected static void initStandardCmds() {
 		// register Standard-Commands here
-		this.Register(new CCmdHelp());
-		this.Register(new CCmdListCmds());
-		this.Register(new CCmdListCvars());
+		Register(new CCmdHelp());
+		Register(new CCmdListCmds());
+		Register(new CCmdListCvars());
 	}
 
-	protected void initStandardCVars() {
-		ICVar cvar;
-		cvar = new CVar<bool>("sys_allow_cheats", false, CVarFlag.SYSTEM, "Enable or disable cheats"); 
-		this.Register(cvar);
-		cvar = new CVar<int>("max_hp", 3000, CVarFlag.DEVELOPER, "Adjust max health points"); 
-		this.Register(cvar);
+	protected static void initStandardCVars() {
+		Register(new CVar<bool>("sys_allow_cheats", false, CVarFlag.SYSTEM, "Enable or disable cheats"));
+		Register(new CVar<int>("max_hp", 3000, CVarFlag.DEVELOPER, "Adjust max health points"));
 	}
 
 	/**
-     * Register a console command
-     *
-     * @param cmd The command
-     */
-	public void Register(ConsoleCmd cmd) {
+	 * Register a console command
+	 *
+	 * @param cmd The command
+	 */
+	public static void Register(ConsoleCmd cmd) {
 		if (cmdList.ContainsKey(cmd.Name)) {
 			logger.Warn("Trying to add command '{}', which already exists!", cmd.Name);
 			return;
@@ -60,29 +58,36 @@ public class DevConsole {
 		cmdList.Add(cmd.Name, cmd);
 	}
 
-	public void Register(ICVar cvar) {
+	public static void Register(ICVar cvar) {
 		if (cvarList.ContainsKey(cvar.Name)) {
 			logger.Warn("Trying to add cvar '{}', which already exists!", cvar.Name);
 			return;
 		}
 		cvarList.Add(cvar.Name, cvar);
 	}
-	
+
 	/**
-     * Unregister a command previously registered by register
-     *
-     * @param cmd The command
-     */
-	public void Unregister(ConsoleCmd cmd) {
+	 * Unregister a command previously registered by register
+	 *
+	 * @param cmd The command
+	 */
+	public static void Unregister(ConsoleCmd cmd) {
 		Unregister(cmd.Name);
 	}
 
-	public void Unregister(string cmdName) {
-		cmdList.Remove(cmdName);
+	public static void Unregister(string name) {
+		ConsoleCmd cmd;
+		ICVar cvar;
+
+		if (TryGetConsoleCmd(name, out cmd)) {
+			cmdList.Remove(name);
+		} else if (TryGetCVar(name, out cvar)) {
+			cvarList.Remove(name);
+		}
 	}
 
-	public void UnregisterByFlags(CCmdFlags flags) {
-		Dictionary<string, ConsoleCmd> tmpList = new Dictionary<string, ConsoleCmd>(this.cmdList);
+	public static void UnregisterCmdsByFlags(CCmdFlags flags) {
+		Dictionary<string, ConsoleCmd> tmpList = new Dictionary<string, ConsoleCmd>(cmdList);
 
 		foreach (ConsoleCmd cmd in tmpList.Values) {
 			if ((cmd.Flags & flags) != 0) {
@@ -91,37 +96,32 @@ public class DevConsole {
 		}
 	}
 
-	public bool SubmitInput(string command) {
+	public static bool ExecuteCmd(string command) {
 		command = command.Trim();
-		if (command.Length > 0) {
-			this.inputHistory.AddLast(command);
-			logger.Info("] {}", command);
-			return this.ExecuteCmd(command);
-		}
-		return false;
-	}
 
-	public bool ExecuteCmd(string command) {
-		string[] args = StringUtil.Tokenize(command);
+		string[] args = command.Split(new char[] { ' ' }, System.StringSplitOptions.RemoveEmptyEntries);
 
 		if (args.Length == 0) {
 			return false;
 		}
 
+		inputHistory.AddLast(command);
+		logger.Log("> {}", command);
+
 		ConsoleCmd cmd;
 		ICVar cvar;
 
 		string arg0 = args[0];
-		if (this.TryGetConsoleCmd(arg0, out cmd)) {
+		if (TryGetConsoleCmd(arg0, out cmd)) {
 			if (cmd.isCallable(true)) {
 				if (cmd.MinParams > (args.Length - 1)) {
-					this.ShowUsage(cmd);
+					ShowUsage(cmd);
 					return false;
 				} else {
 					cmd.Execute(args.Skip(1).ToArray());
 				}
 			}
-		} else if (this.TryGetCVar(arg0, out cvar)) {
+		} else if (TryGetCVar(arg0, out cvar)) {
 			if (args.Length == 2) {
 				try {
 					cvar.Value = args[1];
@@ -142,37 +142,37 @@ public class DevConsole {
 		return true;
 	}
 
-	public bool TryGetConsoleCmd(string cmdName, out ConsoleCmd cmd) {
+	public static bool TryGetConsoleCmd(string cmdName, out ConsoleCmd cmd) {
 		return cmdList.TryGetValue(cmdName, out cmd);
 	}
 
-	public bool TryGetCVar(string cvarName, out ICVar cvar) {
+	public static bool TryGetCVar(string cvarName, out ICVar cvar) {
 		return cvarList.TryGetValue(cvarName, out cvar);
 	}
 
-	public void ShowUsage(ConsoleCmd cmd) {
+	public static void ShowUsage(ConsoleCmd cmd) {
 		logger.Info("HowToUse: {} {}", cmd.Name, cmd.ParamUsage);
 	}
 
-	public void ShowUsage(ICVar cvar) {
+	public static void ShowUsage(ICVar cvar) {
 		logger.Info("{}\n{}: {} ({}) - Default: {}", cvar.Description, cvar.Name, cvar.Value, cvar.Value.GetType().Name, cvar.DefaultValue);
 	}
 
-	public void ShowUsage(string command) {
+	public static void ShowUsage(string command) {
 		ConsoleCmd cmd;
 		ICVar cvar;
-		if (this.TryGetConsoleCmd(command, out cmd)) {
-			this.ShowUsage(cmd);
-		} else if (this.TryGetCVar(command, out cvar)) {
-			this.ShowUsage(cvar);
+		if (TryGetConsoleCmd(command, out cmd)) {
+			ShowUsage(cmd);
+		} else if (TryGetCVar(command, out cvar)) {
+			ShowUsage(cvar);
 		} else {
 			logger.Warn("Command/CVar '{}' does not exists", command);
 		}
 	}
 
-	public void ShowAllCommands() {
+	public static void ShowAllCommands() {
 		StringBuilder sb = new StringBuilder();
-		foreach (ConsoleCmd cmd in this.cmdList.Values) {
+		foreach (ConsoleCmd cmd in cmdList.Values) {
 			if (sb.Length > 0) {
 				sb.Append('\n');
 			}
@@ -182,9 +182,9 @@ public class DevConsole {
 		logger.Info(sb.ToString());
 	}
 
-	public void ShowAllCVars() {
+	public static void ShowAllCVars() {
 		StringBuilder sb = new StringBuilder();
-		foreach (ICVar cvar in this.cvarList.Values) {
+		foreach (ICVar cvar in cvarList.Values) {
 			if (sb.Length > 0) {
 				sb.Append('\n');
 			}
@@ -193,35 +193,107 @@ public class DevConsole {
 		logger.Info(sb.ToString());
 	}
 
-	// ================ Private Classes =====================
 
-	private class CCmdHelp : ConsoleCmd {
-		public CCmdHelp() : 
-			base("help", CCmdFlags.SYSTEM, "Shows how to use a command or cvar", 1, "<command/cvar>") {
-		}
-		
-		public override void Execute(string[] args) {
-			DevConsole.Instance.ShowUsage(args[0]);
+	// Catch Unity-Logs and show them on console
+	private static void HandleLog(string logString, string stackTrace, LogType type) {
+		switch (type) {
+			case LogType.Error:
+			case LogType.Exception:
+				logger.Error(logString);
+				break;
+			case LogType.Warning:
+				logger.Warn(logString);
+				break;
+			case LogType.Log:
+				logger.Log(logString);
+				break;
 		}
 	}
 
-	private class CCmdListCmds : ConsoleCmd {
+	#region === Logger-Methods ===
+
+	public static void Log(string msg) {
+		logger.Log(msg);
+	}
+
+	public static void Log(string msg, params object[] args) {
+		logger.Log(msg, args);
+	}
+
+	public static void Info(string msg) {
+		logger.Info(msg);
+	}
+
+	public static void Info(string msg, params object[] args) {
+		logger.Info(msg, args);
+	}
+
+	public static void Trace(string msg) {
+		logger.Trace(msg);
+	}
+
+	public static void Trace(string msg, params object[] args) {
+		logger.Trace(msg, args);
+	}
+
+	public static void Debug(string msg) {
+		logger.Debug(msg);
+	}
+
+	public static void Debug(string msg, params object[] args) {
+		logger.Debug(msg, args);
+	}
+
+	public static void Warn(string msg) {
+		logger.Warn(msg);
+	}
+
+	public static void Warn(string msg, params object[] args) {
+		logger.Warn(msg, args);
+	}
+
+	public static void Error(string msg) {
+		logger.Error(msg);
+	}
+
+	public static void Error(string msg, params object[] args) {
+		logger.Error(msg, args);
+	}
+
+	#endregion
+
+	// ================ Private Classes =====================
+
+	private class CCmdHelp : ConsoleCmd
+	{
+		public CCmdHelp() :
+			base("help", CCmdFlags.SYSTEM, "Shows how to use a command or cvar", 1, "<command/cvar>") {
+		}
+
+		public override void Execute(string[] args) {
+			DevConsole.ShowUsage(args[0]);
+		}
+	}
+
+	private class CCmdListCmds : ConsoleCmd
+	{
 		public CCmdListCmds() :
 			base("listcmds", CCmdFlags.SYSTEM, "Lists all available console commands") {
 		}
-		
+
 		public override void Execute(string[] args) {
-			DevConsole.Instance.ShowAllCommands();
+			DevConsole.ShowAllCommands();
 		}
 	}
 
-	private class CCmdListCvars : ConsoleCmd {
+	private class CCmdListCvars : ConsoleCmd
+	{
 		public CCmdListCvars() :
-		base("listcvars", CCmdFlags.SYSTEM, "Lists all available CVars") {
+			base("listcvars", CCmdFlags.SYSTEM, "Lists all available CVars") {
 		}
-		
+
 		public override void Execute(string[] args) {
-			DevConsole.Instance.ShowAllCVars();
+			DevConsole.ShowAllCVars();
 		}
 	}
 }

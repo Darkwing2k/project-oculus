@@ -1,8 +1,7 @@
 ﻿using System;
 
 public enum LogLevel {
-	OFF,
-	ALL,
+	NONE,
 	INFO,
 	TRACE,
 	DEBUG,

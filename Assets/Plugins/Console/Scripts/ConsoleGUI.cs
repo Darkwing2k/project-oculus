@@ -14,6 +14,8 @@ public class ConsoleGUI : MonoBehaviour {
     private const int WINDOW_ID = 50;
 	private Vector2 scrollPos = Vector2.zero;
 	private Logger rootLogger;
+	private bool showTimestamp = true;
+	private bool cmdSend = false;
 
 	public bool Toggle() {
 		return (this.enabled = !this.enabled);
@@ -23,6 +25,7 @@ public class ConsoleGUI : MonoBehaviour {
 		if (instance != null) {
 			Debug.LogError ("There is more than one instance of the " + this.GetType().Name);
 		}
+		DevConsole.Initialize();
 		instance = this;
 	}
 
@@ -58,33 +61,55 @@ public class ConsoleGUI : MonoBehaviour {
 		if (Event.current.type == EventType.Layout || Event.current.type == EventType.Repaint) {
 			foreach (Logger.LogEntry le in this.rootLogger.LogEntries) {
 				GUIStyle localStyle = new GUIStyle(GUI.skin.label);
+
+				if (showTimestamp) {
+					GUILayout.BeginHorizontal();
+					string time = le.Timestamp.ToString("[HH:mm:ss]");
+					GUILayout.Label(time, GUILayout.Width(localStyle.CalcSize(new GUIContent(time)).x));
+				}
+
 				switch (le.Level) {
-				case LogLevel.INFO:
-					localStyle.normal.textColor = Color.yellow;
-					break;
-				case LogLevel.TRACE:
-					localStyle.normal.textColor = Color.magenta;
-					break;
-				case LogLevel.DEBUG:
-					localStyle.normal.textColor = Color.cyan;
-					break;
-				case LogLevel.WARN:
-					localStyle.normal.textColor = new Color(1.0f, 0.5f, 0.0f);
-					break;
-				case LogLevel.ERROR:
-					localStyle.normal.textColor = Color.red;
-					break;
-				default:
-					localStyle.normal.textColor = Color.white;
-					break;
+					case LogLevel.NONE:
+						localStyle.normal.textColor = Color.white;
+						break;
+					case LogLevel.INFO:
+						localStyle.normal.textColor = Color.yellow;
+						break;
+					case LogLevel.TRACE:
+						localStyle.normal.textColor = Color.magenta;
+						break;
+					case LogLevel.DEBUG:
+						localStyle.normal.textColor = Color.cyan;
+						break;
+					case LogLevel.WARN:
+						localStyle.normal.textColor = new Color(1.0f, 0.5f, 0.0f);
+						break;
+					case LogLevel.ERROR:
+						localStyle.normal.textColor = Color.red;
+						break;
+					default:
+						localStyle.normal.textColor = Color.white;
+						break;
 				}
 				GUILayout.Label(le.Message, localStyle);
+
+				if (showTimestamp) {
+					GUILayout.EndHorizontal();
+				}
+			}
+
+			if (cmdSend) {
+				scrollPos.y = Mathf.Infinity;
+				cmdSend = false;
 			}
 		}
 
         GUILayout.EndScrollView();
         GUI.SetNextControlName("input");
+		GUILayout.BeginHorizontal();
         input = GUILayout.TextField(input);
+		showTimestamp = GUILayout.Toggle(showTimestamp, "Timestamp", GUILayout.Width(100));
+		GUILayout.EndHorizontal();
 		HandleFocus();
     }
 
@@ -104,8 +129,8 @@ public class ConsoleGUI : MonoBehaviour {
         if (GUI.GetNameOfFocusedControl().Equals("input")) {
 			if (KeyDown(KeyCode.KeypadEnter) || KeyDown(KeyCode.Return)) {
 	            if (input.Length > 0) {
-					DevConsole.Instance.SubmitInput(input);
-					scrollPos = new Vector2(float.MaxValue, float.MaxValue);
+					DevConsole.ExecuteCmd(input);
+					cmdSend = true;
 					input = "";
 	            }
 	        }

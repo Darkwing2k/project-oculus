@@ -13,6 +13,14 @@ public class Logger {
 		this.entryList = new List<LogEntry>();
 	}
 
+	public void Log(string msg) {
+		this.addToList(msg, LogLevel.NONE);
+	}
+
+	public void Log(string msg, params object[] args) {
+		this.Log(resolveParameters(msg, args));
+	}
+
 	public void Info(string msg) {
 		this.addToList(msg, LogLevel.INFO);
 	}
