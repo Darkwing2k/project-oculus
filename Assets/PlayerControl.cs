@@ -6,6 +6,7 @@ public class PlayerControl : MonoBehaviour
 	
 	public AudioSource flightSoundSource;
 	public int Controls; //0 = GamePad, 1 = Keyboard
+    public float scale;
 	
 	private string moveZGamepad = "LStickV";
 	private string moveXGamepad = "LStickH";
@@ -22,8 +23,6 @@ public class PlayerControl : MonoBehaviour
 	private string yaw;
 	private string asc;
 	
-	private float timer;
-	
 	// === Variables for Yaw ===
 	private float yawVelTarget = 0f;
 	private float yawVelValue = 0f;
@@ -36,26 +35,39 @@ public class PlayerControl : MonoBehaviour
 	
 	// === Variables for XZ Movement ===
 	private Vector3 moveAccDir = Vector3.zero;
-	private Vector3 moveVelDir = Vector3.zero;
+    private Vector3 moveVelDir = Vector3.zero;
 	private Vector3 xzRight = Vector3.zero;
     private Vector3 yAxis = Vector3.zero;
 	
 	private float moveVelTarget = 0f;
 	private float moveVelValue = 0f;
-	private float moveVelMax = 15f;
-	private float moveAcc = 15f;
-	private float strafeAcc = 4f;
+	private float moveVelMax = 1.35f;
+	private float moveAcc = 0.6f;
+    private float moveAgility = 0.08f;
 	
 	// === Variables for Ascending/Descending ===
 	private float ascVelTarget = 0f;
 	private float ascVelValue = 0f;
-	private float ascVelMax = 12f;
-	private float ascAcc = 18f;
+	private float ascVelMax = 0.8f;
+    private float ascVelMin = 0f;
+	private float ascAcc = 1.3f;
+
+    // === Variables for using Objects ===
+    public GameObject liftable;
+    public GameObject lifted;
 	
 	// Use this for initialization
 	void Start () 
 	{
         yAxis = new Vector3(0, 1, 0);
+
+        moveVelMax *= scale;
+        moveAcc *= scale;
+
+        ascVelMax *= scale;
+        ascAcc *= scale;
+
+        ascVelMin = Mathf.Abs(Physics.gravity.y * Time.fixedDeltaTime);
 
 		switch(Controls)
 		{
@@ -92,34 +104,50 @@ public class PlayerControl : MonoBehaviour
         {
             moveAccDir = (this.transform.forward * lStickV) + (xzRight * lStickH);
 
-            if (moveAccDir.sqrMagnitude > 1)
-                moveAccDir.Normalize();
+            moveVelTarget = moveAccDir.magnitude;
+
+            if (moveVelTarget > 1)
+                moveVelTarget = 1;
+
+            moveVelTarget *= moveVelMax;
+
+            moveAccDir.Normalize();
         }
         else
         {
             moveAccDir = Vector3.zero;
+            moveVelTarget = 0;
         }
 
         // 
-        moveVelDir += moveAccDir * strafeAcc * Time.deltaTime;
-
-        if (moveVelDir.sqrMagnitude > 1)
-            moveVelDir.Normalize();
-
-        // 
-        moveVelTarget = moveAccDir.sqrMagnitude * moveVelMax;
+        moveVelDir = ((moveAccDir - moveVelDir) * moveAgility) + moveVelDir;
 
         moveVelValue = calcValue(moveVelValue, moveAcc, moveVelTarget, 0.03f);
 
-        if (moveVelValue == 0)
-        {
-            moveVelDir = Vector3.zero;
-        }
-
-        //this.transform.Translate(moveVelDir * moveVelValue, Space.World);
-        //this.rigidbody.velocity = moveVelDir * moveVelValue * 50;
         // ===========================================================================
 
+        // === Calculating Ascending/Descinding Velocity ==================
+        float shoulder = Input.GetAxis(asc);
+
+        if (Mathf.Abs(shoulder) > 0.3f)
+        {
+            ascVelTarget = shoulder * ascVelMax;
+
+            flightSoundSource.pitch = 1 + (0.15f * shoulder);
+        }
+        else
+        {
+            ascVelTarget = ascVelMin;
+
+            flightSoundSource.pitch = 1;
+        }
+
+        ascVelValue = calcValue(ascVelValue, ascAcc, ascVelTarget, 0.03f);
+        // ===========================================================================
+
+        // === Applying Movement & Ascending/Descing Velocity here ===================
+        this.rigidbody.velocity = moveVelDir * moveVelValue + yAxis * ascVelValue;
+        // ===========================================================================
 
         // === Calculating & Applying Yaw Velocity ==============================
         float rStickV = Input.GetAxis("RStickV");
@@ -151,33 +179,6 @@ public class PlayerControl : MonoBehaviour
         this.transform.eulerAngles = new Vector3(this.transform.eulerAngles.x, this.transform.eulerAngles.y, -rollAngleFactor * rollAngleMax);
         // ===========================================================================
 
-
-        // === Calculating Ascending/Descinding Velocity ==================
-        float shoulder = Input.GetAxis(asc);
-
-        if (Mathf.Abs(shoulder) > 0.3f)
-        {
-            //this.transform.Translate(0, maxAscentVel * shoulder, 0, Space.World);
-            ascVelTarget = shoulder * ascVelMax;
-
-            flightSoundSource.pitch = 1 + (0.15f * shoulder);
-        }
-        else
-        {
-            ascVelTarget = 0;
-
-            flightSoundSource.pitch = 1;
-        }
-
-        ascVelValue = calcValue(ascVelValue, ascAcc, ascVelTarget, 0.03f);
-
-        //this.transform.Translate(new Vector3(0,1,0) * ascVelValue, Space.World);
-        // ===========================================================================
-
-        // === Applying Movement & Ascending/Descing Velocity here ===================
-        this.rigidbody.velocity = moveVelDir * moveVelValue + yAxis * ascVelValue + yAxis * Mathf.Abs(Physics.gravity.y) * Time.fixedDeltaTime;
-        // ===========================================================================
-
         // === Debug Stuff ===========================================================
 
         //print (lStickV + " || " + lStickH);
@@ -189,19 +190,20 @@ public class PlayerControl : MonoBehaviour
 
         //print (moveAccDir + " || " + moveAccDir.sqrMagnitude);
 
-        //print ("move >> target: " + moveVelTarget + " | value: " + moveVelValue);
+        //print("move> t: " + moveVelTarget + "| v: " + moveVelValue);
 
-        //print ("yaw >> target: " + yawVelTarget + " | value: " + yawVelValue);
+        //print ("yaw> t: " + yawVelTarget + "| v: " + yawVelValue);
 
-        //print ("roll >> target: " + rollVelTarget + " | value: " + rollVelValue);
+        //print ("roll> t: " + rollVelTarget + "| v: " + rollVelValue);
 
-        //print("asc >> target: " + ascVelTarget + " | value: " + ascVelValue);
+        //print("asc> t: " + ascVelTarget + "| v: " + (Physics.gravity.y * Time.fixedDeltaTime + ascVelValue));
 
-        //print(this.rigidbody.velocity.y);
+        //print(this.rigidbody.velocity.magnitude);
 
-        Debug.DrawRay(this.transform.position, moveAccDir * 4, Color.red);
-        Debug.DrawRay(this.transform.position, moveVelDir * 8, Color.yellow);
-        Debug.DrawRay(this.transform.position, xzRight * 2, Color.white);
+        //print(moveAccDir + "  " + moveVelDir);
+
+        Debug.DrawRay(this.transform.position, moveAccDir * moveVelTarget, Color.red);
+        Debug.DrawRay(this.transform.position, moveVelDir * moveVelValue, Color.green);
 
         //Debug.DrawRay(this.transform.position, this.transform.forward * 10, Color.yellow);
         // ===========================================================================
@@ -209,23 +211,74 @@ public class PlayerControl : MonoBehaviour
 
 	// Update is called once per frame
 	void Update () 
-	{			
-		if(timer < 0)
-		{
-			
-			
-			timer = -1;
-		}
-		else
-		{
-			timer -= Time.deltaTime;
-		}
+	{
+        if (lifted != null && Input.GetButtonDown("Use"))
+        {
+            print("releasing object");
+
+            Destroy(lifted.GetComponent<SpringJoint>());
+            Destroy(lifted.GetComponent<FixedJoint>());
+
+            this.GetComponent<BoxCollider>().isTrigger = true;
+            lifted.GetComponent<Collider>().isTrigger = false;
+
+            lifted = null;
+        }
+
+        if (liftable != null && Input.GetButtonDown("Use"))
+        {
+            print("attaching object");
+
+            // === Attach as SpringJoint ============================
+            SpringJoint sj = liftable.AddComponent<SpringJoint>();
+            sj.connectedBody = this.rigidbody;
+            sj.autoConfigureConnectedAnchor = false;
+            sj.connectedAnchor = new Vector3(0, -0.5f, 0);
+            sj.spring = 30;
+            sj.maxDistance = 0.5f;
+            // ======================================================
+
+            // === Attach as FixedJoint =============================
+            //FixedJoint fj = liftable.AddComponent<FixedJoint>();
+            //fj.connectedBody = this.rigidbody;
+            // ======================================================
+
+            liftable.GetComponent<Collider>().isTrigger = true;
+            this.GetComponent<BoxCollider>().isTrigger = false;
+
+            //liftable.transform.rotation = this.transform.rotation;
+            //liftable.transform.position = new Vector3(this.transform.position.x, this.transform.position.y - 0.1f, this.transform.position.z);
+
+            lifted = liftable;
+            liftable = null;
+        }
 	}
 	
 	void OnCollisionEnter(Collision c)
 	{
-		
+        foreach(ContactPoint cp in c.contacts)
+        {
+            print(cp.point.y - this.transform.position.y);
+        }
 	}
+
+    void OnTriggerEnter(Collider c)
+    {
+        if (c.tag == "Liftable" && c.rigidbody && lifted == null)
+        {
+            print("liftable object in range");
+            liftable = c.gameObject;
+        }
+    }
+
+    void OnTriggerExit(Collider c)
+    {
+        if (c.tag == "Liftable" && c.rigidbody && lifted == null)
+        {
+            print("lifted object left range");
+            liftable = null;
+        }
+    }
 	
 	private float calcValue(float val, float acc, float target, float tolerance)
 	{
