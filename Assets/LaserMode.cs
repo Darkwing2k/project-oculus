@@ -4,14 +4,14 @@ using System.Collections;
 public class LaserMode : MonoBehaviour 
 {
 
+    public BoxCollider trigger;
+
     private GameObject cutable;
     public bool cutMode = false;
-    private Ray pointer;
 
 	// Use this for initialization
 	void Start ()
     {
-        pointer.direction = new Vector3(0, 0, 1);
 	}
 	
 	// Update is called once per frame
@@ -22,24 +22,32 @@ public class LaserMode : MonoBehaviour
             if (!cutMode && cutable != null)
             {
                 cutMode = true;
-                this.GetComponent<FlightControl>().controlsActivated = false;
+                this.transform.parent.GetComponent<FlightControl>().controlsActivated = false;
+
+                
             }
-            else
+            else if(cutMode)
             {
                 cutMode = false;
-                this.GetComponent<FlightControl>().controlsActivated = true;
+                this.transform.parent.GetComponent<FlightControl>().controlsActivated = true;
             }
         }
 
-        Ray r = Camera.main.ScreenPointToRay(new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0));
-        RaycastHit hit;
-
-        if (Physics.Raycast(r, out hit, Mathf.Infinity))
+        if (cutMode)
         {
-            //print(hit.collider.gameObject.layer);
-        }
+            Ray r = Camera.main.ScreenPointToRay(new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0));
+            RaycastHit hit;
 
-        Debug.DrawRay(r.origin, r.direction, Color.cyan);
+            if (Physics.Raycast(r, out hit, Mathf.Infinity))
+            {
+                if (hit.collider.tag.Equals("Cutable"))
+                {
+                    print("target acquired");
+                }
+            }
+
+            Debug.DrawRay(r.origin, r.direction, Color.cyan);
+        }
 	}
 
     void OnTriggerEnter(Collider c)

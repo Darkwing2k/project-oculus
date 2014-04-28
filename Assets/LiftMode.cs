@@ -5,8 +5,6 @@ public class LiftMode : MonoBehaviour
 {
 
     // === Variables for using Objects ===
-    public BoxCollider interactionTrigger;
-
     private GameObject liftable;
     private GameObject lifted;
 
@@ -28,7 +26,7 @@ public class LiftMode : MonoBehaviour
                 Destroy(lifted.GetComponent<SpringJoint>());
                 //Destroy(lifted.GetComponent<FixedJoint>());
 
-                interactionTrigger.isTrigger = true;
+                this.GetComponent<Collider>().isTrigger = true;
                 lifted.GetComponent<Collider>().isTrigger = false;
 
                 lifted = null;
@@ -40,7 +38,7 @@ public class LiftMode : MonoBehaviour
 
                 // === Attach as SpringJoint ============================
                 SpringJoint sj = liftable.AddComponent<SpringJoint>();
-                sj.connectedBody = this.rigidbody;
+                sj.connectedBody = this.transform.parent.rigidbody;
                 sj.autoConfigureConnectedAnchor = false;
                 sj.connectedAnchor = new Vector3(0, -0.5f, 0);
                 sj.spring = 80;
@@ -53,7 +51,7 @@ public class LiftMode : MonoBehaviour
                 // ======================================================
 
                 liftable.GetComponent<Collider>().isTrigger = true;
-                interactionTrigger.isTrigger = false;
+                this.GetComponent<Collider>().isTrigger = false;
 
                 //liftable.transform.rotation = this.transform.rotation;
                 //liftable.transform.position = new Vector3(this.transform.position.x, this.transform.position.y - 0.1f, this.transform.position.z);
