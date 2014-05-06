@@ -1,0 +1,128 @@
+fileFormatVersion: 2
+guid: ea688d50e33a67a43a6c048f3c37c15c
+ModelImporter:
+  serializedVersion: 16
+  fileIDToRecycleName:
+    100000: DellAlie10
+    100002: DellAlie11
+    100004: DellAlie12
+    100006: DellAlien0
+    100008: DellAlien1
+    100010: DellAlien2
+    100012: DellAlien3
+    100014: DellAlien4
+    100016: DellAlien5
+    100018: DellAlien6
+    100020: DellAlien7
+    100022: DellAlien8
+    100024: DellAlien9
+    100026: DellAlienW
+    100028: //RootNode
+    400000: DellAlie10
+    400002: DellAlie11
+    400004: DellAlie12
+    400006: DellAlien0
+    400008: DellAlien1
+    400010: DellAlien2
+    400012: DellAlien3
+    400014: DellAlien4
+    400016: DellAlien5
+    400018: DellAlien6
+    400020: DellAlien7
+    400022: DellAlien8
+    400024: DellAlien9
+    400026: DellAlienW
+    400028: //RootNode
+    2300000: DellAlie10
+    2300002: DellAlie11
+    2300004: DellAlie12
+    2300006: DellAlien0
+    2300008: DellAlien1
+    2300010: DellAlien2
+    2300012: DellAlien3
+    2300014: DellAlien4
+    2300016: DellAlien5
+    2300018: DellAlien6
+    2300020: DellAlien7
+    2300022: DellAlien8
+    2300024: DellAlien9
+    3300000: DellAlie10
+    3300002: DellAlie11
+    3300004: DellAlie12
+    3300006: DellAlien0
+    3300008: DellAlien1
+    3300010: DellAlien2
+    3300012: DellAlien3
+    3300014: DellAlien4
+    3300016: DellAlien5
+    3300018: DellAlien6
+    3300020: DellAlien7
+    3300022: DellAlien8
+    3300024: DellAlien9
+    4300000: DellAlien0
+    4300002: DellAlien1
+    4300004: DellAlien2
+    4300006: DellAlien3
+    4300008: DellAlien4
+    4300010: DellAlien5
+    4300012: DellAlien6
+    4300014: DellAlien7
+    4300016: DellAlien8
+    4300018: DellAlien9
+    4300020: DellAlie10
+    4300022: DellAlie11
+    4300024: DellAlie12
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  additionalBone: 0
+  userData: 
