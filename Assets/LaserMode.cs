@@ -19,8 +19,8 @@ public class LaserMode : MonoBehaviour
 
     private bool newInput;
 
-    public enum State {WAITING ,TARGETING, LASERING};
-    public State currentState = State.WAITING;
+    public enum LaserState {WAITING ,TARGETING, LASERING};
+    public LaserState currentState = LaserState.WAITING;
 
 	// Use this for initialization
 	void Start ()
@@ -33,7 +33,7 @@ public class LaserMode : MonoBehaviour
     {
         newInput = Input.GetButtonDown("Use");
 
-        if (currentState == State.WAITING)
+        if (currentState == LaserState.WAITING)
         {
             if (newInput && cutable != null)
             {
@@ -44,18 +44,18 @@ public class LaserMode : MonoBehaviour
 
                 if (hit.collider.gameObject.GetInstanceID() == cutable.GetInstanceID())
                 {
-                    changeStateTo(State.TARGETING);
+                    changeStateTo(LaserState.TARGETING);
                 }
             }
         }
 
-        if (currentState == State.TARGETING)
+        if (currentState == LaserState.TARGETING)
         {
             if (newInput)
             {
                 newInput = false;
 
-                changeStateTo(State.WAITING);
+                changeStateTo(LaserState.WAITING);
             }
 
             RaycastHit hit;
@@ -102,41 +102,42 @@ public class LaserMode : MonoBehaviour
 
             if(hit.collider.gameObject.GetInstanceID() == cutable.GetInstanceID())
             {
-                changeStateTo(State.LASERING);
+                changeStateTo(LaserState.LASERING);
             }            
         }
 
-        if (currentState == State.LASERING)
+        if (currentState == LaserState.LASERING)
         {
             timer += Time.deltaTime;
 
             if (timer >= timerMax)
             {
-                changeStateTo(State.WAITING);
+                changeStateTo(LaserState.WAITING);
             }
         }
 	}
 
-    private void changeStateTo(State targetState)
+    private void changeStateTo(LaserState targetState)
     {
         // === On-Exit Operations ======================================================================================
         switch (currentState)
         {
-            case State.WAITING:
+            case LaserState.WAITING:
                 {
                     this.transform.parent.GetComponent<FlightControl>().controlsActivated = false;
                    
                     break;
                 }
-            case State.TARGETING:
+            case LaserState.TARGETING:
                 {
 
                     break;
                 }
-            case State.LASERING:
+            case LaserState.LASERING:
                 {
                     cutable.tag = "Untagged";
                     Destroy(cutable.transform.parent.GetComponent<FixedJoint>());
+                    cutable = null;
 
                     break;
                 }
@@ -146,14 +147,14 @@ public class LaserMode : MonoBehaviour
         // === On-Enter Operations ======================================================================================
         switch (targetState)
         {
-            case State.WAITING:
+            case LaserState.WAITING:
                 {
                     Destroy(lr);
                     this.transform.parent.GetComponent<FlightControl>().controlsActivated = true;
 
                     break;
                 }
-            case State.TARGETING:
+            case LaserState.TARGETING:
                 {
                     if (!oculusConnected)
                     {
@@ -172,7 +173,7 @@ public class LaserMode : MonoBehaviour
 
                     break;
                 }
-            case State.LASERING:
+            case LaserState.LASERING:
                 {
                     lr.SetPosition(1, cutable.transform.position);
                     timer = 0;

@@ -167,14 +167,16 @@ public class FlightControl : MonoBehaviour
         if (Mathf.Abs(shoulder) > 0.3f)
         {
             ascVelTarget = shoulder * ascVelMax;
-
-            flightSoundSource.pitch = 1 + (0.15f * shoulder);
+            
+            if(flightSoundSource != null)
+                flightSoundSource.pitch = 1 + (0.15f * shoulder);
         }
         else
         {
             ascVelTarget = ascVelMin;
 
-            flightSoundSource.pitch = 1;
+            if (flightSoundSource != null)
+                flightSoundSource.pitch = 1;
         }
 
         ascVelValue = calcValue(ascVelValue, ascAcc, ascVelTarget, 0.03f);
