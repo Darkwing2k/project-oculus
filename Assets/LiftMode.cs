@@ -3,15 +3,18 @@ using System.Collections;
 
 public class LiftMode : MonoBehaviour 
 {
+    private Player playerRef;
 
     // === Variables for using Objects ===
     private GameObject liftable;
     private GameObject lifted;
 
+    public Vector3 jointPos;
+
 	// Use this for initialization
 	void Start () 
     {
-	
+        playerRef = this.transform.parent.GetComponent<Player>();
 	}
 	
 	// Update is called once per frame
@@ -21,40 +24,34 @@ public class LiftMode : MonoBehaviour
         {
             if (lifted != null)
             {
+                playerRef.liftModeActive = false;
+
                 print("releasing object");
 
-                Destroy(lifted.GetComponent<SpringJoint>());
-                //Destroy(lifted.GetComponent<FixedJoint>());
-
-                this.GetComponent<Collider>().isTrigger = true;
-                lifted.GetComponent<Collider>().isTrigger = false;
+                Destroy(lifted.GetComponent<FixedJoint>());
 
                 lifted = null;
             }
 
             if (liftable != null)
             {
+                playerRef.liftModeActive = true;
+
                 print("attaching object");
 
-                // === Attach as SpringJoint ============================
-                SpringJoint sj = liftable.AddComponent<SpringJoint>();
-                sj.connectedBody = this.transform.parent.rigidbody;
-                sj.autoConfigureConnectedAnchor = false;
-                sj.connectedAnchor = new Vector3(0, -0.5f, 0);
-                sj.spring = 80;
-                sj.maxDistance = 0.01f;
+                // === Attach a Joint ===================================
+                FixedJoint joint = liftable.AddComponent<FixedJoint>();
+                joint.connectedBody = this.transform.parent.rigidbody;
+                joint.autoConfigureConnectedAnchor = false;
+                joint.connectedAnchor = jointPos;
+
+                Mesh m = liftable.GetComponent<MeshFilter>().mesh;
+
+                float anchorY = m.bounds.size.y / 2;
+
+                joint.anchor = new Vector3(0, anchorY, 0);
+                
                 // ======================================================
-
-                // === Attach as FixedJoint =============================
-                //FixedJoint fj = liftable.AddComponent<FixedJoint>();
-                //fj.connectedBody = this.rigidbody;
-                // ======================================================
-
-                liftable.GetComponent<Collider>().isTrigger = true;
-                this.GetComponent<Collider>().isTrigger = false;
-
-                //liftable.transform.rotation = this.transform.rotation;
-                //liftable.transform.position = new Vector3(this.transform.position.x, this.transform.position.y - 0.1f, this.transform.position.z);
 
                 lifted = liftable;
                 liftable = null;

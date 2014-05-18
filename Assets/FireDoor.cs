@@ -45,7 +45,7 @@ public class FireDoor : MonoBehaviour
 
     void OnTriggerEnter(Collider c)
     {
-        if (c.tag.Equals("Player"))
+        if (c.tag.Equals("Player") && currentState == DoorState.OPEN)
         {
             currentState = DoorState.CLOSING;
             steps = 0;

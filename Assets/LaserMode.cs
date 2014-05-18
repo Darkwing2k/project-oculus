@@ -3,16 +3,10 @@ using System.Collections;
 
 public class LaserMode : MonoBehaviour 
 {
+    private Player playerRef;
+    private bool oculusConnected;
 
     private GameObject cutable;
-    public bool oculusConnected;
-
-    public Ray lookingDirection;
-    public Ray laserTargeter;
-    private LineRenderer lr;
-
-    private float alpha = 0;
-    private float beta = 0;
 
     private float timer = 0;
     private float timerMax = 2;
@@ -21,11 +15,63 @@ public class LaserMode : MonoBehaviour
 
     public enum LaserState {WAITING ,TARGETING, LASERING};
     public LaserState currentState = LaserState.WAITING;
+    public LaserState desiredState = LaserState.WAITING;
+
+    // === Targeting values
+    public enum TargetingMethods { LIGHT, CROSSHAIR};
+    public TargetingMethods targetingSystem;
+
+    private Light lightTargeter;
+    private LineRenderer laser;
+    public Vector3 laserPos;
+
+    // === Debug Variables when Oculus is not connected ===
+    private LineRenderer pointer;
+    private Ray laserTargeter;
+    private Ray lookingDirection;
+    private float alpha = 0;
+    private float beta = 0;
 
 	// Use this for initialization
 	void Start ()
     {
-        
+        playerRef = this.transform.parent.GetComponent<Player>();
+        oculusConnected = playerRef.useOculus;
+
+        if (oculusConnected)
+        {
+            switch (targetingSystem)
+            {
+                case TargetingMethods.LIGHT:
+                    {
+                        GameObject lightTargeterGO = new GameObject("lightTargeter");
+                        lightTargeterGO.transform.position = playerRef.eyeCenter.position;
+                        lightTargeterGO.transform.rotation = playerRef.eyeCenter.rotation;
+                        lightTargeterGO.transform.parent = playerRef.eyeCenter;
+
+                        lightTargeter = lightTargeterGO.AddComponent<Light>();
+                        lightTargeter.type = LightType.Spot;
+                        lightTargeter.color = Color.red;
+                        lightTargeter.range = 1;
+                        lightTargeter.spotAngle = 4;
+                        lightTargeter.intensity = 1;
+                        lightTargeter.enabled = false;
+
+                        laser = lightTargeterGO.AddComponent<LineRenderer>();
+                        laser.enabled = false;
+
+                        break;
+                    }
+                case TargetingMethods.CROSSHAIR:
+                    {
+                        break;
+                    }
+            }
+        }
+        else
+        {
+            
+        }
 	}
 	
 	// Update is called once per frame
@@ -33,6 +79,7 @@ public class LaserMode : MonoBehaviour
     {
         newInput = Input.GetButtonDown("Use");
 
+        // === Waiting State ===
         if (currentState == LaserState.WAITING)
         {
             if (newInput && cutable != null)
@@ -44,28 +91,31 @@ public class LaserMode : MonoBehaviour
 
                 if (hit.collider.gameObject.GetInstanceID() == cutable.GetInstanceID())
                 {
-                    changeStateTo(LaserState.TARGETING);
+                    desiredState = LaserState.TARGETING;
                 }
             }
         }
 
+        // === Targeting State ===
         if (currentState == LaserState.TARGETING)
         {
             if (newInput)
             {
                 newInput = false;
 
-                changeStateTo(LaserState.WAITING);
+                desiredState = LaserState.WAITING;
             }
 
             RaycastHit hit;
 
             if (oculusConnected)
             {
-                Ray r = Camera.main.ScreenPointToRay(new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0));
-                Physics.Raycast(r, out hit, 10);
+                Ray r = new Ray();
+                r.origin = playerRef.eyeCenter.position;
+                r.direction = playerRef.eyeCenter.forward;
 
-                Debug.DrawRay(r.origin, r.direction, Color.cyan);
+                Physics.Raycast(r, out hit, 10);                
+
             }
             else
             {
@@ -95,25 +145,67 @@ public class LaserMode : MonoBehaviour
 
                 Physics.Raycast(laserTargeter, out hit, 10);
 
-                lr.SetPosition(1, hit.point);
+                pointer.SetPosition(1, hit.point);
 
                 Debug.DrawRay(laserTargeter.origin, laserTargeter.direction, Color.cyan);
             }
 
             if(hit.collider.gameObject.GetInstanceID() == cutable.GetInstanceID())
             {
-                changeStateTo(LaserState.LASERING);
+                desiredState = LaserState.LASERING;
             }            
         }
 
+        // === Lasering State ===
         if (currentState == LaserState.LASERING)
         {
-            timer += Time.deltaTime;
+            if (oculusConnected)
+            {
+                switch (targetingSystem)
+                {
+                    case TargetingMethods.LIGHT:
+                        {
+                            lightTargeter.transform.LookAt(cutable.transform.position);
+                            break;
+                        }
+                    case TargetingMethods.CROSSHAIR:
+                        {
+                            break;
+                        }
+                }
+            }
+
+            if (newInput)
+            {
+                newInput = false;
+
+                desiredState = LaserState.WAITING;
+            }
+
+            if (Input.GetButton("Action"))
+            {
+                timer += Time.deltaTime;
+
+                laser.enabled = true;
+            }
+            else
+            {
+                laser.enabled = false;
+            }
 
             if (timer >= timerMax)
             {
-                changeStateTo(LaserState.WAITING);
+                cutable.tag = "Untagged";
+                Destroy(cutable.transform.parent.GetComponent<FixedJoint>());
+                cutable = null;
+
+                desiredState = LaserState.WAITING;
             }
+        }
+
+        if (currentState != desiredState)
+        {
+            changeStateTo(desiredState);
         }
 	}
 
@@ -124,7 +216,7 @@ public class LaserMode : MonoBehaviour
         {
             case LaserState.WAITING:
                 {
-                    this.transform.parent.GetComponent<FlightControl>().controlsActivated = false;
+                    this.transform.parent.GetComponent<FlightControl>().ControlsActivated = false;
                    
                     break;
                 }
@@ -135,9 +227,28 @@ public class LaserMode : MonoBehaviour
                 }
             case LaserState.LASERING:
                 {
-                    cutable.tag = "Untagged";
-                    Destroy(cutable.transform.parent.GetComponent<FixedJoint>());
-                    cutable = null;
+                    if (oculusConnected)
+                    {
+                        switch (targetingSystem)
+                        {
+                            case TargetingMethods.LIGHT:
+                                {
+                                    lightTargeter.gameObject.transform.localRotation = new Quaternion(0, 0, 0, 1);
+
+                                    break;
+                                }
+                            case TargetingMethods.CROSSHAIR:
+                                {
+                                    break;
+                                }
+                        }
+
+                        laser.enabled = false;
+                    }
+                    else
+                    {
+                        
+                    }
 
                     break;
                 }
@@ -149,16 +260,54 @@ public class LaserMode : MonoBehaviour
         {
             case LaserState.WAITING:
                 {
-                    Destroy(lr);
-                    this.transform.parent.GetComponent<FlightControl>().controlsActivated = true;
+                    playerRef.laserModeActive = false;
+
+                    if (oculusConnected)
+                    {
+                        switch (targetingSystem)
+                        {
+                            case TargetingMethods.LIGHT:
+                                {
+                                    lightTargeter.enabled = false;
+                                    break;
+                                }
+                            case TargetingMethods.CROSSHAIR:
+                                {
+                                    break;
+                                }
+                        }
+                    }
+                    else
+                    {
+                        Destroy(pointer);
+                    }
+
+                    this.transform.parent.GetComponent<FlightControl>().ControlsActivated = true;
 
                     break;
                 }
             case LaserState.TARGETING:
                 {
-                    if (!oculusConnected)
+                    playerRef.laserModeActive = true;
+
+                    if (oculusConnected)
                     {
-                        lookingDirection = laserTargeter = Camera.main.ScreenPointToRay(new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0));
+                        switch (targetingSystem)
+                        {
+                            case TargetingMethods.LIGHT:
+                                {
+                                    lightTargeter.enabled = true;
+                                    break;
+                                }
+                            case TargetingMethods.CROSSHAIR:
+                                {
+                                    break;
+                                }
+                        }
+                    }
+                    else
+                    {
+                        lookingDirection = laserTargeter = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
 
                         alpha = Vector3.Angle(new Vector3(0, 0, 1), laserTargeter.direction);
                         beta = Vector3.Angle(new Vector3(0, 1, 0), laserTargeter.direction);
@@ -166,16 +315,31 @@ public class LaserMode : MonoBehaviour
                         lookingDirection.direction.Normalize();
                         laserTargeter.direction.Normalize();
 
-                        lr = this.gameObject.AddComponent<LineRenderer>();
-                        lr.SetPosition(0, this.transform.position + new Vector3(0, -0.05f, 0));
-                        lr.SetWidth(0.005f, 0.005f);
+                        pointer = this.gameObject.AddComponent<LineRenderer>();
+                        pointer.SetPosition(0, playerRef.eyeCenter.position + new Vector3(0, -0.05f, 0));
+                        pointer.SetWidth(0.005f, 0.005f);
                     }
 
                     break;
                 }
             case LaserState.LASERING:
                 {
-                    lr.SetPosition(1, cutable.transform.position);
+                    playerRef.laserModeActive = true;
+
+                    laser.SetPosition(1, cutable.transform.position);
+                    laser.SetWidth(0.005f, 0.005f);
+                    laser.SetPosition(0, playerRef.eyeCenter.transform.position + laserPos);
+
+                    if (oculusConnected)
+                    {
+                        
+                    }
+                    else
+                    {
+                        pointer.SetPosition(1, cutable.transform.position);
+                    }
+
+
                     timer = 0;
 
                     break;

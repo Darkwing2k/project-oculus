@@ -3,10 +3,22 @@ using System.Collections;
 
 public class FlightControl : MonoBehaviour 
 {
-    #region Control Variables
-    public int Controls; //0 = GamePad, 1 = Keyboard
+    private Player playerRef;
 
-    public bool controlsActivated = true;
+    #region Control Variables
+    public bool useGamepad; //0 = GamePad, 1 = Keyboard
+
+    private bool controlsActivated;
+    public bool ControlsActivated
+    {
+        set
+        {
+            controlsActivated = value;
+            playerRef.flightControlActive = value;
+        }
+        get { return controlsActivated; }
+
+    }
 
     // for gamepad, use these input axes
     private string moveZGamepad = "LStickV";
@@ -30,13 +42,13 @@ public class FlightControl : MonoBehaviour
     #region Y-Rotate Variables
     private float yawVelTarget = 0f; // Desired Velocity for Y-Rotation
     private float yawVelValue = 0f; // Current Velocity for Y-Rotation
-    private float yawVelMax = 1.8f; // Maximum Velocity for Y-Rotation
+    private float yawVelMax = 1.2f; // Maximum Velocity for Y-Rotation
     private float yawAcc = 3.6f; // Acceleration for Y-Rotation
     #endregion
 
     #region Z-Rotate Variables
     // local Z-Rotation is applied when flying in steep curves with high velocity
-    private float rollAngleMax = 10; // Maximum Z-Rotation
+    private float rollAngleMax = 0; // Maximum Z-Rotation (0 for oculus. prevents simulator sickness)
     private float rollAngleFactor = 0f; // Lies between 0 (= 0°) and 1 (= rollAngleMax). Calculated with the yawVelValue and the moveVelValue
     #endregion
 
@@ -47,7 +59,7 @@ public class FlightControl : MonoBehaviour
 
     private float moveVelTarget = 0f; // Desired Velocity for XZ-Movement
     private float moveVelValue = 0f; // Current Velocity for XZ-Movement
-    private float moveVelMax = 1.35f; // Maximum Velocity for XZ-Movement
+    private float moveVelMax = 1.15f; // Maximum Velocity for XZ-Movement
     private float moveAcc = 0.6f; // Acceleration in XZ-Direction
     private float moveAgility = 0.08f; // How fast a new Direction is applied (Changerate from Current to Desired Direction)
     #endregion
@@ -70,6 +82,9 @@ public class FlightControl : MonoBehaviour
 	// Use this for initialization
 	void Start () 
     {
+        playerRef = this.GetComponent<Player>();
+        ControlsActivated = true;
+
         yAxis = new Vector3(0, 1, 0);
 
         moveVelMax *= scale;
@@ -80,24 +95,19 @@ public class FlightControl : MonoBehaviour
 
         ascVelMin = Mathf.Abs(Physics.gravity.y * Time.fixedDeltaTime);
 
-        switch (Controls)
+        if(useGamepad)
         {
-            case 0:
-                {
-                    moveZ = moveZGamepad;
-                    moveX = moveXGamepad;
-                    yaw = yawGamepad;
-                    asc = ascGamepad;
-                    break;
-                }
-            case 1:
-                {
-                    moveZ = moveZKeyboard;
-                    moveX = moveXKeyboard;
-                    yaw = yawKeyboard;
-                    asc = ascKeyboard;
-                    break;
-                }
+            moveZ = moveZGamepad;
+            moveX = moveXGamepad;
+            yaw = yawGamepad;
+            asc = ascGamepad;
+        }
+        else
+        {
+            moveZ = moveZKeyboard;
+            moveX = moveXKeyboard;
+            yaw = yawKeyboard;
+            asc = ascKeyboard;
         }
 	}
 
@@ -267,5 +277,10 @@ public class FlightControl : MonoBehaviour
         }
 
         return val;
+    }
+
+    void OnCollisionEnter(Collision c)
+    {
+        print(c.collider.name);
     }
 }
