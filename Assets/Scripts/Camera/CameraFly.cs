@@ -2,21 +2,57 @@
 using System.Collections;
 using System;
 
+public enum FlyBehavior
+{
+	Line,
+	HermiteSpline
+}
+
 public class CameraFly : MonoBehaviour {
 
 	public Transform flyPoints;
+	public FlyBehavior flyBehavior;
+
 	private int currentChildIndex;
 
-	private float journeyTime;
-	private float startTime;
-
-	private Vector3 sourcePosition;
-	private Quaternion sourceRotation;
-	
 	private Transform destination;
 
-	private float travelingTime;
+	private FlyPositionSteering flyPosSteering;
 
+	// Use this for initialization
+	void Start() {
+		currentChildIndex = -1;
+		setNextDestination();
+	}
+
+	private bool setNextDestination() {
+		flyPosSteering = null;
+		++currentChildIndex;
+
+		if (flyPoints != null) {
+			if (flyPoints.childCount > 0 && currentChildIndex < flyPoints.childCount) {
+				destination = flyPoints.FindChild(Convert.ToString(currentChildIndex));
+				CameraFlyChild attr = destination.GetComponent<CameraFlyChild>();
+				flyPosSteering = new LineFlyPositionSteering(transform, destination.position, destination.rotation, attr.velocity, DurationType.Velocity);
+				flyPosSteering.Start();
+				return true;
+			}
+		}
+		return false;
+	}
+
+	// Update is called once per frame
+	void Update() {
+		if (flyPosSteering != null && !flyPosSteering.IsFinished) {
+			flyPosSteering.Update();
+
+			if (flyPosSteering.IsFinished) {
+				setNextDestination();
+			}
+		}
+	}
+
+	/*
 	// Use this for initialization
 	void Start () {
 		this.startTime = Time.time;
@@ -63,4 +99,5 @@ public class CameraFly : MonoBehaviour {
 			}
 		}
 	}
+	*/
 }
