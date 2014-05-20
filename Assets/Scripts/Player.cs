@@ -15,6 +15,7 @@ public class Player : MonoBehaviour
 
     public Transform eyeCenter;
 
+
 	// Use this for initialization
 	void Start () 
     {
@@ -37,10 +38,12 @@ public class Player : MonoBehaviour
             }
         }
 	}
-	
+
+
+
 	// Update is called once per frame
 	void Update () 
     {
-	
+
 	}
 }
