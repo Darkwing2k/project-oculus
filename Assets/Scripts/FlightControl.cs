@@ -40,6 +40,7 @@ public class FlightControl : MonoBehaviour
     #endregion
 
     #region Y-Rotate Variables
+    public bool useDirectYawInput;
     private float yawVelTarget = 0f; // Desired Velocity for Y-Rotation
     private float yawVelValue = 0f; // Current Velocity for Y-Rotation
     private float yawVelMax = 1.2f; // Maximum Velocity for Y-Rotation
@@ -47,9 +48,13 @@ public class FlightControl : MonoBehaviour
     #endregion
 
     #region Z-Rotate Variables
+    public bool useRolling;
     // local Z-Rotation is applied when flying in steep curves with high velocity
-    private float rollAngleMax = 0; // Maximum Z-Rotation (0 for oculus. prevents simulator sickness)
-    private float rollAngleFactor = 0f; // Lies between 0 (= 0°) and 1 (= rollAngleMax). Calculated with the yawVelValue and the moveVelValue
+    private float rollAngleTarget = 0;
+    private float rollAngleValue = 0;
+    private float rollAngleMax = 10; // Maximum Z-Rotation (0 for oculus. prevents simulator sickness)
+    private float rollAngleMaxDifference = 1;
+    private float rollAcc = 20;
     #endregion
 
     #region XZ-Movement Variables
@@ -65,17 +70,18 @@ public class FlightControl : MonoBehaviour
     #endregion
 
     #region Y-Movement Variables
+    // useGravity was deactivated to due the "2 collision" bug. As long as the player collided with more than 1 object he floated up
     private Vector3 yAxis = Vector3.zero; // Up Vector. Is always (0,1,0)
 
     private float ascVelTarget = 0f; // Desired Velocity for Y-Movement
     private float ascVelValue = 0f; // Current Velocity for Y-Movement
     private float ascVelMax = 0.8f; // Maximum Velocity for Y-Movement
-    private float ascVelMin = 0f; // Minimum Velocity for Y-Movement (equals gravity for hover flight)
+    private float ascVelMin = 0; // Mathf.Abs(Physics.gravity.y * Time.fixedDeltaTime); // Minimum Velocity for Y-Movement (equals gravity for hover flight)
+    private float ascGravityFactor = 0.15f; // Simulating a faster fall due to gravity.
     private float ascAcc = 1.3f; // Acceleration in Y-Direction
     #endregion
 
     #region Other Variables
-		public float scale;
         public AudioSource flightSoundSource;
 	#endregion
 
@@ -86,14 +92,6 @@ public class FlightControl : MonoBehaviour
         ControlsActivated = true;
 
         yAxis = new Vector3(0, 1, 0);
-
-        moveVelMax *= scale;
-        moveAcc *= scale;
-
-        ascVelMax *= scale;
-        ascAcc *= scale;
-
-        ascVelMin = Mathf.Abs(Physics.gravity.y * Time.fixedDeltaTime);
 
         if(useGamepad)
         {
@@ -113,6 +111,7 @@ public class FlightControl : MonoBehaviour
 
     void FixedUpdate()
     {
+
         float lStickV = 0;
         float lStickH = 0;
 
@@ -169,14 +168,14 @@ public class FlightControl : MonoBehaviour
 
         moveVelDir = ((moveAccDir - moveVelDir) * moveAgility) + moveVelDir;
 
-        moveVelValue = calcValue(moveVelValue, moveAcc, moveVelTarget, 0.03f);
+        moveVelValue = calcValue(moveVelValue, moveAcc, moveVelTarget, moveAcc * Time.deltaTime);
 
         // ===========================================================================
 
         // === Calculating Ascending/Descinding Velocity ==================
         if (Mathf.Abs(shoulder) > 0.3f)
         {
-            ascVelTarget = shoulder * ascVelMax;
+            ascVelTarget = shoulder * ascVelMax - ascGravityFactor;
             
             if(flightSoundSource != null)
                 flightSoundSource.pitch = 1 + (0.15f * shoulder);
@@ -189,7 +188,7 @@ public class FlightControl : MonoBehaviour
                 flightSoundSource.pitch = 1;
         }
 
-        ascVelValue = calcValue(ascVelValue, ascAcc, ascVelTarget, 0.03f);
+        ascVelValue = calcValue(ascVelValue, ascAcc, ascVelTarget, ascAcc * Time.deltaTime);
         // ===========================================================================
 
         // === Applying Movement & Ascending/Descing Velocity here ===================
@@ -211,16 +210,26 @@ public class FlightControl : MonoBehaviour
             yawVelTarget = 0;
         }
 
-        yawVelValue = calcValue(yawVelValue, yawAcc, yawVelTarget, 0.03f);
+        if (useDirectYawInput)
+            yawVelValue = yawVelTarget;
+        else
+            yawVelValue = calcValue(yawVelValue, yawAcc, yawVelTarget, yawAcc * Time.deltaTime);
 
         this.transform.Rotate(0, yawVelValue, 0, Space.World);
-        //this.rigidbody.angularVelocity = new Vector3(0, yawVelValue, 0);
+        //this.rigidbody.angularVelocity = this.rigidbody.angularVelocity + new Vector3(0, yawVelValue, 0);
         // ===========================================================================
 
         // === Calculating & Applying Roll Behaviour when flying curves ==============
-        rollAngleFactor = (yawVelValue / yawVelMax) * (moveVelValue / moveVelMax);
+        if (useRolling)
+        {
+            float rollAngleFactor = (yawVelValue / yawVelMax) * (moveVelValue / moveVelMax);
 
-        this.transform.eulerAngles = new Vector3(this.transform.eulerAngles.x, this.transform.eulerAngles.y, -rollAngleFactor * rollAngleMax);
+            rollAngleTarget = -1 * rollAngleFactor * rollAngleMax; //multiplied with -1 for correct roll direction
+
+            rollAngleValue = calcValue(rollAngleValue, rollAcc, rollAngleTarget, rollAcc * Time.deltaTime);         
+
+            this.transform.eulerAngles = new Vector3(this.transform.eulerAngles.x, this.transform.eulerAngles.y, rollAngleValue);
+        }
         // ===========================================================================
 
         // === Debug Stuff ===========================================================
@@ -263,11 +272,13 @@ public class FlightControl : MonoBehaviour
 
     private float calcValue(float val, float acc, float target, float tolerance)
     {
-        if (target - val > tolerance)
+        float difference = target - val;
+
+        if (difference > tolerance)
         {
             val += acc * Time.deltaTime;
         }
-        else if (target - val < -tolerance)
+        else if (difference < -tolerance)
         {
             val -= acc * Time.deltaTime;
         }

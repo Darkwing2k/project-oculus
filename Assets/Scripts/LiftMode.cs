@@ -30,6 +30,8 @@ public class LiftMode : MonoBehaviour
 
                 Destroy(lifted.GetComponent<FixedJoint>());
 
+                lifted.collider.enabled = true;
+
                 lifted = null;
             }
 
@@ -38,6 +40,9 @@ public class LiftMode : MonoBehaviour
                 playerRef.liftModeActive = true;
 
                 print("attaching object");
+
+                liftable.collider.enabled = false;
+                liftable.transform.rotation = this.transform.rotation;
 
                 // === Attach a Joint ===================================
                 FixedJoint joint = liftable.AddComponent<FixedJoint>();

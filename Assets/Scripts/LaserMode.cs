@@ -1,17 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class LaserMode : MonoBehaviour 
 {
     private Player playerRef;
     private bool oculusConnected;
 
-    private GameObject cutable;
+    public List<GameObject> cutable;
+    public GameObject target;
 
     private float timer = 0;
     private float timerMax = 2;
-
-    private bool newInput;
 
     public enum LaserState {WAITING ,TARGETING, LASERING};
     public LaserState currentState = LaserState.WAITING;
@@ -23,6 +23,10 @@ public class LaserMode : MonoBehaviour
 
     private Light lightTargeter;
     private LineRenderer laser;
+    private bool laserCanHitTarget;
+    public Material laserMaterial;
+    public Color laserColor;
+    public float laserWidth;
     public Vector3 laserPos;
 
     // === Debug Variables when Oculus is not connected ===
@@ -58,7 +62,11 @@ public class LaserMode : MonoBehaviour
                         lightTargeter.enabled = false;
 
                         laser = lightTargeterGO.AddComponent<LineRenderer>();
+                        laser.SetWidth(laserWidth, laserWidth);
+                        laser.material = laserMaterial;
+                        laser.SetColors(laserColor, laserColor);
                         laser.enabled = false;
+                        
 
                         break;
                     }
@@ -77,21 +85,21 @@ public class LaserMode : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
     {
-        newInput = Input.GetButtonDown("Use");
-
         // === Waiting State ===
         if (currentState == LaserState.WAITING)
         {
-            if (newInput && cutable != null)
+            if (Input.GetButtonDown("Use") && cutable.Count != 0)
             {
-                newInput = false;
-
-                RaycastHit hit;
-                Physics.Raycast(this.transform.position, cutable.transform.position - this.transform.position, out hit);
-
-                if (hit.collider.gameObject.GetInstanceID() == cutable.GetInstanceID())
+                print("checking visibility");
+                foreach (GameObject g in cutable)
                 {
-                    desiredState = LaserState.TARGETING;
+                    RaycastHit hit;
+                    Physics.Raycast(this.transform.position, g.transform.position - this.transform.position, out hit);
+
+                    if (hit.collider.gameObject.GetInstanceID() == g.GetInstanceID())
+                    {
+                        desiredState = LaserState.TARGETING;
+                    }
                 }
             }
         }
@@ -99,10 +107,8 @@ public class LaserMode : MonoBehaviour
         // === Targeting State ===
         if (currentState == LaserState.TARGETING)
         {
-            if (newInput)
+            if (Input.GetButtonDown("Use"))
             {
-                newInput = false;
-
                 desiredState = LaserState.WAITING;
             }
 
@@ -150,22 +156,32 @@ public class LaserMode : MonoBehaviour
                 Debug.DrawRay(laserTargeter.origin, laserTargeter.direction, Color.cyan);
             }
 
-            if(hit.collider.gameObject.GetInstanceID() == cutable.GetInstanceID())
+            foreach (GameObject g in cutable)
             {
-                desiredState = LaserState.LASERING;
-            }            
+                if (hit.collider.gameObject.GetInstanceID() == g.GetInstanceID())
+                {
+                    target = g;
+                    desiredState = LaserState.LASERING;
+                    break;
+                }
+            }
         }
 
         // === Lasering State ===
         if (currentState == LaserState.LASERING)
         {
+            if (Input.GetButtonDown("Use"))
+            {
+                desiredState = LaserState.WAITING;
+            }
+
             if (oculusConnected)
             {
                 switch (targetingSystem)
                 {
                     case TargetingMethods.LIGHT:
                         {
-                            lightTargeter.transform.LookAt(cutable.transform.position);
+                            lightTargeter.transform.LookAt(target.transform.position);
                             break;
                         }
                     case TargetingMethods.CROSSHAIR:
@@ -175,29 +191,24 @@ public class LaserMode : MonoBehaviour
                 }
             }
 
-            if (newInput)
-            {
-                newInput = false;
-
-                desiredState = LaserState.WAITING;
-            }
-
             if (Input.GetButton("Action"))
             {
-                timer += Time.deltaTime;
-
                 laser.enabled = true;
+
+                if(laserCanHitTarget)
+                    timer += Time.deltaTime;
             }
             else
             {
                 laser.enabled = false;
             }
 
-            if (timer >= timerMax)
+            if (timer > timerMax)
             {
-                cutable.tag = "Untagged";
-                Destroy(cutable.transform.parent.GetComponent<FixedJoint>());
-                cutable = null;
+                cutable.Remove(target);
+                Destroy(target.GetComponent<Lock>());
+                Destroy(target.transform.parent.GetComponentInChildren<FixedJoint>());
+                target = null;
 
                 desiredState = LaserState.WAITING;
             }
@@ -326,9 +337,21 @@ public class LaserMode : MonoBehaviour
                 {
                     playerRef.laserModeActive = true;
 
-                    laser.SetPosition(1, cutable.transform.position);
-                    laser.SetWidth(0.005f, 0.005f);
-                    laser.SetPosition(0, playerRef.eyeCenter.transform.position + laserPos);
+                    Vector3 laserStartPos = playerRef.eyeCenter.transform.position + laserPos;
+
+                    Ray r = new Ray(laserStartPos, target.transform.position - laserStartPos);
+                    RaycastHit hit;
+
+                    if (Physics.Raycast(r, out hit, 10))
+                    {
+                        if (hit.collider.gameObject.GetInstanceID() == target.GetInstanceID())
+                            laserCanHitTarget = true;
+                        else
+                            laserCanHitTarget = false;
+                    }
+
+                    laser.SetPosition(0, laserStartPos);
+                    laser.SetPosition(1, hit.point);
 
                     if (oculusConnected)
                     {
@@ -336,11 +359,12 @@ public class LaserMode : MonoBehaviour
                     }
                     else
                     {
-                        pointer.SetPosition(1, cutable.transform.position);
+                        pointer.SetPosition(1, target.transform.position);
                     }
 
 
                     timer = 0;
+                    timerMax = target.GetComponent<Lock>().duration;
 
                     break;
                 }
@@ -348,23 +372,5 @@ public class LaserMode : MonoBehaviour
         // =============================================================================================================
 
         currentState = targetState;
-    }
-
-    void OnTriggerEnter(Collider c)
-    {
-        if (c.tag == "Cutable")
-        {
-            print("cutable object in range");
-            cutable = c.gameObject;
-        }
-    }
-
-    void OnTriggerExit(Collider c)
-    {
-        if (c.tag == "Cutable")
-        {
-            print("cutable object left range");
-            cutable = null;
-        }
     }
 }
