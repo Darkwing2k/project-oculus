@@ -16,17 +16,14 @@ public class LaserMode : MonoBehaviour
     public enum LaserState {WAITING ,TARGETING, LASERING};
     public LaserState currentState = LaserState.WAITING;
     public LaserState desiredState = LaserState.WAITING;
+    private LineRenderer laser;
 
     // === Targeting values
     public enum TargetingMethods { LIGHT, CROSSHAIR};
     public TargetingMethods targetingSystem;
 
-    private Light lightTargeter;
-    private LineRenderer laser;
+    private GameObject lightTargeter;
     private bool laserCanHitTarget;
-    public Material laserMaterial;
-    public Color laserColor;
-    public float laserWidth;
     public Vector3 laserPos;
 
     // === Debug Variables when Oculus is not connected ===
@@ -47,27 +44,7 @@ public class LaserMode : MonoBehaviour
             switch (targetingSystem)
             {
                 case TargetingMethods.LIGHT:
-                    {
-                        GameObject lightTargeterGO = new GameObject("lightTargeter");
-                        lightTargeterGO.transform.position = playerRef.eyeCenter.position;
-                        lightTargeterGO.transform.rotation = playerRef.eyeCenter.rotation;
-                        lightTargeterGO.transform.parent = playerRef.eyeCenter;
-
-                        lightTargeter = lightTargeterGO.AddComponent<Light>();
-                        lightTargeter.type = LightType.Spot;
-                        lightTargeter.color = Color.red;
-                        lightTargeter.range = 1;
-                        lightTargeter.spotAngle = 4;
-                        lightTargeter.intensity = 1;
-                        lightTargeter.enabled = false;
-
-                        laser = lightTargeterGO.AddComponent<LineRenderer>();
-                        laser.SetWidth(laserWidth, laserWidth);
-                        laser.material = laserMaterial;
-                        laser.SetColors(laserColor, laserColor);
-                        laser.enabled = false;
-                        
-
+                    {            
                         break;
                     }
                 case TargetingMethods.CROSSHAIR:
@@ -90,13 +67,12 @@ public class LaserMode : MonoBehaviour
         {
             if (Input.GetButtonDown("Use") && cutable.Count != 0)
             {
-                print("checking visibility");
                 foreach (GameObject g in cutable)
                 {
                     RaycastHit hit;
                     Physics.Raycast(this.transform.position, g.transform.position - this.transform.position, out hit);
 
-                    if (hit.collider.gameObject.GetInstanceID() == g.GetInstanceID())
+                    if (hit.collider.transform.parent.gameObject.GetInstanceID() == g.GetInstanceID())
                     {
                         desiredState = LaserState.TARGETING;
                     }
@@ -120,7 +96,7 @@ public class LaserMode : MonoBehaviour
                 r.origin = playerRef.eyeCenter.position;
                 r.direction = playerRef.eyeCenter.forward;
 
-                Physics.Raycast(r, out hit, 10);                
+                Physics.Raycast(r, out hit, 20);                
 
             }
             else
@@ -156,9 +132,11 @@ public class LaserMode : MonoBehaviour
                 Debug.DrawRay(laserTargeter.origin, laserTargeter.direction, Color.cyan);
             }
 
+            print(hit.collider.name);
+
             foreach (GameObject g in cutable)
             {
-                if (hit.collider.gameObject.GetInstanceID() == g.GetInstanceID())
+                if (hit.collider.transform.parent.gameObject.GetInstanceID() == g.GetInstanceID())
                 {
                     target = g;
                     desiredState = LaserState.LASERING;
@@ -244,8 +222,6 @@ public class LaserMode : MonoBehaviour
                         {
                             case TargetingMethods.LIGHT:
                                 {
-                                    lightTargeter.gameObject.transform.localRotation = new Quaternion(0, 0, 0, 1);
-
                                     break;
                                 }
                             case TargetingMethods.CROSSHAIR:
@@ -253,13 +229,13 @@ public class LaserMode : MonoBehaviour
                                     break;
                                 }
                         }
-
-                        laser.enabled = false;
                     }
                     else
                     {
                         
                     }
+
+                    Destroy(laser.gameObject);
 
                     break;
                 }
@@ -279,7 +255,8 @@ public class LaserMode : MonoBehaviour
                         {
                             case TargetingMethods.LIGHT:
                                 {
-                                    lightTargeter.enabled = false;
+                                    Destroy(lightTargeter);
+
                                     break;
                                 }
                             case TargetingMethods.CROSSHAIR:
@@ -307,7 +284,11 @@ public class LaserMode : MonoBehaviour
                         {
                             case TargetingMethods.LIGHT:
                                 {
-                                    lightTargeter.enabled = true;
+                                    lightTargeter = GameObject.Instantiate(Resources.Load("lightTargeter")) as GameObject;
+                                    lightTargeter.transform.position = playerRef.eyeCenter.position;
+                                    lightTargeter.transform.rotation = playerRef.eyeCenter.rotation;
+                                    lightTargeter.transform.parent = playerRef.eyeCenter;
+                                    
                                     break;
                                 }
                             case TargetingMethods.CROSSHAIR:
@@ -337,6 +318,10 @@ public class LaserMode : MonoBehaviour
                 {
                     playerRef.laserModeActive = true;
 
+                    GameObject laserGO = GameObject.Instantiate(Resources.Load("Laser")) as GameObject;
+                    laser = laserGO.GetComponent<LineRenderer>();
+                    laserGO.transform.parent = playerRef.eyeCenter;
+
                     Vector3 laserStartPos = playerRef.eyeCenter.transform.position + laserPos;
 
                     Ray r = new Ray(laserStartPos, target.transform.position - laserStartPos);
@@ -344,7 +329,7 @@ public class LaserMode : MonoBehaviour
 
                     if (Physics.Raycast(r, out hit, 10))
                     {
-                        if (hit.collider.gameObject.GetInstanceID() == target.GetInstanceID())
+                        if (hit.collider.transform.parent.gameObject.GetInstanceID() == target.GetInstanceID())
                             laserCanHitTarget = true;
                         else
                             laserCanHitTarget = false;

@@ -18,6 +18,12 @@ public class GUITest : MonoBehaviour
     private float pixelW = 0;
     private float pixelH = 0;
 
+    private int testX = 640;
+    private int testY = 310;
+
+    private RenderTexture GUIRenderTexture;
+    private GameObject GUIRenderObject;
+
 	// Use this for initialization
 	void Start () 
     {
@@ -27,42 +33,61 @@ public class GUITest : MonoBehaviour
 
         ovrGui = new OVRGUI();
         ovrGui.SetCameraController(ref vrCamera);
-        //ovrGui.SetDisplayResolution(Screen.width, Screen.height);
-        //ovrGui.SetPixelResolution(Screen.width, Screen.height);
 
-        ovrGui.GetDisplayResolution(ref displayW, ref displayH);
-        ovrGui.GetPixelResolution(ref pixelW, ref pixelH);
+        GUIRenderObject = GameObject.Instantiate(Resources.Load("OVRGUIObjectMain")) as GameObject;
+        GUIRenderTexture = new RenderTexture(Screen.width, Screen.height, 0);
 
-        print("Screen w/h: " + Screen.width + " " + Screen.height);
-        print("Display w/h: " + displayW + " " + displayH);
-        print("Pixel w/h: " + pixelW + " " + pixelH);        
+        ovrGui.SetPixelResolution(Screen.width, Screen.height);
+        //GUIHelper.SetDisplayResolution(OVRDevice.HResolution, OVRDevice.VResolution);
+        ovrGui.SetDisplayResolution(1280.0f, 800.0f);
+
+        GUIRenderObject.renderer.material.mainTexture = GUIRenderTexture;
+
+        // Grab transform of GUI object
+        Transform t = GUIRenderObject.transform;
+        // Attach the GUI object to the camera
+        vrCamera.AttachGameObjectToCamera(ref GUIRenderObject);
+        // Reset the transform values (we will be maintaining state of the GUI object
+        // in local state)
+        OVRUtils.SetLocalTransform(ref GUIRenderObject, ref t);
+        // Deactivate object until we have completed the fade-in
+        // Also, we may want to deactive the render object if there is nothing being rendered
+        // into the UI
+        // we will move the position of everything over to the left, so get
+        // IPD / 2 and position camera towards negative X
+        Vector3 lp = GUIRenderObject.transform.localPosition;
+        float ipd = 0.0f;
+        vrCamera.GetIPD(ref ipd);
+        lp.x -= ipd * 0.5f;
+        GUIRenderObject.transform.localPosition = lp + new Vector3(0, 0, -0.45f);
+        
+
+        GUIRenderObject.SetActive(false);
+
+        print("GUIRenderTexture size: " + GUIRenderTexture.width + " " + GUIRenderTexture.height);
+        print("CrosshairTexture size: " + img.width + " " + img.height);
+        print("Crosshair Position : " + testX + " " + testY);
 	}
 
     void OnGUI()
     {
+        GUIRenderObject.SetActive(true);
 
-        Resolution r = Screen.currentResolution;
+        // Cache current active render texture
+        RenderTexture previousActive = RenderTexture.active;
 
-        int imgW = img.width / 2;
-        int imgH = img.height / 2;
-
-        int posX = Screen.width / 2 - imgW;
-        int posY = Screen.height / 2 - imgH;
-
-        if (oculusGUI)
+        // if set, we will render to this texture
+        if (GUIRenderTexture != null)
         {
-            ovrGui.StereoDrawTexture(displayW/2, displayH/2, img.width, img.height, ref img, Color.yellow);
-            ovrGui.StereoDrawTexture(posX - distance, posY, img.width, img.height, ref img, Color.red);
+            RenderTexture.active = GUIRenderTexture;
+            GL.Clear(false, true, new Color(0.0f, 0.0f, 0.0f, 0.0f));
         }
-        else
-        {
-            Rect rect1 = new Rect(posX + distance, posY, img.width, img.height);
-            Rect rect2 = new Rect(posX - distance, posY, img.width, img.height);
 
-            GUI.color = Color.green;
-            GUI.DrawTexture(rect1, img);
-            GUI.DrawTexture(rect2, img);
-        }
+        //ovrGui.StereoDrawTexture(490, 300, img.width, img.height, ref img, Color.yellow);
+        ovrGui.StereoDrawTexture(testX - 3, testY - 3, 6, 6, ref img, Color.red);
+
+        // Restore active render texture
+        RenderTexture.active = previousActive;
     }
 	
 	// Update is called once per frame
@@ -71,25 +96,39 @@ public class GUITest : MonoBehaviour
         if (Input.GetKey(KeyCode.UpArrow))
         {
             distance += 1;
+            testY -= 1;
 
-            print(distance);
+            //print(testY);
         }
 
         if (Input.GetKey(KeyCode.DownArrow))
         {
             distance -= 1;
+            testY += 1;
 
-            print(distance);
+            //print(testY);
         }
 
         if (Input.GetKey(KeyCode.LeftArrow))
         {
-            oculusGUI = true;
+            testX -= 1;
+
+            //print(testX);
+            //oculusGUI = true;
         }
 
         if (Input.GetKey(KeyCode.RightArrow))
         {
-            oculusGUI = false;
+            testX += 1;
+
+            //print(testX);
+            //oculusGUI = false;
+        }
+
+        if (Input.GetKey(KeyCode.Space))
+        {
+            print(testX);
+            print(testY);
         }
 	}
 }

@@ -53,7 +53,6 @@ public class FlightControl : MonoBehaviour
     private float rollAngleTarget = 0;
     private float rollAngleValue = 0;
     private float rollAngleMax = 10; // Maximum Z-Rotation (0 for oculus. prevents simulator sickness)
-    private float rollAngleMaxDifference = 1;
     private float rollAcc = 20;
     #endregion
 
@@ -66,23 +65,26 @@ public class FlightControl : MonoBehaviour
     private float moveVelValue = 0f; // Current Velocity for XZ-Movement
     private float moveVelMax = 1.15f; // Maximum Velocity for XZ-Movement
     private float moveAcc = 0.6f; // Acceleration in XZ-Direction
-    private float moveAgility = 0.08f; // How fast a new Direction is applied (Changerate from Current to Desired Direction)
+    private float moveAgility = 0.15f; // How fast a new Direction is applied (Changerate from Current to Desired Direction)
     #endregion
 
     #region Y-Movement Variables
-    // useGravity was deactivated to due the "2 collision" bug. As long as the player collided with more than 1 object he floated up
     private Vector3 yAxis = Vector3.zero; // Up Vector. Is always (0,1,0)
 
     private float ascVelTarget = 0f; // Desired Velocity for Y-Movement
     private float ascVelValue = 0f; // Current Velocity for Y-Movement
     private float ascVelMax = 0.8f; // Maximum Velocity for Y-Movement
-    private float ascVelMin = 0; // Mathf.Abs(Physics.gravity.y * Time.fixedDeltaTime); // Minimum Velocity for Y-Movement (equals gravity for hover flight)
-    private float ascGravityFactor = 0.15f; // Simulating a faster fall due to gravity.
+    private float ascVelMin = 0; // Minimum Velocity for Y-Movement (equals gravity for hover flight)
     private float ascAcc = 1.3f; // Acceleration in Y-Direction
     #endregion
 
     #region Other Variables
         public AudioSource flightSoundSource;
+
+        // When using gravity, a bug appears when colliding with more than 1 object
+        // these values are used as a workaround for this problem ^^
+        public int amountOfCurrentCollisions = 0;
+        private float ascVelMinTMP;
 	#endregion
 
 	// Use this for initialization
@@ -92,6 +94,7 @@ public class FlightControl : MonoBehaviour
         ControlsActivated = true;
 
         yAxis = new Vector3(0, 1, 0);
+        ascVelMin = Mathf.Abs(Physics.gravity.y * Time.fixedDeltaTime);
 
         if(useGamepad)
         {
@@ -111,7 +114,6 @@ public class FlightControl : MonoBehaviour
 
     void FixedUpdate()
     {
-
         float lStickV = 0;
         float lStickH = 0;
 
@@ -166,16 +168,15 @@ public class FlightControl : MonoBehaviour
             moveVelTarget = 0;
         }
 
-        moveVelDir = ((moveAccDir - moveVelDir) * moveAgility) + moveVelDir;
+        moveVelDir = moveVelDir + ((moveAccDir - moveVelDir) * moveAgility);
 
         moveVelValue = calcValue(moveVelValue, moveAcc, moveVelTarget, moveAcc * Time.deltaTime);
-
         // ===========================================================================
 
         // === Calculating Ascending/Descinding Velocity ==================
         if (Mathf.Abs(shoulder) > 0.3f)
         {
-            ascVelTarget = shoulder * ascVelMax - ascGravityFactor;
+            ascVelTarget = shoulder * ascVelMax;
             
             if(flightSoundSource != null)
                 flightSoundSource.pitch = 1 + (0.15f * shoulder);
@@ -293,5 +294,23 @@ public class FlightControl : MonoBehaviour
     void OnCollisionEnter(Collision c)
     {
         print(c.collider.name);
+        amountOfCurrentCollisions++;
+
+        if (amountOfCurrentCollisions > 1)
+        {
+            ascVelMinTMP = ascVelMin;
+            ascVelMin = ascVelMin/2;
+        }
+    }
+
+    void OnCollisionExit(Collision c)
+    {
+        print(c.collider.name);
+        amountOfCurrentCollisions--;
+
+        if (amountOfCurrentCollisions <= 1)
+        {
+            ascVelMin = ascVelMinTMP;
+        }
     }
 }
