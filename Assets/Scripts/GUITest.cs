@@ -24,6 +24,9 @@ public class GUITest : MonoBehaviour
     private RenderTexture GUIRenderTexture;
     private GameObject GUIRenderObject;
 
+    public GameObject myRenderObject;
+    public RenderTexture myRenderTexture;
+
 	// Use this for initialization
 	void Start () 
     {
@@ -67,6 +70,13 @@ public class GUITest : MonoBehaviour
         print("GUIRenderTexture size: " + GUIRenderTexture.width + " " + GUIRenderTexture.height);
         print("CrosshairTexture size: " + img.width + " " + img.height);
         print("Crosshair Position : " + testX + " " + testY);
+
+
+        myRenderTexture = new RenderTexture(Screen.width, Screen.height, 0);
+
+        myRenderObject.renderer.material.mainTexture = myRenderTexture;
+
+        myRenderObject.SetActive(false);
 	}
 
     void OnGUI()
@@ -84,10 +94,25 @@ public class GUITest : MonoBehaviour
         }
 
         //ovrGui.StereoDrawTexture(490, 300, img.width, img.height, ref img, Color.yellow);
-        ovrGui.StereoDrawTexture(testX - 3, testY - 3, 6, 6, ref img, Color.red);
+        //ovrGui.StereoDrawTexture(testX - 3, testY - 3, 6, 6, ref img, Color.red);
+
+
+        myRenderObject.SetActive(true);
 
         // Restore active render texture
         RenderTexture.active = previousActive;
+
+        RenderTexture previous = RenderTexture.active;
+
+        RenderTexture.active = myRenderTexture;
+        GL.Clear(false, true, new Color(0.0f, 0.0f, 0.0f, 0.0f));
+
+
+
+        GUI.DrawTexture(new Rect(0, 0, myRenderTexture.width, myRenderTexture.height), img);
+        //ovrGui.StereoDrawTexture(0, 0, myRenderTexture.width, myRenderTexture.height, ref img, Color.yellow);
+
+        RenderTexture.active = previous;
     }
 	
 	// Update is called once per frame
