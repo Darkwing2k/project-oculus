@@ -5,17 +5,19 @@ using System.Collections.Generic;
 public class DropZone : MonoBehaviour 
 {
 
-    public List<GameObject> triggerObjects;
+    public GameObject key;
 
-    public int amountTillTrigger;
+    public Triggerable objectToTrigger;
 
-    private List<GameObject> presentObjects;
+    public bool pressed;
 
 	// Use this for initialization
 	void Start () 
     {
-        //triggerObjects = new List<GameObject>();
-        presentObjects = new List<GameObject>();
+        if (key == null)
+        {
+            print("DropZone " + gameObject.name + " has no key!");
+        }
 	}
 	
 	// Update is called once per frame
@@ -26,22 +28,19 @@ public class DropZone : MonoBehaviour
 
     void OnCollisionEnter(Collision c)
     {
-        if (triggerObjects.Contains(c.gameObject))
+        if (key.GetInstanceID() == c.gameObject.GetInstanceID() && !pressed)
         {
-            presentObjects.Add(c.gameObject);
-
-            if (presentObjects.Count >= amountTillTrigger)
-            {
-                print("DropZone triggered");
-            }
+            objectToTrigger.trigger();
+            pressed = true;
         }
     }
 
     void OnCollisionExit(Collision c)
     {
-        if (presentObjects.Contains(c.gameObject))
+        if (key.GetInstanceID() == c.gameObject.GetInstanceID() && pressed)
         {
-            presentObjects.Remove(c.gameObject);
+            objectToTrigger.trigger();
+            pressed = false;
         }
     }
 }

@@ -65,7 +65,7 @@ public class FlightControl : MonoBehaviour
     private float moveVelValue = 0f; // Current Velocity for XZ-Movement
     private float moveVelMax = 1.15f; // Maximum Velocity for XZ-Movement
     private float moveAcc = 0.6f; // Acceleration in XZ-Direction
-    private float moveAgility = 0.15f; // How fast a new Direction is applied (Changerate from Current to Desired Direction)
+    private float moveAgility = 0.08f; // How fast a new Direction is applied (Changerate from Current to Desired Direction)
     #endregion
 
     #region Y-Movement Variables
@@ -95,6 +95,8 @@ public class FlightControl : MonoBehaviour
 
         yAxis = new Vector3(0, 1, 0);
         ascVelMin = Mathf.Abs(Physics.gravity.y * Time.fixedDeltaTime);
+
+        ascVelMinTMP = ascVelMin;
 
         if(useGamepad)
         {
@@ -298,8 +300,7 @@ public class FlightControl : MonoBehaviour
 
         if (amountOfCurrentCollisions > 1)
         {
-            ascVelMinTMP = ascVelMin;
-            ascVelMin = ascVelMin/2;
+            ascVelMin = ascVelMinTMP / 2;
         }
     }
 

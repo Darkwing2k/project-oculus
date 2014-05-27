@@ -12,9 +12,7 @@ public class FireDoorPiece : MonoBehaviour
     public enum Direction {UP, DOWN, LEFT, RIGHT };
     public Direction openDirection;
 
-    public FireDoor.DoorState state;
-
-    public bool open;
+    public FireDoor.DoorState masterState;
 
 	// Use this for initialization
 	void Start () 
@@ -45,26 +43,43 @@ public class FireDoorPiece : MonoBehaviour
                 break;
         }
 
-        if (open)
+        if (masterState == FireDoor.DoorState.OPEN)
         {
             this.transform.position = openPosition;
         }
-        else
+        else if(masterState == FireDoor.DoorState.CLOSED)
         {
             this.transform.position = closePosition;
         }
-
-        //print(m.bounds.size.x * this.transform.localScale.x);
 	}
 	
 	// Update is called once per frame
 	void Update ()
     {
-        
+        masterState = doorRef.currentState;
 
-        if (state == FireDoor.DoorState.CLOSING)
+        switch (masterState)
         {
-            this.transform.position = Vector3.Lerp(openPosition, closePosition, doorRef.steps);
+            case FireDoor.DoorState.OPEN:
+                {
+                    this.transform.position = openPosition;
+                    break;
+                }
+            case FireDoor.DoorState.OPENING:
+                {
+                    this.transform.position = Vector3.Lerp(closePosition, openPosition, doorRef.steps);
+                    break;
+                }
+            case FireDoor.DoorState.CLOSED:
+                {
+                    this.transform.position = closePosition;
+                    break;
+                }
+            case FireDoor.DoorState.CLOSING:
+                {
+                    this.transform.position = Vector3.Lerp(closePosition, openPosition, doorRef.steps);
+                    break;
+                }
         }
     }
 }

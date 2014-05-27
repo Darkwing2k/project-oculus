@@ -2,21 +2,27 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class FireDoor : MonoBehaviour 
+public class FireDoor : Triggerable
 {
     public enum DoorState {OPEN, CLOSED, CLOSING, OPENING};
     public DoorState currentState;
+    public DoorState desiredState;
+
+    public enum Trigger { COLLIDER, BUTTON };
+    public Trigger currentTrigger;
 
     private FireDoorPiece[] doorPieces;
 
     public float steps;
     public float stepSize;
-
+    
 	// Use this for initialization
 	void Start () 
     {
-        currentState = DoorState.OPEN;
         doorPieces = this.GetComponentsInChildren<FireDoorPiece>();
+
+        if (currentTrigger != Trigger.COLLIDER)
+            this.gameObject.collider.enabled = false;
 
         foreach (FireDoorPiece d in doorPieces)
         {
@@ -29,17 +35,51 @@ public class FireDoor : MonoBehaviour
     {
         if (currentState == DoorState.CLOSING)
         {
+            steps -= stepSize;
+
+            if (steps < 0)
+            {
+                desiredState = DoorState.CLOSED;
+            }
+        }
+
+        if (currentState == DoorState.OPENING)
+        {
             steps += stepSize;
 
             if (steps > 1)
             {
-                currentState = DoorState.CLOSED;
-
-                foreach (FireDoorPiece d in doorPieces)
-                {
-                    d.state = DoorState.CLOSED;
-                }
+                desiredState = DoorState.OPEN;
             }
+        }
+
+        if (desiredState != currentState)
+        {
+            switch (desiredState)
+            {
+                case DoorState.CLOSED:
+                    {
+                        steps = 0;
+                        break;
+                    }
+                case DoorState.CLOSING:
+                    {
+
+                        break;
+                    }
+                case DoorState.OPEN:
+                    {
+                        steps = 1;
+                        break;
+                    }
+                case DoorState.OPENING:
+                    {
+                       
+                        break;
+                    }
+            }
+
+            currentState = desiredState;
         }
 	}
 
@@ -47,12 +87,41 @@ public class FireDoor : MonoBehaviour
     {
         if (c.tag.Equals("Player") && currentState == DoorState.OPEN)
         {
-            currentState = DoorState.CLOSING;
-            steps = 0;
+            desiredState = DoorState.CLOSING;
+        }
+    }
 
-            foreach(FireDoorPiece d in doorPieces)
+    public override void trigger()
+    {
+        if (currentTrigger == Trigger.BUTTON)
+        {
+            if (!(triggerOnce && triggered))
             {
-                d.state = DoorState.CLOSING;
+                switch (desiredState)
+                {
+                    case DoorState.CLOSED:
+                        {
+                            desiredState = DoorState.OPENING;
+                            break;
+                        }
+                    case DoorState.CLOSING:
+                        {
+                            desiredState = DoorState.OPENING;
+                            break;
+                        }
+                    case DoorState.OPEN:
+                        {
+                            desiredState = DoorState.CLOSING;
+                            break;
+                        }
+                    case DoorState.OPENING:
+                        {
+                            desiredState = DoorState.CLOSING;
+                            break;
+                        }
+                }
+
+                triggered = true;
             }
         }
     }

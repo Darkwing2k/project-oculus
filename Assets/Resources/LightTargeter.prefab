@@ -37,9 +37,9 @@ Light:
   serializedVersion: 3
   m_Type: 0
   m_Color: {r: 1, g: 0, b: 0, a: 1}
-  m_Intensity: 1
-  m_Range: 1
-  m_SpotAngle: 4
+  m_Intensity: 2
+  m_Range: 1.5
+  m_SpotAngle: 6
   m_CookieSize: 10
   m_Shadows:
     m_Type: 0
@@ -48,7 +48,7 @@ Light:
     m_Bias: .0500000007
     m_Softness: 4
     m_SoftnessFade: 1
-  m_Cookie: {fileID: 0}
+  m_Cookie: {fileID: 2800000, guid: 457b505a64cba714fbc73e2ff4a75376, type: 3}
   m_DrawHalo: 0
   m_ActuallyLightmapped: 0
   m_Flare: {fileID: 0}
