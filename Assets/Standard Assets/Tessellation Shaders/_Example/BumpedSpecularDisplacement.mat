@@ -17,7 +17,7 @@ Material:
         first:
           name: _MainTex
         second:
-          m_Texture: {fileID: 0}
+          m_Texture: {fileID: 2800000, guid: 17da6d53ec93a0444bd0f751b1d02477, type: 3}
           m_Scale: {x: 2, y: 2}
           m_Offset: {x: 0, y: 0}
       data:
@@ -41,12 +41,12 @@ Material:
         second: .0732631832
       data:
         first:
-          name: _Parallax
-        second: .354557991
-      data:
-        first:
           name: _EdgeLength
         second: 12.3068314
+      data:
+        first:
+          name: _Parallax
+        second: .354557991
     m_Colors:
       data:
         first:
