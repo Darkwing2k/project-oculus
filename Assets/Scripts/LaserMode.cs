@@ -19,8 +19,6 @@ public class LaserMode : MonoBehaviour
     private LineRenderer laser;
 
     // === Targeting values
-    private Ray playerLook;
-
     public enum TargetingMethods { LIGHT, CROSSHAIR};
     public TargetingMethods targetingSystem;
 
@@ -29,10 +27,6 @@ public class LaserMode : MonoBehaviour
     public Vector3 laserPos;
 
     private GameObject crosshairGUIObject;
-    private RenderTexture crosshairRenderTexture;
-    public Texture crosshairImg;
-    public bool crosshairKeepDistanceOnLasering;
-    public bool crosshairAdaptDistance;
 
     // === Debug Variables when Oculus is not connected ===
     private LineRenderer pointer;
@@ -46,44 +40,11 @@ public class LaserMode : MonoBehaviour
     {
         playerRef = this.transform.parent.GetComponent<Player>();
         oculusConnected = playerRef.useOculus;
-
-        if (oculusConnected)
-        {
-            switch (targetingSystem)
-            {
-                case TargetingMethods.LIGHT:
-                    {            
-                        break;
-                    }
-                case TargetingMethods.CROSSHAIR:
-                    {
-                        crosshairRenderTexture = new RenderTexture(Screen.width, Screen.height, 0);
-
-                        break;
-                    }
-            }
-        }
-        else
-        {
-            
-        }
 	}
 
     void OnGUI()
     {
-        if (targetingSystem == TargetingMethods.CROSSHAIR && (currentState == LaserState.TARGETING || currentState == LaserState.LASERING))
-        {
-            RenderTexture previous = RenderTexture.active;
 
-            RenderTexture.active = crosshairRenderTexture;
-            GL.Clear(false, true, new Color(0.0f, 0.0f, 0.0f, 0.0f));
-
-            GUI.DrawTexture(new Rect(0, 0, crosshairRenderTexture.width, crosshairRenderTexture.height), crosshairImg);
-
-            RenderTexture.active = previous;
-
-            crosshairGUIObject.SetActive(true);
-        }
     }
 
 	
@@ -120,7 +81,7 @@ public class LaserMode : MonoBehaviour
 
             if (oculusConnected)
             {
-                playerLook = new Ray();
+                Ray playerLook = new Ray();
                 playerLook.origin = playerRef.eyeCenter.position;
                 playerLook.direction = playerRef.eyeCenter.forward;
 
@@ -134,16 +95,7 @@ public class LaserMode : MonoBehaviour
                         }
                     case TargetingMethods.CROSSHAIR:
                         {
-                            if (crosshairAdaptDistance)
-                            {
-                                Vector3 tmp = crosshairGUIObject.transform.localPosition;
-                                float dist = (hit.point - playerRef.eyeCenter.position).magnitude;
-
-                                if (dist > 0.5f)
-                                    dist = 0.5f;
-
-                                crosshairGUIObject.transform.localPosition = new Vector3(tmp.x, tmp.y, dist - 0.015f);
-                            }
+                            crosshairGUIObject.GetComponent<CrosshairBehaviour>().crosshairAdaptDistance(hit);
 
                             break;
                         }
@@ -155,12 +107,12 @@ public class LaserMode : MonoBehaviour
                 float rStickH = Input.GetAxis("RStickH");
                 float rStickV = Input.GetAxis("RStickV");
 
-                if (Mathf.Abs(rStickH) > 0.3f || Mathf.Abs(rStickH) > 0.3f)
+                if (Mathf.Abs(rStickH) > 0.3f)
                 {
                     alpha = alpha + (rStickH * 1f);
                 }
 
-                if (Mathf.Abs(rStickV) > 0.3f || Mathf.Abs(rStickV) > 0.3f)
+                if (Mathf.Abs(rStickV) > 0.3f)
                 {
                     beta = beta + (rStickV * 1f);
 
@@ -254,7 +206,7 @@ public class LaserMode : MonoBehaviour
         {
             case LaserState.WAITING:
                 {
-                    this.transform.parent.GetComponent<FlightControl>().ControlsActivated = false;
+                    this.transform.parent.GetComponent<FlightControl2>().ControlsActivated = false;
                    
                     break;
                 }
@@ -265,25 +217,6 @@ public class LaserMode : MonoBehaviour
                 }
             case LaserState.LASERING:
                 {
-                    if (oculusConnected)
-                    {
-                        switch (targetingSystem)
-                        {
-                            case TargetingMethods.LIGHT:
-                                {
-                                    break;
-                                }
-                            case TargetingMethods.CROSSHAIR:
-                                {
-                                    break;
-                                }
-                        }
-                    }
-                    else
-                    {
-                        
-                    }
-
                     Destroy(laser.gameObject);
 
                     break;
@@ -321,7 +254,7 @@ public class LaserMode : MonoBehaviour
                         Destroy(pointer);
                     }
 
-                    this.transform.parent.GetComponent<FlightControl>().ControlsActivated = true;
+                    this.transform.parent.GetComponent<FlightControl2>().ControlsActivated = true;
 
                     break;
                 }
@@ -345,7 +278,9 @@ public class LaserMode : MonoBehaviour
                             case TargetingMethods.CROSSHAIR:
                                 {
                                     crosshairGUIObject = GameObject.Instantiate(Resources.Load("CrosshairGUIObject")) as GameObject;
+                                    crosshairGUIObject.GetComponent<CrosshairBehaviour>().playerRef = playerRef;
 
+                                    /*
                                     crosshairGUIObject.renderer.material.mainTexture = crosshairRenderTexture;
 
                                     Vector3 localPos = crosshairGUIObject.transform.localPosition;
@@ -357,6 +292,7 @@ public class LaserMode : MonoBehaviour
                                     crosshairGUIObject.transform.localEulerAngles = localRot;
 
                                     crosshairGUIObject.SetActive(false);
+                                     * */
 
                                     break;
                                 }
@@ -414,17 +350,7 @@ public class LaserMode : MonoBehaviour
                                 }
                             case TargetingMethods.CROSSHAIR:
                                 {
-
-                                    Vector3 eyeCenterToTarget = target.transform.position - playerRef.eyeCenter.position;
-
-                                    if (crosshairKeepDistanceOnLasering)
-                                    {
-                                        eyeCenterToTarget.Normalize();
-                                        eyeCenterToTarget *= crosshairGUIObject.transform.localPosition.z;
-                                    }
-
-                                    crosshairGUIObject.transform.parent = null;
-                                    crosshairGUIObject.transform.position = playerRef.eyeCenter.position + eyeCenterToTarget;
+                                    crosshairGUIObject.GetComponent<CrosshairBehaviour>().snapToTarget(target.transform.position);
 
                                     break;
                                 }

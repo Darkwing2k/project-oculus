@@ -134,7 +134,6 @@ GameObject:
   - 54: {fileID: 5400000}
   - 114: {fileID: 11400020}
   - 114: {fileID: 11400016}
-  - 114: {fileID: 11400022}
   m_Layer: 2
   m_Name: Player
   m_TagString: Player
@@ -239,23 +238,6 @@ GameObject:
   m_Layer: 2
   m_Name: CameraMain
   m_TagString: MainCamera
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!1 &100028
-GameObject:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 400028}
-  - 33: {fileID: 3300002}
-  - 23: {fileID: 2300002}
-  m_Layer: 0
-  m_Name: CrosshairGUIObject
-  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -402,7 +384,6 @@ Transform:
   m_LocalPosition: {x: -.0140075684, y: -0, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 400028}
   - {fileID: 400024}
   m_Father: {fileID: 400012}
 --- !u!4 &400024
@@ -428,17 +409,6 @@ Transform:
   m_Children:
   - {fileID: 400006}
   m_Father: {fileID: 400014}
---- !u!4 &400028
-Transform:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100028}
-  m_LocalRotation: {x: -.707106829, y: 0, z: 0, w: .707106829}
-  m_LocalPosition: {x: 0, y: 0, z: .300000012}
-  m_LocalScale: {x: .00499999989, y: 1, z: .00499999989}
-  m_Children: []
-  m_Father: {fileID: 400022}
 --- !u!20 &2000000
 Camera:
   m_ObjectHideFlags: 1
@@ -576,27 +546,6 @@ Renderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_SortingLayerID: 0
---- !u!23 &2300002
-Renderer:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100028}
-  m_Enabled: 1
-  m_CastShadows: 0
-  m_ReceiveShadows: 0
-  m_LightmapIndex: 255
-  m_LightmapTilingOffset: {x: 1, y: 1, z: 0, w: 0}
-  m_Materials:
-  - {fileID: 2100000, guid: cb648531a855abe449cce4f05baba2e1, type: 2}
-  m_SubsetIndices: 
-  m_StaticBatchRoot: {fileID: 0}
-  m_UseLightProbes: 0
-  m_LightProbeAnchor: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_SortingLayerID: 0
 --- !u!33 &3300000
 MeshFilter:
   m_ObjectHideFlags: 1
@@ -604,13 +553,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100010}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!33 &3300002
-MeshFilter:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100028}
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!54 &5400000
 Rigidbody:
   m_ObjectHideFlags: 1
@@ -618,9 +560,9 @@ Rigidbody:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100014}
   serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: .0500000007
+  m_Mass: 2
+  m_Drag: 5
+  m_AngularDrag: 5
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
@@ -846,9 +788,6 @@ MonoBehaviour:
   desiredState: 0
   targetingSystem: 1
   laserPos: {x: 0, y: -.25, z: -.0500000007}
-  crosshairImg: {fileID: 2800000, guid: 64ce76f827a71b44da62c30c0b506fd2, type: 3}
-  crosshairKeepDistanceOnLasering: 0
-  crosshairAdaptDistance: 1
 --- !u!114 &11400002
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -973,14 +912,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 100014}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 74869d35024c7704ab9cd5c5ff0d4852, type: 3}
+  m_Script: {fileID: 11500000, guid: 39a14d2c2cbc007419d12a714634d5d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useGamepad: 1
+  playerRef: {fileID: 11400020}
+  directionalForce: 10
+  directionalForceMode: 0
+  upwardForce: 10
+  maxDirectionalVelocity: 0
+  currentDirectionalVelocity: 0
   useDirectYawInput: 0
   useRolling: 0
-  flightSoundSource: {fileID: 8200000}
-  amountOfCurrentCollisions: 0
 --- !u!114 &11400018
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1009,27 +951,12 @@ MonoBehaviour:
   useGamepad: 1
   liftModeActive: 0
   laserModeActive: 0
-  flightControlActive: 0
+  flightControlActive: 1
   normalCameras:
   - {fileID: 2000006}
   - {fileID: 2000004}
   vrCamera: {fileID: 11400010}
   eyeCenter: {fileID: 400022}
---- !u!114 &11400022
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100014}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d4a54362803ff74b9ccc0e5fe44831e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  img: {fileID: 2800000, guid: 64ce76f827a71b44da62c30c0b506fd2, type: 3}
-  txt: 
-  myRenderObject: {fileID: 100028}
-  myRenderTexture: {fileID: 0}
 --- !u!124 &12400000
 Behaviour:
   m_ObjectHideFlags: 1
