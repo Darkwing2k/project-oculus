@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class LiftMode : MonoBehaviour 
 {
-    private Player playerRef;
+    public Player playerRef;
 
     // === Variables for using Objects ===
-    private GameObject liftable;
     private GameObject lifted;
 
     public Vector3 jointPos;
@@ -14,71 +14,72 @@ public class LiftMode : MonoBehaviour
 	// Use this for initialization
 	void Start () 
     {
-        playerRef = this.transform.parent.GetComponent<Player>();
+
 	}
 	
 	// Update is called once per frame
 	void Update () 
     {
-        if (Input.GetButtonDown("Use"))
+        if (playerRef.LiftModeEnabled)
         {
-            if (lifted != null)
-            {
-                playerRef.liftModeActive = false;
-
-                print("releasing object");
-
-                Destroy(lifted.GetComponent<FixedJoint>());
-
-                lifted.collider.enabled = true;
-
-                lifted = null;
-            }
-
-            if (liftable != null)
-            {
-                playerRef.liftModeActive = true;
-
-                print("attaching object");
-
-                liftable.collider.enabled = false;
-                liftable.transform.rotation = this.transform.rotation;
-
-                // === Attach a Joint ===================================
-                FixedJoint joint = liftable.AddComponent<FixedJoint>();
-                joint.connectedBody = this.transform.parent.rigidbody;
-                joint.autoConfigureConnectedAnchor = false;
-                joint.connectedAnchor = jointPos;
-
-                Mesh m = liftable.GetComponent<MeshFilter>().mesh;
-
-                float anchorY = m.bounds.size.y / 2;
-
-                joint.anchor = new Vector3(0, anchorY, 0);
-                
-                // ======================================================
-
-                lifted = liftable;
-                liftable = null;
-            }
+            //lifted.transform.localPosition = jointPos;
         }
 	}
 
-    void OnTriggerEnter(Collider c)
+    public GameObject shortestDistanceTo(List<LiftModeTarget> targets)
     {
-        if (c.tag == "Liftable" && c.rigidbody && lifted == null)
+        float minDist = float.MaxValue;
+        LiftModeTarget candidate = null;
+
+        foreach (LiftModeTarget t in targets)
         {
-            print("liftable object in range");
-            liftable = c.gameObject;
+            float magnitude = (t.gameObject.transform.position - this.gameObject.transform.position).magnitude;
+
+            if(magnitude < minDist)
+            {
+                candidate = t;
+                minDist = magnitude;
+            }
         }
+
+        return candidate.transform.parent.gameObject;
     }
 
-    void OnTriggerExit(Collider c)
+    public void attachObject(GameObject liftable)
     {
-        if (c.tag == "Liftable" && c.rigidbody && lifted == null)
-        {
-            print("lifted object left range");
-            liftable = null;
-        }
+        print("attaching object");
+
+        liftable.collider.enabled = false;
+        liftable.transform.parent = this.transform;
+        liftable.transform.localPosition = jointPos;
+        liftable.transform.rotation = this.transform.rotation;
+
+        // === Attach a Joint ===================================
+        FixedJoint joint = liftable.AddComponent<FixedJoint>();
+        joint.connectedBody = playerRef.rigidbody;
+        joint.autoConfigureConnectedAnchor = false;
+        joint.connectedAnchor = jointPos;
+
+        Mesh m = liftable.GetComponentInChildren<MeshFilter>().mesh;
+
+        float anchorY = m.bounds.size.y / 2;
+
+        joint.anchor = new Vector3(0, 0, 0);
+        // ======================================================
+
+        lifted = liftable;
+        liftable = null;
+    }
+
+    public void releaseObject()
+    {
+        print("releasing object");
+
+        Destroy(lifted.GetComponent<FixedJoint>());
+
+        lifted.transform.parent = null;
+        lifted.collider.enabled = true;
+
+        lifted = null;
     }
 }

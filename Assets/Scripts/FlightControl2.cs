@@ -5,18 +5,6 @@ public class FlightControl2 : MonoBehaviour
 {
     public Player playerRef;
 
-    private bool controlsActivated;
-    public bool ControlsActivated
-    {
-        set
-        {
-            controlsActivated = value;
-            playerRef.flightControlActive = value;
-        }
-        get { return controlsActivated; }
-
-    }
-
     public float directionalForce;
     public ForceMode directionalForceMode;
 
@@ -51,8 +39,6 @@ public class FlightControl2 : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        ControlsActivated = true;
-
         maxDirectionalVelocity = 0;
         currentDirectionalVelocity = 0;
     }
@@ -66,7 +52,7 @@ public class FlightControl2 : MonoBehaviour
         rStickH = 0;
 
         // == Get all Joystick Positions =================================
-        if (controlsActivated)
+        if (playerRef.FlightControlEnabled)
         {
             lStickV = Input.GetAxis("LStickV");
             lStickH = Input.GetAxis("LStickH");

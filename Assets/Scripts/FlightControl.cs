@@ -8,18 +8,6 @@ public class FlightControl : MonoBehaviour
     #region Control Variables
     public bool useGamepad; //0 = GamePad, 1 = Keyboard
 
-    private bool controlsActivated;
-    public bool ControlsActivated
-    {
-        set
-        {
-            controlsActivated = value;
-            playerRef.flightControlActive = value;
-        }
-        get { return controlsActivated; }
-
-    }
-
     // for gamepad, use these input axes
     private string moveZGamepad = "LStickV";
     private string moveXGamepad = "LStickH";
@@ -91,7 +79,6 @@ public class FlightControl : MonoBehaviour
 	void Start () 
     {
         playerRef = this.GetComponent<Player>();
-        ControlsActivated = true;
 
         yAxis = new Vector3(0, 1, 0);
         ascVelMin = Mathf.Abs(Physics.gravity.y * Time.fixedDeltaTime);
@@ -125,7 +112,7 @@ public class FlightControl : MonoBehaviour
         float rStickH = 0;
 
         // == Get all Joystick Positions =================================
-        if (controlsActivated)
+        if (playerRef.FlightControlEnabled)
         {
             lStickV = Input.GetAxis(moveZ);
             lStickH = Input.GetAxis(moveX);
