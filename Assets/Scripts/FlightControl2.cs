@@ -41,6 +41,8 @@ public class FlightControl2 : MonoBehaviour
     {
         maxDirectionalVelocity = 0;
         currentDirectionalVelocity = 0;
+
+        playerRef = FindObjectOfType<Player>();
     }
 
     void FixedUpdate()

@@ -14,7 +14,7 @@ public class LiftMode : MonoBehaviour
 	// Use this for initialization
 	void Start () 
     {
-
+        playerRef = FindObjectOfType<Player>();
 	}
 	
 	// Update is called once per frame

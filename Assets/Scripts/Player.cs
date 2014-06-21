@@ -50,10 +50,6 @@ public class Player : MonoBehaviour
 	// Use this for initialization
 	void Start () 
     {
-        flightControlScript.playerRef = this;
-        laserModeScript.playerRef = this;
-        liftModeScript.playerRef = this;
-
         FlightControlEnabled = true;
         LaserModeEnabled = false;
         LiftModeEnabled = false;

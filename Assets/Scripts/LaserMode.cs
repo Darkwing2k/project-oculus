@@ -36,7 +36,7 @@ public class LaserMode : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
-
+        playerRef = FindObjectOfType<Player>();
 	}
 	
 	// Update is called once per frame
@@ -45,6 +45,7 @@ public class LaserMode : MonoBehaviour
         // === Targeting State ===
         if (currentState == LaserState.TARGETING)
         {
+            // Raycast in player´s look direction to define a target
             RaycastHit hit;
 
             if (playerRef.useOculus)
@@ -63,6 +64,7 @@ public class LaserMode : MonoBehaviour
                         }
                     case TargetingMethods.CROSSHAIR:
                         {
+                            // Raycast is also needed to correctly position the crosshair
                             crosshairGUIObject.GetComponent<CrosshairBehaviour>().crosshairAdaptDistance(hit);
 
                             break;
@@ -72,6 +74,7 @@ public class LaserMode : MonoBehaviour
             }
             else
             {
+                // ======== For non-Oculus mode ===========================================
                 float rStickH = Input.GetAxis("RStickH");
                 float rStickV = Input.GetAxis("RStickV");
 
@@ -101,13 +104,15 @@ public class LaserMode : MonoBehaviour
                 pointer.SetPosition(1, hit.point);
 
                 Debug.DrawRay(laserTargeter.origin, laserTargeter.direction, Color.cyan);
+                // =========================================================================
             }
 
-            foreach (LaserModeTarget g in playerRef.cutables)
+            // check if the raycast hit any of the possible targets around
+            foreach (LaserModeTarget target in playerRef.cutables)
             {
-                if (hit.collider.gameObject.GetInstanceID() == g.transform.parent.gameObject.GetInstanceID())
+                if (hit.collider.gameObject.GetInstanceID() == target.transform.parent.gameObject.GetInstanceID())
                 {
-                    currentTarget = g;
+                    currentTarget = target;
                     desiredState = LaserState.LASERING;
                     break;
                     
@@ -124,6 +129,7 @@ public class LaserMode : MonoBehaviour
                 {
                     case TargetingMethods.LIGHT:
                         {
+                            // lightTargeter shall stay on the current target
                             lightTargeter.transform.LookAt(currentTarget.transform.position);
                             break;
                         }
@@ -134,6 +140,7 @@ public class LaserMode : MonoBehaviour
                 }
             }
 
+            // when button is pressed, the laser is shown and the target loses duration
             if (Input.GetButton("Action"))
             {
                 laser.enabled = true;
@@ -146,6 +153,7 @@ public class LaserMode : MonoBehaviour
                 laser.enabled = false;
             }
 
+            // if the duration max is reached, the target is cut and the state will be changed to TARGETING
             if (timer > timerMax)
             {
                 currentTarget.GetComponent<LaserModeTarget>().Cut();
@@ -157,6 +165,8 @@ public class LaserMode : MonoBehaviour
             }
         }
 
+        // if no cutable is around, lasermode will be disabled
+        // this happens in 2 cases: 1. all targets were cut 2. player flew through a cutable trigger and left it while in lasermode due to inertia
         if (playerRef.cutables.Count == 0)
         {
             playerRef.LaserModeEnabled = false;
@@ -169,14 +179,16 @@ public class LaserMode : MonoBehaviour
     {
         //some statemachine rules:
 
-        //IDLE -> TARGETING,       player uses cutable,        create crosshair
-        //IDLE -> LASERING,        no transition!,             -
-
-        //TARGETING -> IDLE,       player aborted,             destroy crosshair
-        //TARGETING -> LASERING,   player acquired a target,   create laser
-
-        //LASERING -> IDLE,        player aborted,             destroy crosshair and laser
-        //LASERING -> TARGETING    player lasered one of few,  destroy crosshair and laser (crosshair needs reset, so destroy here and create new on enter TARGETING)
+        // CURRENT -> TARGET     |  what happened             |  perform action
+        //----------------------------------------------------------------------------------------------
+        // IDLE -> TARGETING     |  player uses cutable       |  create crosshair
+        // IDLE -> LASERING      |  no transition!            |  -
+        //                       |                            |
+        // TARGETING -> IDLE     |  player aborted            |  destroy crosshair
+        // TARGETING -> LASERING |  player acquired a target  |  create laser
+        //                       |                            |
+        // LASERING -> IDLE      |  player aborted or all cut |  destroy crosshair and laser
+        // LASERING -> TARGETING |  player lasered one of few |  destroy crosshair and laser (crosshair needs reset, so destroy here and create new on enter TARGETING)
 
         if (currentState != targetState)
         {
@@ -358,6 +370,7 @@ public class LaserMode : MonoBehaviour
             }
             // =============================================================================================================
 
+            // now switch states
             print("LaserMode state changed from " + currentState + " to " + targetState);
             desiredState = targetState;
             currentState = targetState;
