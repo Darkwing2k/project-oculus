@@ -29,8 +29,8 @@ public class SecurityCamera : MonoBehaviour
     public float timerTillLook;
     private float lookTimer;
 
-    private bool playerInCollider;
-    private bool playerInAngle;
+    public bool playerInCollider;
+    public bool playerInAngle;
 
     private Light camLight;
     public Color normalColor;
@@ -66,13 +66,13 @@ public class SecurityCamera : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
     {
-        if (playerInCollider)
+        if (playerInCollider && secCamMaster.camerasReactToPlayer)
         {
             losTimer += Time.deltaTime;
 
             if (losTimer > timerTillLosCheck)
             {
-                playerInAngle = checkPlayerVisibility(playerRef.transform.position);
+                checkPlayerVisibility();
 
                 losTimer = 0;
             }
@@ -265,25 +265,35 @@ public class SecurityCamera : MonoBehaviour
         }
     }
 
-    public bool checkPlayerVisibility(Vector3 playerPos)
+    public void checkPlayerVisibility()
     {
-        float angle = Vector3.Angle(this.transform.forward, playerPos - this.transform.position);
+        float angle = Vector3.Angle(this.transform.forward, playerRef.transform.position - this.transform.position);
 
         if (angle < fovAngle)
         {
-            Ray r = new Ray(this.transform.position, playerPos - this.transform.position);
+            Ray r = new Ray(this.transform.position, playerRef.transform.position - this.transform.position);
             RaycastHit hit;
 
             Physics.Raycast(r, out hit);
 
             Debug.DrawRay(r.origin, r.direction * 10, Color.red, 3);
 
-            if (hit.collider.gameObject.tag.Equals("Player"))
+            if (hit.collider.gameObject.GetInstanceID() == playerRef.GetInstanceID())
             {
-                return true;
+
+                playerInAngle = true;
+                return;
             }
         }
 
-        return false;
+        playerInAngle = false;
+    }
+
+    public void lookAtPlayer()
+    {
+        if (playerInCollider)
+        {
+            this.transform.parent.LookAt(playerRef.transform.position);
+        }
     }
 }

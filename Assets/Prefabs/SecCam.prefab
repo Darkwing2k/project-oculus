@@ -11,7 +11,7 @@ GameObject:
   - 135: {fileID: 13500000}
   - 114: {fileID: 11400002}
   - 114: {fileID: 11400000}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: SecCameraBehaviour
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -194,6 +194,8 @@ MonoBehaviour:
   timerTillLosCheck: 1
   timerTillAlert: 2
   timerTillLook: 10
+  playerInCollider: 0
+  playerInAngle: 0
   normalColor: {r: 0, g: .382352948, b: .0342799164, a: 0}
   startledColor: {r: .389046669, g: .411764681, b: 0, a: 0}
   alarmedColor: {r: .529411793, g: 0, b: 0, a: 0}

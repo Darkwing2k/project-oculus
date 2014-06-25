@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Button : MonoBehaviour 
 {
-    public Triggerable objectToTrigger;
-    public Light lightToTrigger;
+    public List<Triggerable> objectsToTrigger;
 
     public GameObject playerRef;
 
@@ -23,14 +23,16 @@ public class Button : MonoBehaviour
         {
             if (!pressed)
             {
-                objectToTrigger.trigger();
-                lightToTrigger.enabled = true;
+                foreach(Triggerable t in objectsToTrigger)
+                    t.trigger();
+
                 pressed = true;
             }
             else
             {
-                objectToTrigger.trigger();
-                lightToTrigger.enabled = false;
+                foreach (Triggerable t in objectsToTrigger)
+                    t.trigger();
+
                 pressed = false;
             }
         }

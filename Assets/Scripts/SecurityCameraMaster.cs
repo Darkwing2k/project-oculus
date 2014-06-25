@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class SecurityCameraMaster : MonoBehaviour 
+public class SecurityCameraMaster : Triggerable 
 {
     public List<SecurityCamera> secCams;
 
@@ -11,6 +11,8 @@ public class SecurityCameraMaster : MonoBehaviour
     public float forgetPosIn;
 
     private bool registered;
+
+    public bool camerasReactToPlayer;
 
 	// Use this for initialization
 	void Start () 
@@ -23,6 +25,8 @@ public class SecurityCameraMaster : MonoBehaviour
         }
 
         playerSeenAt = Vector3.zero;
+
+        triggerOnce = true;
 	}
 	
 	// Update is called once per frame
@@ -45,5 +49,20 @@ public class SecurityCameraMaster : MonoBehaviour
         playerSeenAt = playerPos;
 
         infoAge = 0;
+    }
+
+    public override void trigger()
+    {
+        if (!triggered)
+        {
+            triggered = true;
+            camerasReactToPlayer = true;
+
+            foreach (SecurityCamera sc in secCams)
+            {
+                sc.lookAtPlayer();
+                sc.checkPlayerVisibility();
+            }
+        }
     }
 }
