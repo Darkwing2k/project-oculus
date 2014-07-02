@@ -1,0 +1,203 @@
+-- ProBuilder 2.1.4 -
+
+# Features
+	- Notifications are now displayed when a shortcut is recognized.
+	- New preview feature in Geometry Interface.  Interactively create and place shapes.
+	- Remove dependency on concave MeshCollider for face selection.
+	- New MenuItems for opening the Texture Window, and assorted editor commands.
+
+# Changes
+	- Move GUI folder to Resources, allowing 6by7 root folder to be placed anywhere in Project hierarchy.
+	- Decouple collisions from ProBuilder API entirely.
+
+# Bug Fixes
+	- Fix bug where Mesh.Colors32 property would be lost on duplication.
+	- Clamp values in Geometry Interface to sane values.
+	- Fix plane generation pivot location when segments < 0.
+	- Fix bug that caused Unity to no longer recognize numberical input.
+	- Fix regression in 2.1.3 that caused MeshColliders break on entering playmode.
+	- Fix bug where shortcut keys would sometimes not be recognized.
+	- When updating ProBuilder, the editor window is now force-reloaded.
+	- Editor window is now sized correctly for both dockable and non-dockable frames.
+	- Fix compile errors when building project in Unity 4.1.2+
+	- Fix bug that caused merged objects to incorrectly snap vertex points while ProGrids window is present.
+	- Fix NullReferenceError when clicking Merge button with nothing selected.
+	- Fix GUISkin issues in Unity 3.5.
+	- Fix GUISkin modifications affecting pb_Geometry_Editor incorrectly.
+	- Fix 'Delete Face' notification incorrectly displaying on OSX.
+	- Fix merged objects losing collisions.
+
+# API
+	- ProBuilder.Shortcut is now pb_Shortcut.
+	- Add pb_Upgrade_Utility as a base class for all updating operations.
+
+-- ProBuilder 2.1.3 --
+
+# Features
+	- New Vertex Color Interface.
+	- New 'Detach Face' action.
+	- New 'Toggle Mover Visibility' button.
+
+# Changes
+	- pb_Mesh_Extension renamed to pb_Object_Extensions.
+	- Transition default shader to Diffuse Vertex Color.
+
+# Bug Fixes
+	- Fix pb_Object breakage when upgrading to 2.1.2+ from <= 2.1.1.
+	- Fix bug where switching to Geometry mode would not always correctly set Tool.current to Tools.None.
+	- Fix bug where calling the distinctTriangles member of a pb_Face would sometimes throw an exception.
+	- Fix null reference errors when deleting object faces.
+	- Fix regression in 2.1.2 that caused non-cube type primitives to lose entity data and mesh information.
+	- Fix regression that caused Nodraw Visiblity Toggle to break.
+
+# API
+	- Remove unnecessary calls to the mesh reference when accessing vertex information (most notably in UV mapping functions).
+	- Cache distinct indices in pb_Face, replacing pb_Face::DistinctIndices() with pb_Face.distinctTriangles.
+	- Add pb_Edge class, and accompanying methods to retrieve all face edges and selectively perimeter edges.
+	- Add SetColors32(Color32[] colors) to pb_Object class.
+	- Add DetachFace(pb_Face face) to pb_Object class.
+
+# Internal
+	- Update to SVN 1.7, small adjustments to build scripts.
+	- Add shell script to build distributable packages on OSX.
+
+-- ProBuilder 2.1.2 --
+
+# Features
+	- New interface for pb_Entity class in Inspector.
+	- Scale transform now supported.
+	- Double click pb_Object face to select all faces.
+	- New ProBuilder/About window provides more build information.
+	- Full prefab support (removes "Create Prefab" button from ProBuilder editor).
+
+# Changes
+	- Rewrite context tip for Lightmapping button to reflect it's new purpose.
+	- Automatically freeze scale transform when applying any change to vertices.
+	- Always ZTest for selection graphic in face mode.
+	- 'G' key now toggles between Edit Levels.
+	- Remove face vertex handle information from scene view.
+	- Remove install script from package.
+
+# Bug Fixes
+	- Fix bug where user would be allowed to add multiple collision components to pb_Object.
+	- Fix bug where geometry would shift on Undo/Redo incorrectly.
+	- Fix leak when deleting pb_Objects.
+	- Fix regression in 2.1.1 that introduced a leak on switching pb_Objects while in ModeBased vertex editing.
+	- Fix bug where selection graphics would occasionally not update on undo, redo, or prefab apply / revert.
+	- Fix bug where setting EntityType would destroy transform parent/child connections.
+	- Fix incorrecty window sizing in pb_Editor.
+	- Fix rare error log when duplicating prefab objects.
+
+# API
+	- Add OnVertexMovementFinished event to pb_Editor.
+
+# Internal
+	- Implement SixBySeven shared library.
+
+-- ProBuilder 2.1.1 --
+
+# Features
+	- Add MirrorTool action.
+	- Add Prism primitive.
+	- Add ProBuilderizer action (API example).
+	- Add Flip Winding Order action (flips face normals).
+	- Add dimensions parameter to Prism and Cube in Geometry Interface.
+	- Add ability to delete faces (select faces and press backspace)
+
+# Changes
+	- "Auto NoDraw" becomes "NoDraw Tool", and features a vastly improved interface.
+	- Scroll bars added to ProBuilder Preferences panel, allowing for unlimited preference additions.
+	- Add undo support to Set Pivot action.
+	- No longer force rename pb_Objects post-initialization.
+	- Comment out menu item for Project Wide Nodraw utility, leaving action available for advanced users.
+
+# Bug Fixes
+	- Fix bug where handles in Seamless editing mode would not draw.
+	- Fix bug where selected objects would disappear at runtime.
+	- Fix bug where drag selection would not be recognized in Seamless editing mode.
+	- Fix Unity crash when importing packages while ProBuilder window is open.
+	- Fix regression in 2.1 where a MeshCollider would always be assigned to pb_Object, regardless of Collider settings.
+	- Fix cylinder generation code to properly account for height divisions (now accepts 0 as a parameter).
+	- Fix bug where undoing texture modifications would not consistently refresh pb_Object to original state.
+	- Fix bug where pb_Objects would disappear at runtime with static batching enabled.
+	- Add overload to TranslateVertices that accepts bool forceDisableSnap.
+	- Fix bug in PivotTool that caused vertices to incorrectly be snapped when setting new pivot with snapping enabled.
+
+# API Changes
+	- Add pb_Object::InitWithObject
+	- Add ProBuilder::CreateObjectWithObject
+	- Add pb_Object::GetName
+	- Add ProBuilder::CreatePrimitive(ProBuilder.Shape shape)
+
+# Internal
+	- Add DrawAllFaceNormals to #DEBUG flagged pb_Editor.
+	- Update Sublime Extension to version 3.
+
+-- ProBuilder 2.1 --
+
+# Features
+	- Add Smoothing Group support.
+	- New face selection graphic system respects depth order + speed boost.
+	- Add drag selection support for faces.
+	- UV2 channel generation now totally automated.
+	- New Lightmap Window exposes UnwrapParam properties per-object for fine-grained UV2 generation control.
+	- Add smart object naming, with the convention "pb(Shape Type)([Entity Type])-(Object ID)" - ex: pb-Cube[Detail]-1701)
+	- Add new "Mover" entity type, which is non-static and allows complete control at runtime.
+	- Add support for n-gon faces.
+
+# Changes
+	- 'World' is now default handle alignment.
+	- Update default materials with dedicated textures.
+	- Update QuickStart window with more explicit options.
+	- Default values for Cylinder are now slightly more sane.
+
+# Bug Fixes
+	- Fix ProceduralMaterials throwing errors in Texture Editor.
+	- Fix rare bug where incorrect vertex indices would be selected in an UpdateSelection() call, throwing a NullReferenceException.
+	- Fix bug where toggling selected faces would not correctly remove vertices from internal selection list.
+	- Fix bug where pivot would center at 0,0,0 on merging objects.
+	- Hide ACG property in Inspector window.
+	- Fix bug where merged objects would lose EntityType information.
+	- Fix bug where prefab creation would not account for pb_Group data.
+	- Fix bug where merged objects would lose normal data.
+	- Fix bug where exiting Texture Mode would not consistently set Edit Mode to Top.
+	- Fix bug where generating UV2 channel would incorrectly hide NoDraw faces, breaking synchronization with pb_Editor UI.
+	- Fix bug where ListenForTopLevelMovement would incorrectly fire, significantly slowing scene navigation.
+	- Fix bug where duplicating multiple objects would result in referenced pb_Objects.
+	- Fix bug in pb_Group where SetActive would incorrectly be called in Unity 3.5.
+	- Fix bug where collision meshes would not correctly update after an Undo / Redo event.
+	- Fix bug where drag selection would not exit properly if a function key is pressed mid drag.
+	- Fix bug where vertex handles would incorrectly be drawn in Top level editing mode.
+	- Fix bug where deleting a pb_Object would occasionally cause a NullReferenceError in UpdateSelection().
+	- Fix bug where Occluder objects would not allow textures to be applied.
+	- Fix bug where box colliders would not properly inherit trigger boolean value.
+	- Fix bug where merging objects or creating groups would not snap pivot point to grid (this also introduces centered pivot points).
+	- Fix rare bug where get_localRotation would fail.
+	- Fix white flash in Texture Window preview.
+	- Fix bug where ProBuilder would not remember Handle Alignment setting.
+	- Fix bug where editor selection property would not correctly update on object deletion.
+	- Fix minor bug where vertex handles would sometimes not immediately draw on entering Geometry editing mode.
+	- Fix bug where closing Texture Window manually would not always exit EditLevel.Texture.
+	- Fix bug where an Undo/Redo event would sometimes cause pb_Editor to attempt to refresh every pb_Object in scene.
+	- Fix bug where exiting EditLevel.Texture to Geo Mode would not correctly remember the previous SelectionMode. 
+	- Fix bug where cylinder object sometimes initialize with un-even side lengths.
+	- Fix bug where on deleting a pb_Object's MeshCollider, ProBuilder would not immediately re-initialize it (prevents common PEBKAC error).
+
+# API
+	- Integrate Doxygen (Still a work in progress - feel free to drop by the forums with any questions).
+	- Add SharedTrianglesWithFacesExclusive for extracting shared triangle indices exclusive to passed faces.
+	- VerticesWithIndiceArray is now VerticesWithTriangleArray.
+	- Remove pb_Object::CreatePrimitive.  Use pb_Shape for object creation, or pb_Object::CreateCube(float scale).
+	- Add OnVertexMovement EventHandler to pb_Object.
+	- pb_Object::CreateObjectWithPointsfaces is now pb_Object::CreateObjectWithVerticesFaces.
+
+# Actions
+	- Update AutoNodraw to cast from all vertices + center point when determining hidden flag.
+	- In PivotTool.cs, snap pivot point to grid if no vertices are selected.
+	- Refactor EntityType.Brush to EntityType.Detail.
+
+# Internal
+	- Add pb_Profiler class
+	- Add UVee window + ProBuilder specific modifications
+	- Add internal preference to force update preference when necessary (usually means adding shortcut items).
+	- Significant performace improvements in handle drawing.
