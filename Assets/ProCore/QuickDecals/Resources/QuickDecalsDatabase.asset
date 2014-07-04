@@ -13,7 +13,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   s_decals: []
   names: []
-  isPacked: []
+  isPacked: 
   materials: []
   shaders: []
   atlasSize: 

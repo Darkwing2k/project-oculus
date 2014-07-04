@@ -542,7 +542,7 @@ MonoBehaviour:
   selected_faces: []
   previousTransform: {x: 0, y: 0, z: 0}
   isSelectable: 1
-  _name: Cube
+  _name: 43756265
 --- !u!114 &11400006
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -696,7 +696,7 @@ MonoBehaviour:
   selected_faces: []
   previousTransform: {x: 0, y: 0, z: 0}
   isSelectable: 1
-  _name: Cube
+  _name: 43756265
 --- !u!114 &11400008
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -870,7 +870,7 @@ MonoBehaviour:
   selected_faces: []
   previousTransform: {x: 0, y: 0, z: 0}
   isSelectable: 1
-  _name: Cube
+  _name: 43756265
 --- !u!114 &11400012
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1064,7 +1064,7 @@ MonoBehaviour:
   selected_faces: []
   previousTransform: {x: 0, y: 0, z: 0}
   isSelectable: 1
-  _name: Cube
+  _name: 43756265
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
