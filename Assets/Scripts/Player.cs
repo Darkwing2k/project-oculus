@@ -56,6 +56,8 @@ public class Player : MonoBehaviour
         LaserModeEnabled = false;
         LiftModeEnabled = false;
 
+        noClip = false;
+
         if (useOculus)
         {
             vrCamera.gameObject.SetActive(true);
@@ -125,10 +127,10 @@ public class Player : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.Joystick1Button4))
+        if (Input.GetKeyDown(KeyCode.Joystick1Button4) || Input.GetKeyDown(KeyCode.Space))
         {
             noClip = !noClip;
-            this.gameObject.collider.enabled = noClip;
+            this.gameObject.collider.enabled = !noClip;
         }
 	}
 

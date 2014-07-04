@@ -56,13 +56,26 @@ public class FlightControl2 : MonoBehaviour
         // == Get all Joystick Positions =================================
         if (playerRef.FlightControlEnabled)
         {
-            lStickV = Input.GetAxis("LStickV");
-            lStickH = Input.GetAxis("LStickH");
+            if (playerRef.useGamepad)
+            {
+                lStickV = Input.GetAxis("LStickV");
+                lStickH = Input.GetAxis("LStickH");
 
-            shoulder = Input.GetAxis("Shoulder");
+                shoulder = Input.GetAxis("Shoulder");
 
-            rStickV = Input.GetAxis("RStickV");
-            rStickH = Input.GetAxis("RStickH");
+                rStickV = Input.GetAxis("RStickV");
+                rStickH = Input.GetAxis("RStickH");
+            }
+            else
+            {
+                lStickV = Input.GetAxis("ZAxis");
+                lStickH = Input.GetAxis("XAxis");
+
+                shoulder = Input.GetAxis("YAxis");
+
+                rStickV = Input.GetAxis("RStickV");
+                rStickH = Input.GetAxis("YAngular");
+            }
         }
         // ===============================================================
 
