@@ -17,7 +17,7 @@ public class FlightControl2 : MonoBehaviour
     public bool useDirectYawInput;
     private float yawVelTarget = 0f; // Desired Velocity for Y-Rotation
     private float yawVelValue = 0f; // Current Velocity for Y-Rotation
-    private float yawVelMax = 1.2f; // Maximum Velocity for Y-Rotation
+    private float yawVelMax = 1.8f; // Maximum Velocity for Y-Rotation
     private float yawAcc = 3.6f; // Acceleration for Y-Rotation
     #endregion
 
@@ -66,6 +66,7 @@ public class FlightControl2 : MonoBehaviour
         }
         // ===============================================================
 
+        // ====== Movement on xz Axis ======================================
         if (Mathf.Abs(lStickV) > 0.3f || Mathf.Abs(lStickH) > 0.3f)
         {
             Vector3 forceDir = this.transform.forward * lStickV + this.transform.right * lStickH;
@@ -73,19 +74,17 @@ public class FlightControl2 : MonoBehaviour
             this.rigidbody.AddForce(forceDir * directionalForce, directionalForceMode);
         }
 
+        // ====== Movement on y Axis =======================================
         Vector3 upForce = (-1 * Physics.gravity * this.rigidbody.mass) + (new Vector3(0, 1, 0) * shoulder * upwardForce);
 
         this.rigidbody.AddForce(upForce, ForceMode.Force);
 
         currentDirectionalVelocity = Mathf.Abs(this.rigidbody.velocity.x) + Mathf.Abs(this.rigidbody.velocity.z);
 
+        // ===== Angular Movement ==========================================
         if (currentDirectionalVelocity > maxDirectionalVelocity)
             maxDirectionalVelocity = currentDirectionalVelocity;
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
         if (Mathf.Abs(rStickH) > 0.3f)
         {
             yawVelTarget = rStickH * yawVelMax;
@@ -114,6 +113,12 @@ public class FlightControl2 : MonoBehaviour
 
             this.transform.eulerAngles = new Vector3(this.transform.eulerAngles.x, this.transform.eulerAngles.y, rollAngleValue);
         }
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
     }
 
     private float calcValue(float val, float acc, float target, float tolerance)

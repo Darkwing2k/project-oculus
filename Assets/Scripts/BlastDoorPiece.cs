@@ -19,6 +19,8 @@ public class BlastDoorPiece : MonoBehaviour
     public enum Dimension { X, Y, Z};
     public Dimension dimension;
 
+    public float gap = 0.5f;
+
 	// Use this for initialization
 	void Start () 
     {
@@ -30,8 +32,8 @@ public class BlastDoorPiece : MonoBehaviour
 
         if (autoDetectSize)
         {
-            float height = m.bounds.size.y * this.transform.localScale.y;
-            float width = m.bounds.size.x * this.transform.localScale.x;
+            float height = m.bounds.size.y * this.transform.localScale.y + gap;
+            float width = m.bounds.size.x * this.transform.localScale.x + gap;
             float angle = this.transform.eulerAngles.y * Mathf.Deg2Rad;
 
             switch (openDirection)
@@ -73,6 +75,8 @@ public class BlastDoorPiece : MonoBehaviour
                     }
             }
 
+            value += gap;
+
             float angle = this.transform.eulerAngles.y * Mathf.Deg2Rad;
 
             switch (openDirection)
@@ -104,10 +108,24 @@ public class BlastDoorPiece : MonoBehaviour
 	}
 	
 	// Update is called once per frame
-	void Update ()
+	void FixedUpdate ()
     {
         masterState = doorRef.currentState;
 
+        if (masterState == BlastDoor.DoorState.OPEN)
+        {
+            this.transform.position = openPosition;
+        }
+        else if (masterState == BlastDoor.DoorState.CLOSED)
+        {
+            this.transform.position = closePosition;
+        }
+        else
+        {
+            this.transform.position = Vector3.Lerp(closePosition, openPosition, doorRef.steps);
+        }
+
+        /*
         switch (masterState)
         {
             case BlastDoor.DoorState.OPEN:
@@ -117,19 +135,26 @@ public class BlastDoorPiece : MonoBehaviour
                 }
             case BlastDoor.DoorState.OPENING:
                 {
-                    this.transform.position = Vector3.Lerp(closePosition, openPosition, doorRef.steps);
+                    //this.transform.position = Vector3.Lerp(closePosition, openPosition, doorRef.steps);
+
+                    this.rigidbody.MovePosition(Vector3.Lerp(closePosition, openPosition, doorRef.steps));
+
                     break;
                 }
             case BlastDoor.DoorState.CLOSED:
                 {
-                    this.transform.position = closePosition;
+                    
                     break;
                 }
             case BlastDoor.DoorState.CLOSING:
                 {
-                    this.transform.position = Vector3.Lerp(closePosition, openPosition, doorRef.steps);
+                    //this.transform.position = Vector3.Lerp(closePosition, openPosition, doorRef.steps);
+
+                    this.rigidbody.MovePosition(Vector3.Lerp(closePosition, openPosition, doorRef.steps));
+
                     break;
                 }
         }
+         * */
     }
 }

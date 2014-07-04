@@ -46,6 +46,8 @@ public class Player : MonoBehaviour
 
     public Transform eyeCenter;
 
+    public bool noClip;
+
 
 	// Use this for initialization
 	void Start () 
@@ -121,6 +123,12 @@ public class Player : MonoBehaviour
                 LiftModeEnabled = false;
                 inputHandled = true;
             }
+        }
+
+        if (Input.GetKeyDown(KeyCode.Joystick1Button4))
+        {
+            noClip = !noClip;
+            this.gameObject.collider.enabled = noClip;
         }
 	}
 
