@@ -26,49 +26,58 @@ public class LiftMode : MonoBehaviour
         }
 	}
 
-    public GameObject shortestDistanceTo(List<LiftModeTarget> targets)
+    public LiftModeTarget shortestDistanceTo(List<LiftModeTarget> targets)
     {
         float minDist = float.MaxValue;
         LiftModeTarget candidate = null;
 
-        foreach (LiftModeTarget t in targets)
+        foreach (LiftModeTarget current in targets)
         {
-            float magnitude = (t.gameObject.transform.position - this.gameObject.transform.position).magnitude;
+            float sqrMagnitude = (current.gameObject.transform.position - this.gameObject.transform.position).sqrMagnitude;
 
-            if(magnitude < minDist)
+            if (sqrMagnitude < minDist)
             {
-                candidate = t;
-                minDist = magnitude;
+                RaycastHit hit;
+                Physics.Raycast(playerRef.transform.position, current.transform.parent.position - playerRef.transform.position, out hit, 100);
+
+                if (hit.collider.gameObject.GetInstanceID() == current.transform.parent.gameObject.GetInstanceID())
+                {
+                    candidate = current;
+                    minDist = sqrMagnitude;
+                }
             }
         }
 
-        return candidate.transform.parent.gameObject;
+        return candidate;
     }
 
     public void attachObject(GameObject liftable)
     {
-        print("attaching object");
+        if (liftable != null)
+        {
+            print("attaching object");
 
-        liftable.collider.enabled = false;
-        liftable.transform.parent = this.transform;
-        liftable.transform.localPosition = jointPos;
-        liftable.transform.rotation = this.transform.rotation;
+            liftable.collider.enabled = false;
+            liftable.transform.parent = this.transform;
+            liftable.transform.localPosition = jointPos;
+            liftable.transform.rotation = this.transform.rotation;
 
-        // === Attach a Joint ===================================
-        FixedJoint joint = liftable.AddComponent<FixedJoint>();
-        joint.connectedBody = playerRef.rigidbody;
-        joint.autoConfigureConnectedAnchor = false;
-        joint.connectedAnchor = jointPos;
+            // === Attach a Joint ===================================
+            FixedJoint joint = liftable.AddComponent<FixedJoint>();
+            joint.connectedBody = playerRef.rigidbody;
+            joint.autoConfigureConnectedAnchor = false;
+            joint.connectedAnchor = jointPos;
 
-        Mesh m = liftable.GetComponentInChildren<MeshFilter>().mesh;
+            Mesh m = liftable.GetComponentInChildren<MeshFilter>().mesh;
 
-        float anchorY = m.bounds.size.y / 2;
+            float anchorY = m.bounds.size.y / 2;
 
-        joint.anchor = new Vector3(0, 0, 0);
-        // ======================================================
+            joint.anchor = new Vector3(0, 0, 0);
+            // ======================================================
 
-        lifted = liftable;
-        liftable = null;
+            lifted = liftable;
+            liftable = null;
+        }
     }
 
     public void releaseObject()

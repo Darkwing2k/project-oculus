@@ -114,9 +114,14 @@ public class Player : MonoBehaviour
 
             if (!inputHandled && liftables.Count != 0 && !LiftModeEnabled && !LaserModeEnabled)
             {
-                liftModeScript.attachObject(liftModeScript.shortestDistanceTo(liftables));
-                LiftModeEnabled = true;
-                inputHandled = true;
+                LiftModeTarget liftable = liftModeScript.shortestDistanceTo(liftables);
+
+                if (liftable != null)
+                {
+                    liftModeScript.attachObject(liftable.transform.parent.gameObject);
+                    LiftModeEnabled = true;
+                    inputHandled = true;
+                }
             }
 
             if (!inputHandled && LiftModeEnabled)
