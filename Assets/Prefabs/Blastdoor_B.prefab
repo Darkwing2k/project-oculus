@@ -28,6 +28,9 @@ GameObject:
   - 23: {fileID: 2300000}
   - 95: {fileID: 9500000}
   - 114: {fileID: 11400000}
+  - 65: {fileID: 6500000}
+  - 136: {fileID: 13600002}
+  - 136: {fileID: 13600000}
   m_Layer: 0
   m_Name: SM_Blastdoor_B
   m_TagString: Untagged
@@ -42,7 +45,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100000}
   m_LocalRotation: {x: -.5, y: .5, z: .5, w: .5}
-  m_LocalPosition: {x: 54.8000031, y: -18.8539772, z: 23.5449142}
+  m_LocalPosition: {x: 54.7111816, y: -18.8958454, z: 23.5449142}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 400002}
@@ -54,7 +57,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100002}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.04491425, y: 0, z: -1.54602242}
+  m_LocalPosition: {x: 2, y: -.100000001, z: -1.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 400000}
@@ -86,6 +89,18 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100002}
   m_Mesh: {fileID: 4300000, guid: 9af5b85b4d4297e40b52bbbdbdd1467d, type: 3}
+--- !u!65 &6500000
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100002}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 4, y: .400000006, z: 3}
+  m_Center: {x: -2, y: .100000001, z: 1.64999998}
 --- !u!95 &9500000
 Animator:
   serializedVersion: 2
@@ -118,6 +133,7 @@ MonoBehaviour:
   masterState: 0
   autoDetectSize: 0
   dimension: 2
+  gap: .5
 --- !u!114 &11400002
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -135,6 +151,32 @@ MonoBehaviour:
   desiredState: 0
   steps: 1
   stepSize: .00499999989
+--- !u!136 &13600000
+CapsuleCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100002}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: .200000003
+  m_Height: 4.5
+  m_Direction: 0
+  m_Center: {x: -2, y: .100000001, z: .100000001}
+--- !u!136 &13600002
+CapsuleCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100002}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: .200000003
+  m_Height: 3.4000001
+  m_Direction: 0
+  m_Center: {x: -2, y: .100000001, z: -.140000001}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
