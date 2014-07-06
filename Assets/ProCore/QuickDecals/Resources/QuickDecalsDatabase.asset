@@ -11,10 +11,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7bfeb40e027395d45a5545d3b06bcea6, type: 3}
   m_Name: QuickDecalsDatabase
   m_EditorClassIdentifier: 
-  s_decals: []
-  names: []
-  isPacked: 
-  materials: []
-  shaders: []
-  atlasSize: 
-  padding: 
+  s_decals:
+  - '{
+
+    01_floor
+
+    34a69d4bd383db440893cc9e540ad630
+
+    (-45.0, 45.0, 0.0)
+
+    (0.8, 1.2, 1.0)
+
+    (0, 0, 0, 0)
+
+    0
+
+    0
+
+    0
+
+    0
+
+    0
+
+    0
+
+    }'
+  names:
+  - 01_floor
+  isPacked: 00
+  materials:
+  - 
+  shaders:
+  - Transparent/Diffuse
+  atlasSize: 00100000
+  padding: 04000000
