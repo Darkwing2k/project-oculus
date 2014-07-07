@@ -11,9 +11,13 @@ public class DropZone : MonoBehaviour
 
     public bool pressed;
 
+    private AudioSource audio;
+
 	// Use this for initialization
 	void Start () 
     {
+        audio = GetComponent<AudioSource>();
+
         if (key == null)
         {
             print("DropZone " + gameObject.name + " has no key!");
@@ -30,8 +34,12 @@ public class DropZone : MonoBehaviour
     {
         if (key.GetInstanceID() == c.gameObject.GetInstanceID() && !pressed)
         {
-            objectToTrigger.trigger();
-            pressed = true;
+            if (objectToTrigger != null)
+            {
+                objectToTrigger.trigger();
+                pressed = true;
+            }
+            audio.Play();
         }
     }
 

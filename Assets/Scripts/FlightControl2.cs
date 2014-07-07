@@ -13,6 +13,9 @@ public class FlightControl2 : MonoBehaviour
     public float maxDirectionalVelocity;
     public float currentDirectionalVelocity;
 
+    private Transform audioChild;
+    private AudioSource audio;
+
     #region Y-Rotate Variables
     public bool useDirectYawInput;
     private float yawVelTarget = 0f; // Desired Velocity for Y-Rotation
@@ -36,9 +39,15 @@ public class FlightControl2 : MonoBehaviour
     private float rStickV;
     private float rStickH;
 
+    private float moveVol = 0.4f;
+    private float movePitch = 0.36f;
+
     // Use this for initialization
     void Start()
     {
+        audioChild = transform.Find("AudioSource");
+        audio = audioChild.GetComponent<AudioSource>();
+
         maxDirectionalVelocity = 0;
         currentDirectionalVelocity = 0;
 
@@ -52,6 +61,9 @@ public class FlightControl2 : MonoBehaviour
         shoulder = 0;
         rStickV = 0;
         rStickH = 0;
+
+        audio.volume = 0.3f;
+        audio.pitch = 0.3f;
 
         // == Get all Joystick Positions =================================
         if (playerRef.FlightControlEnabled)
@@ -85,6 +97,9 @@ public class FlightControl2 : MonoBehaviour
             Vector3 forceDir = this.transform.forward * lStickV + this.transform.right * lStickH;
 
             this.rigidbody.AddForce(forceDir * directionalForce, directionalForceMode);
+
+            audio.volume = moveVol;
+            audio.pitch = movePitch;
         }
 
         // ====== Movement on y Axis =======================================
@@ -93,6 +108,12 @@ public class FlightControl2 : MonoBehaviour
         this.rigidbody.AddForce(upForce, ForceMode.Force);
 
         currentDirectionalVelocity = Mathf.Abs(this.rigidbody.velocity.x) + Mathf.Abs(this.rigidbody.velocity.z);
+
+        if (shoulder != 0)
+        {
+            audio.volume = moveVol;
+            audio.pitch = movePitch;
+        }
 
         // ===== Angular Movement ==========================================
         if (currentDirectionalVelocity > maxDirectionalVelocity)
