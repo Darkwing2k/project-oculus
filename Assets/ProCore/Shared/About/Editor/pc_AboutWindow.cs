@@ -1,4 +1,4 @@
-// Todo - Implement a base AboutWindow class and figure a better way to manage multiple instances.
+// Todo - Implement a base pc_AboutWindow class and figure a better way to manage multiple instances.
 #if UNITY_4_0 || UNITY_4_0_1 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_3_0 || UNITY_4_3_1 || UNITY_4_3_2 || UNITY_4_3_3 || UNITY_4_3_4 || UNITY_4_3_5 || UNITY_4_3_6 || UNITY_4_3_7 || UNITY_4_3_8 || UNITY_4_3_9 || UNITY_4_4 || UNITY_4_4_0 || UNITY_4_4_1 || UNITY_4_4_2 || UNITY_4_4_3 || UNITY_4_4_4 || UNITY_4_4_5 || UNITY_4_4_6 || UNITY_4_4_7 || UNITY_4_4_8 || UNITY_4_4_9 || UNITY_4_5 || UNITY_4_5_0 || UNITY_4_5_1 || UNITY_4_5_2 || UNITY_4_5_3 || UNITY_4_5_4 || UNITY_4_5_5 || UNITY_4_5_6 || UNITY_4_5_7 || UNITY_4_5_8 || UNITY_4_5_9 || UNITY_4_6 || UNITY_4_6_0 || UNITY_4_6_1 || UNITY_4_6_2 || UNITY_4_6_3 || UNITY_4_6_4 || UNITY_4_6_5 || UNITY_4_6_6 || UNITY_4_6_7 || UNITY_4_6_8 || UNITY_4_6_9 || UNITY_4_7 || UNITY_4_7_0 || UNITY_4_7_1 || UNITY_4_7_2 || UNITY_4_7_3 || UNITY_4_7_4 || UNITY_4_7_5 || UNITY_4_7_6 || UNITY_4_7_7 || UNITY_4_7_8 || UNITY_4_7_9 || UNITY_4_8 || UNITY_4_8_0 || UNITY_4_8_1 || UNITY_4_8_2 || UNITY_4_8_3 || UNITY_4_8_4 || UNITY_4_8_5 || UNITY_4_8_6 || UNITY_4_8_7 || UNITY_4_8_8 || UNITY_4_8_9
 #define UNITY_4
 #endif
@@ -37,14 +37,15 @@ public class pc_AboutWindowSetup : AssetPostprocessor
 				break;
 	}
 
-	// [MenuItem("Edit/Preferences/Clear About Version: " + AboutWindow.PRODUCT_IDENTIFIER)]
+	// [MenuItem("Edit/Preferences/Clear About Version: " + pc_AboutWindow.PRODUCT_IDENTIFIER)]
 	// public static void MenuClearVersionPref()
 	// {
-	// 	EditorPrefs.DeleteKey(AboutWindow.PRODUCT_IDENTIFIER);
+	// 	EditorPrefs.DeleteKey(pc_AboutWindow.PRODUCT_IDENTIFIER);
 	// }
 #endregion
 }
 
+/* Change 'pc_AboutWindow' to your own class name */
 public class pc_AboutWindow : EditorWindow
 {
 
@@ -151,7 +152,7 @@ public class pc_AboutWindow : EditorWindow
 	// 	string[] entries = System.Array.FindAll(allFiles, name => name.Contains("pc_AboutEntry"));
 		
 	// 	if(entries.Length > 0)
-	// 		AboutWindow.Init(entries[0], true);
+	// 		pc_AboutWindow.Init(entries[0], true);
 	// }
 
 	/**
