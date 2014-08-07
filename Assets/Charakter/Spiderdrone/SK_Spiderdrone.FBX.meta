@@ -1,0 +1,720 @@
+fileFormatVersion: 2
+guid: 4907a0f7362e1d443845e45d0a5cf40d
+ModelImporter:
+  serializedVersion: 16
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: Box001
+    100004: Box002
+    100006: Box003
+    100008: Box004
+    100010: Box011
+    100012: Box012
+    100014: Box013
+    100016: Box018
+    100018: Box019
+    100020: Box020
+    100022: Box021
+    100024: Box022
+    100026: Box023
+    100028: Box024
+    100030: Box025
+    100032: Box026
+    100034: Box027
+    100036: Box028
+    100038: Box029
+    100040: Box030
+    100042: Box031
+    100044: Box032
+    100046: Box033
+    100048: Box034
+    100050: Box035
+    100052: Box036
+    100054: Box037
+    100056: Box039
+    100058: Spider
+    100060: Spider 1
+    100062: Spider 2
+    100064: Spider 3
+    100066: SpiderHub
+    100068: SpiderLLeg11
+    100070: SpiderLLeg12
+    100072: SpiderLLeg13
+    100074: SpiderLLeg1Platform
+    100076: SpiderLLeg21
+    100078: SpiderLLeg22
+    100080: SpiderLLeg23
+    100082: SpiderLLeg2Platform
+    100084: SpiderLLeg31
+    100086: SpiderLLeg32
+    100088: SpiderLLeg33
+    100090: SpiderLLeg3Platform
+    100092: SpiderLLeg41
+    100094: SpiderLLeg42
+    100096: SpiderLLeg43
+    100098: SpiderLLeg4Platform
+    100100: SpiderRLeg11
+    100102: SpiderRLeg12
+    100104: SpiderRLeg13
+    100106: SpiderRLeg1Platform
+    100108: SpiderRLeg21
+    100110: SpiderRLeg22
+    100112: SpiderRLeg23
+    100114: SpiderRLeg2Platform
+    100116: SpiderRLeg31
+    100118: SpiderRLeg32
+    100120: SpiderRLeg33
+    100122: SpiderRLeg3Platform
+    100124: SpiderRLeg41
+    100126: SpiderRLeg42
+    100128: SpiderRLeg43
+    100130: SpiderRLeg4Platform
+    100132: Spider_Mandibel_L
+    100134: Spider_Mandibel_R
+    100136: Spiderhub
+    400000: //RootNode
+    400002: Box001
+    400004: Box002
+    400006: Box003
+    400008: Box004
+    400010: Box011
+    400012: Box012
+    400014: Box013
+    400016: Box018
+    400018: Box019
+    400020: Box020
+    400022: Box021
+    400024: Box022
+    400026: Box023
+    400028: Box024
+    400030: Box025
+    400032: Box026
+    400034: Box027
+    400036: Box028
+    400038: Box029
+    400040: Box030
+    400042: Box031
+    400044: Box032
+    400046: Box033
+    400048: Box034
+    400050: Box035
+    400052: Box036
+    400054: Box037
+    400056: Box039
+    400058: Spider
+    400060: Spider 1
+    400062: Spider 2
+    400064: Spider 3
+    400066: SpiderHub
+    400068: SpiderLLeg11
+    400070: SpiderLLeg12
+    400072: SpiderLLeg13
+    400074: SpiderLLeg1Platform
+    400076: SpiderLLeg21
+    400078: SpiderLLeg22
+    400080: SpiderLLeg23
+    400082: SpiderLLeg2Platform
+    400084: SpiderLLeg31
+    400086: SpiderLLeg32
+    400088: SpiderLLeg33
+    400090: SpiderLLeg3Platform
+    400092: SpiderLLeg41
+    400094: SpiderLLeg42
+    400096: SpiderLLeg43
+    400098: SpiderLLeg4Platform
+    400100: SpiderRLeg11
+    400102: SpiderRLeg12
+    400104: SpiderRLeg13
+    400106: SpiderRLeg1Platform
+    400108: SpiderRLeg21
+    400110: SpiderRLeg22
+    400112: SpiderRLeg23
+    400114: SpiderRLeg2Platform
+    400116: SpiderRLeg31
+    400118: SpiderRLeg32
+    400120: SpiderRLeg33
+    400122: SpiderRLeg3Platform
+    400124: SpiderRLeg41
+    400126: SpiderRLeg42
+    400128: SpiderRLeg43
+    400130: SpiderRLeg4Platform
+    400132: Spider_Mandibel_L
+    400134: Spider_Mandibel_R
+    400136: Spiderhub
+    2300000: Box001
+    2300002: Box002
+    2300004: Box003
+    2300006: Box004
+    2300008: Box011
+    2300010: Box012
+    2300012: Box013
+    2300014: Box018
+    2300016: Box019
+    2300018: Box020
+    2300020: Box021
+    2300022: Box022
+    2300024: Box023
+    2300026: Box024
+    2300028: Box025
+    2300030: Box026
+    2300032: Box027
+    2300034: Box028
+    2300036: Box029
+    2300038: Box030
+    2300040: Box031
+    2300042: Box032
+    2300044: Box033
+    2300046: Box034
+    2300048: Box035
+    2300050: Box036
+    2300052: Box037
+    2300054: Box039
+    2300056: Spider 1
+    2300058: Spider 2
+    2300060: Spider 3
+    2300062: SpiderHub
+    2300064: SpiderLLeg11
+    2300066: SpiderLLeg12
+    2300068: SpiderLLeg13
+    2300070: SpiderLLeg21
+    2300072: SpiderLLeg22
+    2300074: SpiderLLeg23
+    2300076: SpiderLLeg31
+    2300078: SpiderLLeg32
+    2300080: SpiderLLeg33
+    2300082: SpiderLLeg41
+    2300084: SpiderLLeg42
+    2300086: SpiderLLeg43
+    2300088: SpiderRLeg11
+    2300090: SpiderRLeg12
+    2300092: SpiderRLeg13
+    2300094: SpiderRLeg21
+    2300096: SpiderRLeg22
+    2300098: SpiderRLeg23
+    2300100: SpiderRLeg31
+    2300102: SpiderRLeg32
+    2300104: SpiderRLeg33
+    2300106: SpiderRLeg41
+    2300108: SpiderRLeg42
+    2300110: SpiderRLeg43
+    2300112: Spider_Mandibel_L
+    2300114: Spider_Mandibel_R
+    2300116: Spiderhub
+    3300000: Box001
+    3300002: Box002
+    3300004: Box003
+    3300006: Box004
+    3300008: Box011
+    3300010: Box012
+    3300012: Box013
+    3300014: Box018
+    3300016: Box019
+    3300018: Box020
+    3300020: Box021
+    3300022: Box022
+    3300024: Box023
+    3300026: Box024
+    3300028: Box025
+    3300030: Box026
+    3300032: Box027
+    3300034: Box028
+    3300036: Box029
+    3300038: Box030
+    3300040: Box031
+    3300042: Box032
+    3300044: Box033
+    3300046: Box034
+    3300048: Box035
+    3300050: Box036
+    3300052: Box037
+    3300054: Box039
+    3300056: Spider 1
+    3300058: Spider 2
+    3300060: Spider 3
+    3300062: SpiderHub
+    3300064: SpiderLLeg11
+    3300066: SpiderLLeg12
+    3300068: SpiderLLeg13
+    3300070: SpiderLLeg21
+    3300072: SpiderLLeg22
+    3300074: SpiderLLeg23
+    3300076: SpiderLLeg31
+    3300078: SpiderLLeg32
+    3300080: SpiderLLeg33
+    3300082: SpiderLLeg41
+    3300084: SpiderLLeg42
+    3300086: SpiderLLeg43
+    3300088: SpiderRLeg11
+    3300090: SpiderRLeg12
+    3300092: SpiderRLeg13
+    3300094: SpiderRLeg21
+    3300096: SpiderRLeg22
+    3300098: SpiderRLeg23
+    3300100: SpiderRLeg31
+    3300102: SpiderRLeg32
+    3300104: SpiderRLeg33
+    3300106: SpiderRLeg41
+    3300108: SpiderRLeg42
+    3300110: SpiderRLeg43
+    3300112: Spider_Mandibel_L
+    3300114: Spider_Mandibel_R
+    3300116: Spiderhub
+    4300000: Spider
+    4300002: Box001
+    4300004: Spider
+    4300006: Box037
+    4300008: Spider
+    4300010: Box039
+    4300012: Box020
+    4300014: Box021
+    4300016: Box002
+    4300018: Box030
+    4300020: Box031
+    4300022: Box032
+    4300024: Box019
+    4300026: Box022
+    4300028: Box013
+    4300030: Box036
+    4300032: Box035
+    4300034: Box034
+    4300036: Box018
+    4300038: Box023
+    4300040: Box012
+    4300042: Box029
+    4300044: Box028
+    4300046: Box027
+    4300048: Box004
+    4300050: Box003
+    4300052: Box011
+    4300054: Box024
+    4300056: Box025
+    4300058: Box026
+    4300060: Box033
+    4300062: SpiderHub
+    4300064: SpiderLLeg11
+    4300066: SpiderLLeg12
+    4300068: SpiderLLeg13
+    4300070: SpiderRLeg11
+    4300072: SpiderRLeg12
+    4300074: SpiderRLeg13
+    4300076: SpiderLLeg21
+    4300078: SpiderLLeg22
+    4300080: SpiderLLeg23
+    4300082: SpiderRLeg21
+    4300084: SpiderRLeg22
+    4300086: SpiderRLeg23
+    4300088: SpiderLLeg31
+    4300090: SpiderLLeg32
+    4300092: SpiderLLeg33
+    4300094: SpiderRLeg31
+    4300096: SpiderRLeg32
+    4300098: SpiderRLeg33
+    4300100: SpiderLLeg41
+    4300102: SpiderLLeg42
+    4300104: SpiderLLeg43
+    4300106: SpiderRLeg41
+    4300108: SpiderRLeg42
+    4300110: SpiderRLeg43
+    4300112: Spider_Mandibel_L
+    4300114: Spider_Mandibel_R
+    4300116: Spiderhub
+    7400000: Spiderdrome Walkcycle
+    7400002: Take 001
+    9500000: //RootNode
+    13700000: Box001
+    13700002: Box003
+    13700004: Box004
+    13700006: Box011
+    13700008: Box037
+    13700010: Box039
+    13700012: Spiderhub
+    13700014: Box002
+    13700016: Box012
+    13700018: Box013
+    13700020: Box018
+    13700022: Box019
+    13700024: Box020
+    13700026: Box021
+    13700028: Box022
+    13700030: Box023
+    13700032: Box024
+    13700034: Box025
+    13700036: Box026
+    13700038: Box027
+    13700040: Box028
+    13700042: Box029
+    13700044: Box030
+    13700046: Box031
+    13700048: Box032
+    13700050: Box034
+    13700052: Box035
+    13700054: Box036
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Spiderdrome Walkcycle
+      takeName: Take 001
+      firstFrame: 0
+      lastFrame: 24
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Spider
+        weight: 1
+      - path: SpiderHub
+        weight: 1
+      - path: SpiderHub/Box033
+        weight: 1
+      - path: SpiderHub/Spider 1
+        weight: 1
+      - path: SpiderHub/Spider 1/Box039
+        weight: 1
+      - path: SpiderHub/Spider 2
+        weight: 1
+      - path: SpiderHub/Spider 2/Box037
+        weight: 1
+      - path: SpiderHub/Spider 3
+        weight: 1
+      - path: SpiderHub/Spider 3/Box001
+        weight: 1
+      - path: SpiderHub/SpiderLLeg11
+        weight: 1
+      - path: SpiderHub/SpiderLLeg11/Box002
+        weight: 1
+      - path: SpiderHub/SpiderLLeg11/SpiderLLeg12
+        weight: 1
+      - path: SpiderHub/SpiderLLeg11/SpiderLLeg12/Box021
+        weight: 1
+      - path: SpiderHub/SpiderLLeg11/SpiderLLeg12/SpiderLLeg13
+        weight: 1
+      - path: SpiderHub/SpiderLLeg11/SpiderLLeg12/SpiderLLeg13/Box020
+        weight: 1
+      - path: SpiderHub/SpiderLLeg21
+        weight: 1
+      - path: SpiderHub/SpiderLLeg21/Box013
+        weight: 1
+      - path: SpiderHub/SpiderLLeg21/SpiderLLeg22
+        weight: 1
+      - path: SpiderHub/SpiderLLeg21/SpiderLLeg22/Box022
+        weight: 1
+      - path: SpiderHub/SpiderLLeg21/SpiderLLeg22/SpiderLLeg23
+        weight: 1
+      - path: SpiderHub/SpiderLLeg21/SpiderLLeg22/SpiderLLeg23/Box019
+        weight: 1
+      - path: SpiderHub/SpiderLLeg31
+        weight: 1
+      - path: SpiderHub/SpiderLLeg31/Box012
+        weight: 1
+      - path: SpiderHub/SpiderLLeg31/SpiderLLeg32
+        weight: 1
+      - path: SpiderHub/SpiderLLeg31/SpiderLLeg32/Box023
+        weight: 1
+      - path: SpiderHub/SpiderLLeg31/SpiderLLeg32/SpiderLLeg33
+        weight: 1
+      - path: SpiderHub/SpiderLLeg31/SpiderLLeg32/SpiderLLeg33/Box018
+        weight: 1
+      - path: SpiderHub/SpiderLLeg41
+        weight: 1
+      - path: SpiderHub/SpiderLLeg41/Box011
+        weight: 1
+      - path: SpiderHub/SpiderLLeg41/SpiderLLeg42
+        weight: 1
+      - path: SpiderHub/SpiderLLeg41/SpiderLLeg42/Box003
+        weight: 1
+      - path: SpiderHub/SpiderLLeg41/SpiderLLeg42/SpiderLLeg43
+        weight: 1
+      - path: SpiderHub/SpiderLLeg41/SpiderLLeg42/SpiderLLeg43/Box004
+        weight: 1
+      - path: SpiderHub/SpiderRLeg11
+        weight: 1
+      - path: SpiderHub/SpiderRLeg11/Box032
+        weight: 1
+      - path: SpiderHub/SpiderRLeg11/SpiderRLeg12
+        weight: 1
+      - path: SpiderHub/SpiderRLeg11/SpiderRLeg12/Box031
+        weight: 1
+      - path: SpiderHub/SpiderRLeg11/SpiderRLeg12/SpiderRLeg13
+        weight: 1
+      - path: SpiderHub/SpiderRLeg11/SpiderRLeg12/SpiderRLeg13/Box030
+        weight: 1
+      - path: SpiderHub/SpiderRLeg21
+        weight: 1
+      - path: SpiderHub/SpiderRLeg21/Box034
+        weight: 1
+      - path: SpiderHub/SpiderRLeg21/SpiderRLeg22
+        weight: 1
+      - path: SpiderHub/SpiderRLeg21/SpiderRLeg22/Box035
+        weight: 1
+      - path: SpiderHub/SpiderRLeg21/SpiderRLeg22/SpiderRLeg23
+        weight: 1
+      - path: SpiderHub/SpiderRLeg21/SpiderRLeg22/SpiderRLeg23/Box036
+        weight: 1
+      - path: SpiderHub/SpiderRLeg31
+        weight: 1
+      - path: SpiderHub/SpiderRLeg31/Box027
+        weight: 1
+      - path: SpiderHub/SpiderRLeg31/SpiderRLeg32
+        weight: 1
+      - path: SpiderHub/SpiderRLeg31/SpiderRLeg32/Box028
+        weight: 1
+      - path: SpiderHub/SpiderRLeg31/SpiderRLeg32/SpiderRLeg33
+        weight: 1
+      - path: SpiderHub/SpiderRLeg31/SpiderRLeg32/SpiderRLeg33/Box029
+        weight: 1
+      - path: SpiderHub/SpiderRLeg41
+        weight: 1
+      - path: SpiderHub/SpiderRLeg41/Box026
+        weight: 1
+      - path: SpiderHub/SpiderRLeg41/SpiderRLeg42
+        weight: 1
+      - path: SpiderHub/SpiderRLeg41/SpiderRLeg42/Box025
+        weight: 1
+      - path: SpiderHub/SpiderRLeg41/SpiderRLeg42/SpiderRLeg43
+        weight: 1
+      - path: SpiderHub/SpiderRLeg41/SpiderRLeg42/SpiderRLeg43/Box024
+        weight: 1
+      - path: SpiderLLeg1Platform
+        weight: 1
+      - path: SpiderLLeg2Platform
+        weight: 1
+      - path: SpiderLLeg3Platform
+        weight: 1
+      - path: SpiderLLeg4Platform
+        weight: 1
+      - path: SpiderRLeg1Platform
+        weight: 1
+      - path: SpiderRLeg2Platform
+        weight: 1
+      - path: SpiderRLeg3Platform
+        weight: 1
+      - path: SpiderRLeg4Platform
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: Take 001
+      takeName: Take 001
+      firstFrame: 0
+      lastFrame: 24
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Spider
+        weight: 1
+      - path: SpiderHub
+        weight: 1
+      - path: SpiderHub/Box033
+        weight: 1
+      - path: SpiderHub/Spider 1
+        weight: 1
+      - path: SpiderHub/Spider 1/Box039
+        weight: 1
+      - path: SpiderHub/Spider 2
+        weight: 1
+      - path: SpiderHub/Spider 2/Box037
+        weight: 1
+      - path: SpiderHub/Spider 3
+        weight: 1
+      - path: SpiderHub/Spider 3/Box001
+        weight: 1
+      - path: SpiderHub/SpiderLLeg11
+        weight: 1
+      - path: SpiderHub/SpiderLLeg11/Box002
+        weight: 1
+      - path: SpiderHub/SpiderLLeg11/SpiderLLeg12
+        weight: 1
+      - path: SpiderHub/SpiderLLeg11/SpiderLLeg12/Box021
+        weight: 1
+      - path: SpiderHub/SpiderLLeg11/SpiderLLeg12/SpiderLLeg13
+        weight: 1
+      - path: SpiderHub/SpiderLLeg11/SpiderLLeg12/SpiderLLeg13/Box020
+        weight: 1
+      - path: SpiderHub/SpiderLLeg21
+        weight: 1
+      - path: SpiderHub/SpiderLLeg21/Box013
+        weight: 1
+      - path: SpiderHub/SpiderLLeg21/SpiderLLeg22
+        weight: 1
+      - path: SpiderHub/SpiderLLeg21/SpiderLLeg22/Box022
+        weight: 1
+      - path: SpiderHub/SpiderLLeg21/SpiderLLeg22/SpiderLLeg23
+        weight: 1
+      - path: SpiderHub/SpiderLLeg21/SpiderLLeg22/SpiderLLeg23/Box019
+        weight: 1
+      - path: SpiderHub/SpiderLLeg31
+        weight: 1
+      - path: SpiderHub/SpiderLLeg31/Box012
+        weight: 1
+      - path: SpiderHub/SpiderLLeg31/SpiderLLeg32
+        weight: 1
+      - path: SpiderHub/SpiderLLeg31/SpiderLLeg32/Box023
+        weight: 1
+      - path: SpiderHub/SpiderLLeg31/SpiderLLeg32/SpiderLLeg33
+        weight: 1
+      - path: SpiderHub/SpiderLLeg31/SpiderLLeg32/SpiderLLeg33/Box018
+        weight: 1
+      - path: SpiderHub/SpiderLLeg41
+        weight: 1
+      - path: SpiderHub/SpiderLLeg41/Box011
+        weight: 1
+      - path: SpiderHub/SpiderLLeg41/SpiderLLeg42
+        weight: 1
+      - path: SpiderHub/SpiderLLeg41/SpiderLLeg42/Box003
+        weight: 1
+      - path: SpiderHub/SpiderLLeg41/SpiderLLeg42/SpiderLLeg43
+        weight: 1
+      - path: SpiderHub/SpiderLLeg41/SpiderLLeg42/SpiderLLeg43/Box004
+        weight: 1
+      - path: SpiderHub/SpiderRLeg11
+        weight: 1
+      - path: SpiderHub/SpiderRLeg11/Box032
+        weight: 1
+      - path: SpiderHub/SpiderRLeg11/SpiderRLeg12
+        weight: 1
+      - path: SpiderHub/SpiderRLeg11/SpiderRLeg12/Box031
+        weight: 1
+      - path: SpiderHub/SpiderRLeg11/SpiderRLeg12/SpiderRLeg13
+        weight: 1
+      - path: SpiderHub/SpiderRLeg11/SpiderRLeg12/SpiderRLeg13/Box030
+        weight: 1
+      - path: SpiderHub/SpiderRLeg21
+        weight: 1
+      - path: SpiderHub/SpiderRLeg21/Box034
+        weight: 1
+      - path: SpiderHub/SpiderRLeg21/SpiderRLeg22
+        weight: 1
+      - path: SpiderHub/SpiderRLeg21/SpiderRLeg22/Box035
+        weight: 1
+      - path: SpiderHub/SpiderRLeg21/SpiderRLeg22/SpiderRLeg23
+        weight: 1
+      - path: SpiderHub/SpiderRLeg21/SpiderRLeg22/SpiderRLeg23/Box036
+        weight: 1
+      - path: SpiderHub/SpiderRLeg31
+        weight: 1
+      - path: SpiderHub/SpiderRLeg31/Box027
+        weight: 1
+      - path: SpiderHub/SpiderRLeg31/SpiderRLeg32
+        weight: 1
+      - path: SpiderHub/SpiderRLeg31/SpiderRLeg32/Box028
+        weight: 1
+      - path: SpiderHub/SpiderRLeg31/SpiderRLeg32/SpiderRLeg33
+        weight: 1
+      - path: SpiderHub/SpiderRLeg31/SpiderRLeg32/SpiderRLeg33/Box029
+        weight: 1
+      - path: SpiderHub/SpiderRLeg41
+        weight: 1
+      - path: SpiderHub/SpiderRLeg41/Box026
+        weight: 1
+      - path: SpiderHub/SpiderRLeg41/SpiderRLeg42
+        weight: 1
+      - path: SpiderHub/SpiderRLeg41/SpiderRLeg42/Box025
+        weight: 1
+      - path: SpiderHub/SpiderRLeg41/SpiderRLeg42/SpiderRLeg43
+        weight: 1
+      - path: SpiderHub/SpiderRLeg41/SpiderRLeg42/SpiderRLeg43/Box024
+        weight: 1
+      - path: SpiderLLeg1Platform
+        weight: 1
+      - path: SpiderLLeg2Platform
+        weight: 1
+      - path: SpiderLLeg3Platform
+        weight: 1
+      - path: SpiderLLeg4Platform
+        weight: 1
+      - path: SpiderRLeg1Platform
+        weight: 1
+      - path: SpiderRLeg2Platform
+        weight: 1
+      - path: SpiderRLeg3Platform
+        weight: 1
+      - path: SpiderRLeg4Platform
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: .00999999978
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  additionalBone: 0
+  userData: 
