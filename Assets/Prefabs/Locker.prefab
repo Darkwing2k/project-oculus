@@ -28,7 +28,6 @@ GameObject:
   - 4: {fileID: 400002}
   - 135: {fileID: 13500000}
   - 114: {fileID: 11400000}
-  - 114: {fileID: 11400002}
   m_Layer: 2
   m_Name: CutableItemBehaviour
   m_TagString: Untagged
@@ -258,7 +257,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100010}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 300.769501, y: .709999979, z: 3.17568398}
+  m_LocalPosition: {x: 42.8063812, y: -12.4119205, z: 46.8252525}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 400004}
@@ -575,18 +574,18 @@ HingeJoint:
   m_Anchor: {x: .5, y: 0, z: 0}
   m_Axis: {x: 0, y: 1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 300.964508, y: .709999979, z: 3.03068399}
-  m_UseSpring: 0
+  m_ConnectedAnchor: {x: 43.0013809, y: -12.4119205, z: 46.6802521}
+  m_UseSpring: 1
   m_Spring:
     spring: 1
-    damper: 0
-    targetPosition: 0
-  m_UseMotor: 1
+    damper: 1
+    targetPosition: 230
+  m_UseMotor: 0
   m_Motor:
     targetVelocity: -10
-    force: 1
+    force: 2
     freeSpin: 0
-  m_UseLimits: 1
+  m_UseLimits: 0
   m_Limits:
     min: 0
     max: -90
@@ -705,17 +704,6 @@ MonoBehaviour:
   isCut: 0
   destroyWhenCut:
   - {fileID: 13800000}
---- !u!114 &11400002
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100002}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9fa587bd94b30f747b6f3f015302cc0c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!135 &13500000
 SphereCollider:
   m_ObjectHideFlags: 1

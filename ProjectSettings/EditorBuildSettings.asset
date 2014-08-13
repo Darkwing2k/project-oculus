@@ -7,5 +7,7 @@ EditorBuildSettings:
   m_Scenes:
   - enabled: 0
     path: Assets/Scenes/Office_TestArea.unity
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Mesh_Test.unity
+  - enabled: 1
+    path: Assets/Scenes/Levelbuild_Prototype_004.unity

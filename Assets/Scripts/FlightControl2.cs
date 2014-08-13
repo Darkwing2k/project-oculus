@@ -16,6 +16,9 @@ public class FlightControl2 : MonoBehaviour
     private Transform audioChild;
     private AudioSource audio;
 
+    private float yawVerTarget = 0f;
+    private float yawVerValue = 0f;
+
     #region Y-Rotate Variables
     public bool useDirectYawInput;
     private float yawVelTarget = 0f; // Desired Velocity for Y-Rotation
@@ -127,13 +130,28 @@ public class FlightControl2 : MonoBehaviour
         {
             yawVelTarget = 0;
         }
+        // Right analog Stick for Up-Down Rotation
+        /*
+        if (Mathf.Abs(rStickV) > 0.3f)
+        {
+            yawVerTarget = rStickV * yawVelMax;
+        }
+        else
+        {
+            yawVerTarget = 0;
+        }
+         * */
 
         if (useDirectYawInput)
             yawVelValue = yawVelTarget;
         else
             yawVelValue = calcValue(yawVelValue, yawAcc, yawVelTarget, yawAcc * Time.deltaTime);
 
+        yawVerValue = calcValue(yawVerValue, yawAcc, yawVerTarget, yawAcc * Time.deltaTime);        
+
         this.transform.Rotate(0, yawVelValue, 0, Space.World);
+        
+        this.transform.Rotate(yawVerValue, 0, 0, Space.Self); //Up-Down Rotation
 
         if (useRolling)
         {
