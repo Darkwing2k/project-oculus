@@ -37,6 +37,10 @@ public class JumpAttackBehaviour : IBehaviour {
 				timePassedSinceJump = 0.0f;
 				jumpInProgress = false;
                 generalBehaviour.anim.Play();
+
+                generalBehaviour.soundSource.clip = generalBehaviour.walkSound;
+                generalBehaviour.soundSource.loop = true;
+                generalBehaviour.soundSource.Play();
 			}
 		}
 			
@@ -68,6 +72,10 @@ public class JumpAttackBehaviour : IBehaviour {
 		generalBehaviour.enemy.rigidbody.useGravity = true;
 		generalBehaviour.enemy.rigidbody.AddForce(jumpVector, ForceMode.Impulse);
         generalBehaviour.anim.Stop();
+
+        generalBehaviour.soundSource.clip = generalBehaviour.jumpSound;
+        generalBehaviour.soundSource.loop = false;
+        generalBehaviour.soundSource.Play();
 	}
 
 	//TODO: try to implement a more general, height independent, method (maybe floor collider?)

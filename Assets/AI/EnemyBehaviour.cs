@@ -33,6 +33,10 @@ public class EnemyBehaviour : IBehaviour {
 
     public Animation anim;
 
+    public AudioSource soundSource;
+    public AudioClip walkSound;
+    public AudioClip jumpSound;
+
     public OffMeshLinkData targetLinkData;
     public OffMeshLink endLink;
     public bool processingOffMeshLink;
@@ -43,9 +47,14 @@ public class EnemyBehaviour : IBehaviour {
 	protected EnemyBehaviour()
 	{}
 
-	public EnemyBehaviour(GameObject enemy, GameObject player, NavMeshAgent enemyNavMeshAgent, Animation anim)
+	public EnemyBehaviour(GameObject enemy, GameObject player, NavMeshAgent enemyNavMeshAgent, Animation anim, AudioSource ss, AudioClip walk, AudioClip jump)
 	{
         this.anim = anim;
+
+        this.soundSource = ss;
+        this.walkSound = walk;
+        this.jumpSound = jump;
+
 		this.enemy = enemy;
 		this.player = player;
 		this.agent = enemyNavMeshAgent;

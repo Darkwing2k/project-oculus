@@ -13,6 +13,10 @@ public class SpiderControl : MonoBehaviour {
 
     public Animation anim;
 
+    public AudioSource soundSource;
+    public AudioClip walkSound;
+    public AudioClip jumpSound;
+
 	public float speed = 2.0f;
 
 	float timer = 0.0f;
@@ -36,12 +40,14 @@ public class SpiderControl : MonoBehaviour {
         updateDelegate = new executeInUpdateMethod(dummy);
         anim = this.gameObject.GetComponent<Animation>();
 
+        soundSource = this.gameObject.GetComponent<AudioSource>();
+
 		spiderEnemy = GameObject.FindWithTag("Spider");
 		player = GameObject.FindWithTag("Player");
 		NavMeshAgent navMeshAgent = spiderEnemy.GetComponent<NavMeshAgent>();
 		navMeshAgent.speed = speed;
 
-		generalBehaviour = new EnemyBehaviour(spiderEnemy, player, navMeshAgent, anim);
+		generalBehaviour = new EnemyBehaviour(spiderEnemy, player, navMeshAgent, anim, soundSource, walkSound, jumpSound);
         generalBehaviour.DEBUG_startPos = spiderEnemy.transform.position;
         generalBehaviour.speed = speed;
 		generalBehaviour.changeBehaviour(new WanderBehaviour(generalBehaviour, this));
@@ -74,6 +80,11 @@ public class SpiderControl : MonoBehaviour {
                         {
                             generalBehaviour.changeBehaviour(new FollowBehaviour(generalBehaviour, this));
                             generalBehaviour.anim.Play();
+
+                            generalBehaviour.soundSource.clip = generalBehaviour.walkSound;
+                            generalBehaviour.soundSource.loop = true;
+                            generalBehaviour.soundSource.Play();
+
                         }
                     }
                     else if (generalBehaviour.currentBehaviour is FollowBehaviour)

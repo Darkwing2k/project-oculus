@@ -113,6 +113,11 @@ public class WanderBehaviour : IBehaviour {
 	private void wait(float timePassed)
 	{
         generalBehaviour.anim.Stop();
+
+        generalBehaviour.soundSource.clip = generalBehaviour.walkSound;
+        generalBehaviour.soundSource.loop = true;
+        generalBehaviour.soundSource.Stop();
+
 		timer += timePassed;
 		if (timer >= timeToWait)
 		{
@@ -121,6 +126,8 @@ public class WanderBehaviour : IBehaviour {
 			timer = 0.0f;
             timeToWait = UnityEngine.Random.Range(0.0f, 3.0f);
             generalBehaviour.anim.Play();
+
+            generalBehaviour.soundSource.Play();
 		}
 	}
 
