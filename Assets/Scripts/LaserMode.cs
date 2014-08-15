@@ -8,6 +8,9 @@ public class LaserMode : MonoBehaviour
 
     public LaserModeTarget currentTarget;
 
+    private AudioSource laserSoundSrc;
+    public AudioClip laserSound;
+
     private float timer = 0;
     private float timerMax = 2;
 
@@ -322,6 +325,11 @@ public class LaserMode : MonoBehaviour
                         GameObject laserGO = GameObject.Instantiate(Resources.Load("Laser")) as GameObject;
                         laser = laserGO.GetComponent<LineRenderer>();
                         laserGO.transform.parent = playerRef.eyeCenter;
+
+                        laserSoundSrc =  this.gameObject.AddComponent<AudioSource>();
+
+                        laserSoundSrc.loop = false;
+                        laserSoundSrc.clip = laserSound;
 
                         Vector3 laserStartPos = playerRef.eyeCenter.transform.position + laserPos;
 
