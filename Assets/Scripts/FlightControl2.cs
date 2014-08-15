@@ -13,7 +13,6 @@ public class FlightControl2 : MonoBehaviour
     public float maxDirectionalVelocity;
     public float currentDirectionalVelocity;
 
-    private Transform audioChild;
     private AudioSource audio;
 
     private float yawVerTarget = 0f;
@@ -42,14 +41,13 @@ public class FlightControl2 : MonoBehaviour
     private float rStickV;
     private float rStickH;
 
-    private float moveVol = 0.4f;
-    private float movePitch = 0.36f;
+    public float moveVol;
+    public float movePitch;
 
     // Use this for initialization
     void Start()
     {
-        audioChild = transform.Find("AudioSource");
-        audio = audioChild.GetComponent<AudioSource>();
+        audio = this.gameObject.GetComponentInChildren<AudioSource>();
 
         maxDirectionalVelocity = 0;
         currentDirectionalVelocity = 0;
@@ -64,9 +62,6 @@ public class FlightControl2 : MonoBehaviour
         shoulder = 0;
         rStickV = 0;
         rStickH = 0;
-
-        audio.volume = 0.3f;
-        audio.pitch = 0.3f;
 
         // == Get all Joystick Positions =================================
         if (playerRef.FlightControlEnabled)
