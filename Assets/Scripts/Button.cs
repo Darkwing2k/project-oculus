@@ -44,6 +44,8 @@ public class Button : MonoBehaviour
         if (c.gameObject.tag.Equals("Player"))
         {
             playerRef = c.gameObject;
+
+            playerRef.GetComponent<Player>().buttonInfo.gameObject.SetActive(true);
         }
     }
 
@@ -51,6 +53,8 @@ public class Button : MonoBehaviour
     {
         if (c.gameObject.tag.Equals("Player"))
         {
+            playerRef.GetComponent<Player>().buttonInfo.gameObject.SetActive(false);
+
             playerRef = null;
         }
     }

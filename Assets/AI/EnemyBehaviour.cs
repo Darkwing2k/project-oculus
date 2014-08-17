@@ -64,7 +64,7 @@ public class EnemyBehaviour : IBehaviour {
 
 	public void execute(float timePassed)
 	{
-		Debug.Log(currentBehaviour.ToString());
+		//Debug.Log(currentBehaviour.ToString());
 		currentBehaviour.execute(timePassed);
 	}
 

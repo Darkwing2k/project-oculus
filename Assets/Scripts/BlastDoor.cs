@@ -20,8 +20,9 @@ public class BlastDoor : Triggerable
     private bool moveSoundActive;
     public AudioClip shut;
     public float shutPitch;
-    
-    
+
+    public bool letsGetPhysical;
+
 	// Use this for initialization
 	void Start () 
     {
@@ -86,11 +87,32 @@ public class BlastDoor : Triggerable
             {
                 case DoorState.CLOSED:
                     {
+                        
+
                         steps = 0;
                         break;
                     }
                 case DoorState.CLOSING:
                     {
+                        if (letsGetPhysical)
+                        {
+                            Ray r = new Ray(this.transform.position, this.transform.up * -1);
+
+                            Debug.DrawRay(r.origin, r.direction * 100, Color.red, 10);
+
+                            RaycastHit hit;
+
+                            if (Physics.Raycast(r, out hit, 100))
+                            {
+                                Debug.Log("hit " + hit.collider.gameObject.name + " " + hit.point.y);
+
+                                foreach (BlastDoorPiece piece in doorPieces)
+                                {
+                                    piece.closePosition.y = hit.point.y + 1.1f;
+                                }
+                            }                            
+                        }
+
                         break;
                     }
                 case DoorState.OPEN:

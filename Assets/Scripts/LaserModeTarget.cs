@@ -26,7 +26,10 @@ public class LaserModeTarget : MonoBehaviour
     {
         if (!isCut && c.gameObject.tag.Equals("Player") && !isCut)
         {
-            c.GetComponent<Player>().registerCutable(this);
+            Player p = c.GetComponent<Player>();
+
+            p.registerCutable(this);
+            p.buttonInfo.gameObject.SetActive(true);
         }
     }
 
@@ -34,7 +37,10 @@ public class LaserModeTarget : MonoBehaviour
     {
         if (!isCut && c.gameObject.tag.Equals("Player"))
         {
-            c.GetComponent<Player>().removeCutable(this);
+            Player p = c.GetComponent<Player>();
+
+            p.removeCutable(this);
+            p.buttonInfo.gameObject.SetActive(false);
         }
     }
 

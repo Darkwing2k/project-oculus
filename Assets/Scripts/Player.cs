@@ -7,6 +7,8 @@ public class Player : MonoBehaviour
     public bool useOculus;
     public bool useGamepad;
 
+    public CrosshairBehaviour buttonInfo;
+
     [System.Obsolete("Only for display in Editor, use LiftModeEnabled instead")]
     public bool liftModeActive; 
     public bool LiftModeEnabled
@@ -47,7 +49,6 @@ public class Player : MonoBehaviour
     public Transform eyeCenter;
 
     public bool noClip;
-
 
 	// Use this for initialization
 	void Start () 

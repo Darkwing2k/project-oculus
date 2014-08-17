@@ -63,7 +63,7 @@ public class SpiderControl : MonoBehaviour {
         {
             if (timer >= timeToExecute)
             {
-                Debug.Log("IS BEHAVIOUR CHANGE LOCKED: " + generalBehaviour.behaviourChangeLocked);
+                //Debug.Log("IS BEHAVIOUR CHANGE LOCKED: " + generalBehaviour.behaviourChangeLocked);
                 if (!generalBehaviour.behaviourChangeLocked)
                 {
                     Vector3 playerPosition = player.transform.position;

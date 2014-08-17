@@ -7,7 +7,7 @@ public class LiftMode : MonoBehaviour
     public Player playerRef;
 
     // === Variables for using Objects ===
-    private GameObject lifted;
+    public GameObject lifted;
 
     public Vector3 jointPos;
 
