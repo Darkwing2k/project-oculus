@@ -81,7 +81,7 @@ public class DrMerge : EditorWindow {
 
                 SceneMerger.activateProgressReports(fetchMergeProgress);
 
-                worker.RunWorkerAsync();
+                //worker.RunWorkerAsync();
             }
 
             if (merging)
