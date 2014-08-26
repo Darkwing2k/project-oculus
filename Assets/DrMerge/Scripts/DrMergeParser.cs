@@ -12,7 +12,18 @@ public class DeserializedScene
 {
     public string name;
 
+    public int index;
+
+    public List<string> allSceneLines;
+
     public Dictionary<long, DeserializedObject> objects;
+
+    public DeserializedScene(List<string> allLines)
+    {
+        allSceneLines = allLines;
+        index = 2;
+        objects = new Dictionary<long, DeserializedObject>();
+    }
 
     public void compare(DeserializedScene otherScene)
     {
@@ -45,6 +56,18 @@ public class DeserializedScene
             }
         }
     }
+
+    public void parse()
+    {
+        while (index < allSceneLines.Count)
+        {
+            DeserializedObject tmpO = new DeserializedObject();
+
+            tmpO.parse(allSceneLines, ref index);
+
+            objects.Add(tmpO.id, tmpO);
+        }
+    }
 }
 
 public class DeserializedObject
@@ -55,8 +78,6 @@ public class DeserializedObject
 
     public string typeName;
 
-    public List<string> allLines;
-
     public List<Member> members;
 
     public List<int> differences;
@@ -66,18 +87,10 @@ public class DeserializedObject
 
     public DeserializedObject()
     {
-        allLines = new List<string>();
         members = new List<Member>();
         differences = new List<int>();
 
         result = CompareResult.UNDECIDED;
-    }
-
-    public DeserializedObject(long id, int type, string typeName) : this()
-    {
-        this.id = id;
-        this.type = type;
-        this.typeName = typeName;
     }
 
     public bool equal(DeserializedObject other)
@@ -95,6 +108,48 @@ public class DeserializedObject
         }
 
         return equal;
+    }
+
+    public void parse(List<string> allSceneLines, ref int index)
+    {
+        string[] typeAndIdLine = allSceneLines[index].Split(' ');
+
+        typeAndIdLine[1] = typeAndIdLine[1].Split('!')[2];
+
+        typeAndIdLine[2] = typeAndIdLine[2].Split('&')[1];
+
+        id = long.Parse(typeAndIdLine[2]);
+        type = int.Parse(typeAndIdLine[1]);
+
+        index++;
+
+        typeName = allSceneLines[index].Split(':')[0];
+
+        index++;
+
+        string line;
+
+        while (! (line = allSceneLines[index]).StartsWith("--- !u!"))
+        {
+            if (line.EndsWith(":"))
+            {
+                Array tmpA = new Array(line.Split(':')[0]);
+
+                tmpA.parse(allSceneLines, index);
+
+                members.Add(tmpA);
+            }
+            else
+            {
+                Variable tmpV = new Variable();
+
+                tmpV.parse(allSceneLines, index);
+
+                members.Add(tmpV);
+            }
+            
+            index++;
+        }
     }
 }
 
@@ -141,7 +196,7 @@ public class Variable : Member
                 string[] pieces = line.Split(sep, 2);
 
                 this.name = pieces[0];
-                this.value = pieces[1];
+                this.value = "{" + pieces[1];
 
                 return;
             }
