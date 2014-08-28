@@ -7,7 +7,7 @@ public class PlayerStateMachine : MonoBehaviour
     public GameObject buttonInfo;
     public List<Usable> currentUsables;
 
-    public enum PlayerStateEnum { IDLE, LIFT, LASER, HACK };
+    public enum PlayerStateEnum { IDLE, LIFT, LASER, HACK, INPUT };
     public PlayerStateEnum currentState;
 
     public enum InputType { USE };
@@ -30,6 +30,7 @@ public class PlayerStateMachine : MonoBehaviour
         states.Add(PlayerStateEnum.LIFT, gameObject.GetComponent<LiftState>());
         states.Add(PlayerStateEnum.LASER, gameObject.GetComponent<LaserState>());
         states.Add(PlayerStateEnum.HACK, gameObject.GetComponent<HackState>());
+		states.Add(PlayerStateEnum.INPUT, gameObject.GetComponent<InputState>());
 
         currentState = PlayerStateEnum.IDLE;
 

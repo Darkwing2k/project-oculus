@@ -21,7 +21,7 @@ public abstract class Usable : MonoBehaviour
     }
 
     // Monobehaviour stuff
-    void Start()
+    protected virtual void Start()
     {
         playerRef = GameObject.FindGameObjectWithTag("Player");
         psm = playerRef.GetComponent<PlayerStateMachine>();
