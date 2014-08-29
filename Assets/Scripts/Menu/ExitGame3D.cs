@@ -52,7 +52,7 @@ public class ExitGame3D : Menu3D {
 	}
 
 	void Update () {
-		if (t < 0.85f) {
+		if (t < 0.7f) {
 			text3D.transform.position = Vector3.Lerp(origin.position, target.position, t);
 			t += Time.deltaTime / 2.0f;
 		}

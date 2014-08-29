@@ -30,8 +30,8 @@ public class ObjectZoom : MonoBehaviour {
 	}
 
 	void OnDisable() {
-		transform.position = startPos;
-		transform.rotation = startRot;
+		//transform.position = startPos;
+		//transform.rotation = startRot;
 	}
 
 	void Update() {
@@ -52,6 +52,7 @@ public class ObjectZoom : MonoBehaviour {
 				//transform.rotation = Quaternion.Slerp(startRot, Quaternion.LookRotation(target.position - startPos), t);
 			}
 		}
+		Debug.DrawLine(startPos, targetPos, Color.red);
 	}
 
 	public void ZoomIn() {
@@ -59,7 +60,8 @@ public class ObjectZoom : MonoBehaviour {
 			t = 0.0f;
 		}
 
-		targetPos = target.position - ((target.position - transform.position).normalized * minDistanceToTarget);
+		targetPos = target.position -((target.position - transform.position).normalized * minDistanceToTarget);
+		Debug.Log(targetPos);
 
 		zoomIn = true;
 		zoomOut = false;

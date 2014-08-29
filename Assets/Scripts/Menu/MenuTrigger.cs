@@ -22,12 +22,18 @@ public class MenuTrigger : MonoBehaviour {
 
 	void OnTriggerEnter(Collider other) {
 		Debug.Log("TriggerEntered: " + other.gameObject.name);
+		deactivateMenu();
 		activateMenu(other);
 	}
 	
 	void OnTriggerExit(Collider other) {
 		Debug.Log("TriggerExited: " + other.gameObject.name);
-		deactivateMenu(other);
+		
+		Menu menu = other.gameObject.GetComponent<Menu>();
+
+		if (menu != null && menu == activeMenu) {
+			deactivateMenu();
+		}
 	}
 
 	private void activateMenu(Collider collider) {
@@ -39,10 +45,8 @@ public class MenuTrigger : MonoBehaviour {
 		}
 	}
 
-	private void deactivateMenu(Collider collider) {
-		Menu menu = collider.gameObject.GetComponent<Menu>();
-
-		if (menu != null && menu == activeMenu) {
+	private void deactivateMenu() {
+		if (activeMenu != null) {
 			activeMenu.Deactivate();
 			activeMenu = null;
 		}

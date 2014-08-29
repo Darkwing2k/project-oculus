@@ -6,9 +6,10 @@ TagManager:
   - Liftable
   - Cutable
   - Level
-  - 
+  - MainMenu
   - Spider
   - ClimbableWallCollider
+  - PlayerMenu
   - 
   Builtin Layer 0: Default
   Builtin Layer 1: TransparentFX

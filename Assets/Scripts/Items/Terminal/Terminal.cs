@@ -16,7 +16,7 @@ public class Terminal : MonoBehaviour {
 
 	void Awake() {
 		inputfield = GetComponentInChildren<TextMesh>();
-		zoomer = GetComponent<ObjectZoom>();
+		zoomer = GetComponentInChildren<ObjectZoom>();
 		inputfield.text = "";
 		currentState = TerminalState.DISABLED;
 	}
