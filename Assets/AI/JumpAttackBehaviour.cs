@@ -7,7 +7,7 @@ public class JumpAttackBehaviour : IBehaviour {
 
 	private bool jumpInProgress;
 
-	private static float timeToCheckIfJumpCompleted = 3.0f;
+	private static float timeToCheckIfJumpCompleted = 0.8f;
 	private float timePassedSinceJump;
 
 	private static Vector3 jumpCorrectionVector = new Vector3(0.0f, 5.0f, 0.0f);
@@ -81,6 +81,7 @@ public class JumpAttackBehaviour : IBehaviour {
 	//TODO: try to implement a more general, height independent, method (maybe floor collider?)
 	private bool isJumpCompleted()
 	{
+        Debug.Log("timePassedSinceJump: " + timePassedSinceJump);
 		if (timePassedSinceJump > timeToCheckIfJumpCompleted)
 		{
 			if (generalBehaviour.enemy.transform.position.y < 2.0f)
