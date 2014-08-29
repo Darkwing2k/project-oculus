@@ -20,6 +20,10 @@ public class DrMerge : EditorWindow {
 
     private DiffDeciderModel ddModel;
 
+    private DrMergeParser parser;
+    private Object sceneA;
+    private Object sceneB;
+
     [MenuItem("Window/DrMerge")]
     static void Init()
     {
@@ -30,12 +34,12 @@ public class DrMerge : EditorWindow {
 
     private void OnLostFocus()
     {
-        /*
         performedMerge = false;
         merging = false;
         mergingProgress = 0;
         counter = 0;
-        */
+
+        parser = null;
     }
 
     private void OnDestroy()
@@ -60,14 +64,17 @@ public class DrMerge : EditorWindow {
             EditorGUILayout.BeginVertical();
 
             GUILayout.Label("Scene A");
-            SceneMerger.a.original = EditorGUILayout.ObjectField(SceneMerger.a.original, typeof(Object), true);
+            //SceneMerger.a.original = EditorGUILayout.ObjectField(SceneMerger.a.original, typeof(Object), true);
+            sceneA = EditorGUILayout.ObjectField(sceneA, typeof(Object), true);
 
             GUILayout.Label("Scene B");
-            SceneMerger.b.original = EditorGUILayout.ObjectField(SceneMerger.b.original, typeof(Object), true);
+            //SceneMerger.b.original = EditorGUILayout.ObjectField(SceneMerger.b.original, typeof(Object), true);
+            sceneB = EditorGUILayout.ObjectField(sceneB, typeof(Object), true);
 
 
             if (GUILayout.Button("Start"))
             {
+                /*
                 merging = true;
 
                 BackgroundWorker worker = new BackgroundWorker();
@@ -80,8 +87,14 @@ public class DrMerge : EditorWindow {
                 SceneMerger.getPathsAndNames();
 
                 SceneMerger.activateProgressReports(fetchMergeProgress);
+                 * */
 
                 //worker.RunWorkerAsync();
+
+                parser = new DrMergeParser(AssetDatabase.GetAssetPath(sceneA), AssetDatabase.GetAssetPath(sceneB));
+                parser.parse();
+
+                parser.print(Application.dataPath + "/DrMerge/ParserLog.txt", true, true);
             }
 
             if (merging)
