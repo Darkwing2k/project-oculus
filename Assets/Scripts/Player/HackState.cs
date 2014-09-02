@@ -10,6 +10,11 @@ public class HackState : PlayerState
         h.use();
 
         psm.changePlayerState(PlayerStateMachine.PlayerStateEnum.IDLE);
+
+        if (h.pressed && !h.toggle)
+        {
+            psm.deregisterUsable(h);
+        }
     }
 
     public override void handleInput(PlayerStateMachine.InputType inputT, System.Collections.Generic.List<Usable> usables)
