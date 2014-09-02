@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEditor;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,16 +7,24 @@ using System.IO;
 
 public class DeserializedScene
 {
-    public string name;
+    public static SceneManager manager;
 
-    public int index;
+    public string name;
+    public int parseIndex;
+    public int objectCount;
 
     public List<string> allSceneLines;
 
-    public Dictionary<long, DeserializedObject> objects;
+    public Dictionary<long, DObject> objects;
 
-    public DeserializedScene(List<string> allLines)
+    public List<Change> changes;
+
+    public static Color prevColor;
+
+    public DeserializedScene(SceneManager manager, List<string> allLines)
     {
+        DeserializedScene.manager = manager;
+
         allSceneLines = new List<string>();
 
         for (int i = 0; i < allLines.Count; i++)
@@ -23,105 +32,185 @@ public class DeserializedScene
             allSceneLines.Add(allLines[i]);
         }
 
-        index = 2;
-        objects = new Dictionary<long, DeserializedObject>();
+        parseIndex = 2;
+        objectCount = 0;
+
+        objects = new Dictionary<long, DObject>();
+        changes = new List<Change>();
     }
 
-    public void compare(DeserializedScene otherScene)
+    public static void compare(DeserializedScene sceneA, DeserializedScene sceneB)
     {
-        foreach (KeyValuePair<long, DeserializedObject> current in objects)
+        foreach (DObject currentObjA in sceneA.objects.Values)
         {
-            if (otherScene.objects.ContainsKey(current.Key))
+            if (sceneB.objects.ContainsKey(currentObjA.id))
             {
-                if (current.Value.equal(otherScene.objects[current.Key]))
+                if (currentObjA.isEqualTo(sceneB.objects[currentObjA.id]))
                 {
-                    current.Value.result = DeserializedObject.CompareResult.EQUAL;
-                    otherScene.objects[current.Key].result = DeserializedObject.CompareResult.EQUAL;
+                    currentObjA.result = DObject.CompareResult.EQUAL;
+                    sceneB.objects[currentObjA.id].result = DObject.CompareResult.EQUAL;
+
+                    currentObjA.chosen = true;
+                    sceneB.objects[currentObjA.id].chosen = false;
                 }
                 else
                 {
-                    current.Value.result = DeserializedObject.CompareResult.DIFFERENT;
-                    otherScene.objects[current.Key].result = DeserializedObject.CompareResult.DIFFERENT;
+                    currentObjA.result = DObject.CompareResult.DIFFERENT;
+                    sceneB.objects[currentObjA.id].result = DObject.CompareResult.DIFFERENT;
                 }
             }
             else
             {
-                current.Value.result = DeserializedObject.CompareResult.NEW;
+                currentObjA.result = DObject.CompareResult.NEW;
             }
         }
 
-        foreach (KeyValuePair<long, DeserializedObject> current in otherScene.objects)
+        foreach (DObject currentObjB in sceneB.objects.Values)
         {
-            if (current.Value.result == DeserializedObject.CompareResult.UNDECIDED)
+            if (currentObjB.result == DObject.CompareResult.UNDECIDED)
             {
-                current.Value.result = DeserializedObject.CompareResult.NEW;
+                currentObjB.result = DObject.CompareResult.NEW;
+            }
+        }
+
+        sceneA.linkObjectsInChange(true);
+        sceneB.linkObjectsInChange(false);
+
+        linkChanges(sceneA, sceneB);
+    }
+
+    private void linkObjectsInChange(bool changeIsChosen)
+    {
+        foreach (DObject currentObject in objects.Values)
+        {
+            if (currentObject.result != DObject.CompareResult.EQUAL && currentObject.change == null)
+            {
+                Change ch = new Change(this, changeIsChosen);
+
+                ch.references = currentObject.getReferencesOfDiffs();
+
+                ch.references.Add(currentObject.id);
+
+                foreach (long currentID in ch.references)
+                {
+                    objects[currentID].change = ch;
+                }
+
+                ch.updateChosenInRefs();
+
+                changes.Add(ch);
             }
         }
     }
 
-    public static void compare(DeserializedScene A, DeserializedScene B)
+    private static void linkChanges(DeserializedScene sceneA, DeserializedScene sceneB)
     {
+        foreach (DObject currentObjA in sceneA.objects.Values)
+        {
+            if (currentObjA.result == DObject.CompareResult.DIFFERENT)
+            {
+                DObject currentObjB = sceneB.objects[currentObjA.id];
 
+                currentObjA.change.partner = currentObjB.change;
+                currentObjB.change.partner = currentObjA.change;
+            }
+        }
     }
 
     public void parse()
     {
-        while (index < allSceneLines.Count)
+        while (parseIndex < allSceneLines.Count)
         {
-            Debug.Log("before new Object " + index);
+            DObject tmpO = new DObject(objectCount);
 
-            DeserializedObject tmpO = new DeserializedObject();
+            objectCount++;
 
-            tmpO.parse(allSceneLines, ref index);
+            tmpO.parse(allSceneLines, ref parseIndex);
 
             objects.Add(tmpO.id, tmpO);
-
-            Debug.Log("after new Object " + index);
         }
     }
 
-    public void print(StreamWriter fout, bool withTags, bool withIDs)
+    private void printHead(StreamWriter fout)
     {
         fout.WriteLine(allSceneLines[0]);
         fout.WriteLine(allSceneLines[1]);
+    }
 
-        foreach (KeyValuePair<long, DeserializedObject> current in objects)
+    public void print(StreamWriter fout, bool debug)
+    {
+        print(fout, false, true, debug);
+    }
+
+    public void print(StreamWriter fout, bool merged, bool includeHead, bool debug)
+    {
+        if (includeHead)
         {
-            current.Value.print(fout, withTags, withIDs);
+            printHead(fout);
+        }
+
+        foreach (DObject current in objects.Values)
+        {
+            current.print(fout, merged, debug);
         }
     }
 }
 
-public class DeserializedObject
+public abstract class Deserialized
+{
+    public string name;
+
+    public abstract bool isEqualTo(Deserialized other);
+
+    public abstract void parse(List<string> allSceneLines, ref int index);
+
+    public abstract List<long> getReferencesOfDiffs();
+
+    //public abstract void addReferencesToChange(Change ch);
+
+    public abstract void print(StreamWriter fout, bool merged, bool debug);
+
+    public abstract void onGUI();
+}
+
+public class DObject : Deserialized
 {
     public long id;
-
     public int type;
-
     public string typeName;
+    public int number;
 
-    public List<Member> members;
+    public Change change;
 
+    public List<Deserialized> members;
     public List<int> differences;
 
     public enum CompareResult { UNDECIDED, EQUAL, DIFFERENT, NEW };
     public CompareResult result;
 
-    public DeserializedObject()
+    public bool expanded;
+    public bool chosen;
+
+    public DObject(int n)
     {
-        members = new List<Member>();
+        name = "";
+        number = n;
+
+        members = new List<Deserialized>();
         differences = new List<int>();
 
         result = CompareResult.UNDECIDED;
     }
 
-    public bool equal(DeserializedObject other)
+    public override bool isEqualTo(Deserialized d)
     {
+        DObject other = (DObject)d;
+
         bool equal = true;
 
         for (int i = 0; i < members.Count; i++)
         {
-            if (!members[i].equal(other.members[i]))
+            if (!members[i].isEqualTo(other.members[i]))
             {
                 equal = false;
                 differences.Add(i);
@@ -132,7 +221,7 @@ public class DeserializedObject
         return equal;
     }
 
-    public void parse(List<string> allSceneLines, ref int index)
+    public override void parse(List<string> allSceneLines, ref int index)
     {
         string[] typeAndIdLine = allSceneLines[index].Split(' ');
 
@@ -153,9 +242,16 @@ public class DeserializedObject
 
         while (index < allSceneLines.Count && !(line = allSceneLines[index]).StartsWith("--- !u!"))
         {
+            if (line.TrimStart().StartsWith("m_Name:"))
+            {
+                name = line.Split(':')[1];
+
+                allSceneLines[index] = line + SceneManager.SEPSYM + id;
+            }
+
             if (line.EndsWith(":") || line.EndsWith("[]"))
             {
-                Array tmpA = new Array(line.Split(':')[0]);
+                DArray tmpA = new DArray(line.Split(':')[0]);
 
                 tmpA.parse(allSceneLines, ref index);
 
@@ -163,7 +259,7 @@ public class DeserializedObject
             }
             else
             {
-                Variable tmpV = new Variable();
+                DVariable tmpV = new DVariable();
 
                 tmpV.parse(allSceneLines, ref index);
 
@@ -174,38 +270,99 @@ public class DeserializedObject
         }
     }
 
-    public void print(StreamWriter fout, bool withTags, bool withIDs)
+    public override List<long> getReferencesOfDiffs()
     {
-        fout.WriteLine("--- !u!" + type + " &" + id);
-        fout.WriteLine(typeName + ":");
+        List<long> refs = new List<long>();
 
-        foreach (Member current in members)
+        foreach (int i in differences)
         {
-            current.print(fout, withTags, withIDs);
+            refs.AddRange(members[i].getReferencesOfDiffs());
+        }
+
+        return refs;
+    }
+
+    public override void print(StreamWriter fout, bool merged, bool debug)
+    {
+        /*
+        if (debug && result != CompareResult.EQUAL)
+        {
+            fout.WriteLine("Change: " + change.myNr + " connected to " + change.partner.myNr);
+        }
+        */
+
+        if (!merged || chosen) // merged -> chosen (wenn merged, dann chosen)
+        {
+            fout.WriteLine("--- !u!" + type + " &" + id);
+
+            if (debug)
+            {
+                fout.WriteLine("Object Nr: " + number);
+                fout.WriteLine("Status: " + result);
+
+                if (result != CompareResult.EQUAL)
+                {
+                    fout.Write("Referencing: ");
+                    foreach (long ID in change.references)
+                    {
+                        fout.Write(ID + " ");
+                    }
+                    fout.WriteLine();
+
+                    fout.WriteLine("Change Nr: " + change.nr);
+
+                    fout.WriteLine("Change Partner: " + change.partner.nr);
+                }
+            }
+
+            fout.WriteLine(typeName + ":");
+
+            for (int i = 0; i < members.Count; i++)
+            {
+                if (debug && differences.Contains(i))
+                {
+                    fout.Write("DIFF: ");
+                }
+
+                members[i].print(fout, merged, debug);
+            }
+        }
+    }
+
+    public override void onGUI()
+    {
+        string textToDisplay = (name + " (" + typeName + ")" + " (" + result + ")").TrimStart();
+
+        if (result == CompareResult.DIFFERENT)
+        {
+            expanded = EditorGUILayout.Foldout(expanded, textToDisplay);
+
+            EditorGUILayout.BeginVertical();
+            if (expanded)
+            {
+                foreach (int i in differences)
+                {
+                    members[i].onGUI();
+                }
+            }
+            EditorGUILayout.EndVertical();
+        }
+        else if (result == CompareResult.NEW)
+        {
+            GUILayout.Label(textToDisplay);
         }
     }
 }
 
-public abstract class Member
-{
-    public string name;
-
-    public abstract bool equal(Member other);
-
-    public abstract void parse(List<string> allSceneLines, ref int index);
-
-    public abstract void print(StreamWriter fout, bool withTags, bool withIDs);
-}
-
-public class Variable : Member
+public class DVariable : Deserialized
 {
     public string value;
 
-    public long valueIsThisID;
+    public long reference;
 
-    public override bool equal(Member m)
+    public override bool isEqualTo(Deserialized m)
     {
-        Variable other = (Variable)m;
+        DVariable other = (DVariable)m;
 
         if (string.Compare(name, other.name) != 0)
         {
@@ -235,9 +392,7 @@ public class Variable : Member
                 this.name = pieces[0];
                 this.value = "{" + pieces[1];
 
-                Debug.Log("short form " + name);
-
-                valueIsThisID = extractID();
+                reference = extractID();
 
                 return;
             }
@@ -250,14 +405,26 @@ public class Variable : Member
         this.name = pieces2[0];
         this.value = pieces2[1];
 
-        valueIsThisID = extractID();
+        reference = extractID();
     }
 
-    public override void print(StreamWriter fout, bool withTags, bool withIDs)
+    public override List<long> getReferencesOfDiffs()
+    {
+        List<long> refs = new List<long>();
+
+        if (reference > 0)
+        {
+            refs.Add(reference);
+        }
+
+        return refs;
+    }
+
+    public override void print(StreamWriter fout, bool merged, bool debug)
     {
         string lineToWrite = "";
 
-        if (withTags)
+        if (debug)
         {
             lineToWrite += "Variable:: ";
         }
@@ -271,15 +438,20 @@ public class Variable : Member
 
         lineToWrite += value;
 
-        if (withIDs)
+        if (debug)
         {
-            if (valueIsThisID != -1)
+            if (reference != -1)
             {
-                lineToWrite += " " + valueIsThisID;
+                lineToWrite += " " + reference;
             }
         }
 
         fout.WriteLine(lineToWrite);
+    }
+
+    public override void onGUI()
+    {
+        GUILayout.Label((name + ": " + value).TrimStart());
     }
 
     public long extractID()
@@ -308,55 +480,85 @@ public class Variable : Member
     }
 }
 
-public class Array : Member
+public class DArray : Deserialized
 {
-    public List<Variable> variables;
+    public List<DVariable> variables;
 
-    public List<long> varsHaveTheseIDs;
+    public List<long> references;
 
-    public Array(string n)
+    public List<int> differences;
+
+    public bool expanded;
+
+    public DArray(string n)
     {
         name = n;
-        variables = new List<Variable>();
-        varsHaveTheseIDs = new List<long>();        
+        variables = new List<DVariable>();
+        references = new List<long>();
+        differences = new List<int>();
     }
 
-    public override bool equal(Member m)
+    public override bool isEqualTo(Deserialized m)
     {
-        Array other = (Array)m;
+        DArray other = (DArray)m;
+
+        bool equal = true;
 
         if (string.Compare(name, other.name) != 0)
         {
-            return false;
+            equal = false;
         }
 
         if (variables.Count != other.variables.Count)
         {
-            return false;
+            equal = false;
         }
 
-        for (int i = 0; i < variables.Count; i++)
+        if (references.Count == 0)
         {
-            if (!variables[i].equal(other.variables[i]))
+            for (int i = 0; i < variables.Count; i++)
             {
-                return false;
+                if (!variables[i].isEqualTo(other.variables[i]))
+                {
+                    return false;
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < references.Count; i++)
+            {
+                if (! other.references.Contains(this.references[i]))
+                {
+                    differences.Add(i);
+                    equal = false;
+                }
+            }
+
+            for (int i = 0; i < other.references.Count; i++)
+            {
+                if (!this.references.Contains(other.references[i]))
+                {
+                    other.differences.Add(i);
+                    equal = false;
+                }
             }
         }
 
-        return true;
+        return equal;
     }
 
     public override void parse(List<string> allSceneLines, ref int index)
     {
         string line = allSceneLines[index];
 
-        int offset = Array.countWhitespaces(line);
+        int offset = DArray.countWhitespaces(line);
 
         index++;
 
-        while (offset == Array.countWhitespaces(allSceneLines[index]) - 1)
+        while (offset == DArray.countWhitespaces(allSceneLines[index]) - 1)
         {
-            Variable tmp = new Variable();
+            DVariable tmp = new DVariable();
 
             tmp.parse(allSceneLines, ref index);
 
@@ -367,20 +569,32 @@ public class Array : Member
 
         index--;
 
-        foreach (Variable current in variables)
+        foreach (DVariable current in variables)
         {
-            if (current.valueIsThisID >= 0)
+            if (current.reference >= 0)
             {
-                varsHaveTheseIDs.Add(current.valueIsThisID);
+                references.Add(current.reference);
             }
         }
     }
 
-    public override void print(StreamWriter fout, bool withTags, bool withIDs)
+    public override List<long> getReferencesOfDiffs()
+    {
+        List<long> refs = new List<long>();
+
+        foreach (int i in differences)
+        {
+            refs.Add(references[i]);
+        }
+
+        return refs;
+    }
+
+    public override void print(StreamWriter fout, bool merged, bool debug)
     {
         string lineToWrite = "";
 
-        if (withTags)
+        if (debug)
         {
             lineToWrite += "Array   :: ";
         }
@@ -392,9 +606,9 @@ public class Array : Member
             lineToWrite += " []";
         }
 
-        if (withIDs)
+        if (debug)
         {
-            foreach (long current in varsHaveTheseIDs)
+            foreach (long current in references)
             {
                 if (current != -1)
                 {
@@ -405,9 +619,27 @@ public class Array : Member
 
         fout.WriteLine(lineToWrite);
 
-        foreach (Variable current in variables)
+        for (int i = 0; i < variables.Count; i++)
         {
-            current.print(fout, withTags, withIDs);
+            if (debug && differences.Contains(i))
+            {
+                fout.Write("DIFF: ");
+            }
+
+            variables[i].print(fout, merged, debug);
+        }
+    }
+
+    public override void onGUI()
+    {
+        expanded = EditorGUILayout.Foldout(expanded, (name).TrimStart());
+
+        if (expanded)
+        {
+            foreach (DVariable current in variables)
+            {
+                current.onGUI();
+            }
         }
     }
 

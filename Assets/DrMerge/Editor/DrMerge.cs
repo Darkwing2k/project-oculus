@@ -20,9 +20,12 @@ public class DrMerge : EditorWindow {
 
     private DiffDeciderModel ddModel;
 
-    private DrMergeParser parser;
+    // -----------------
+    private SceneManager manager;
     private Object sceneA;
     private Object sceneB;
+
+    private bool parserDone;
 
     [MenuItem("Window/DrMerge")]
     static void Init()
@@ -32,14 +35,21 @@ public class DrMerge : EditorWindow {
         
     }
 
-    private void OnLostFocus()
+    private void reset()
     {
         performedMerge = false;
         merging = false;
+        //newEntries.Clear();
         mergingProgress = 0;
         counter = 0;
 
-        parser = null;
+        manager = null;
+        parserDone = false;
+    }
+
+    private void OnLostFocus()
+    {
+        //reset();
     }
 
     private void OnDestroy()
@@ -51,30 +61,57 @@ public class DrMerge : EditorWindow {
     {
         if (GUILayout.Button("Reset"))
         {
-            performedMerge = false;
-            merging = false;
-            //newEntries.Clear();
-            mergingProgress = 0;
-            counter = 0;
+            reset();
         }
 
+        if (!parserDone)
+        {
+            EditorGUILayout.BeginVertical();
+
+            GUILayout.Label("Scene A");
+            sceneA = EditorGUILayout.ObjectField(sceneA, typeof(Object), true);
+
+            GUILayout.Label("Scene B");
+            sceneB = EditorGUILayout.ObjectField(sceneB, typeof(Object), true);
+
+            if (GUILayout.Button("Start"))
+            {
+                int lastIndexOfSlash = AssetDatabase.GetAssetPath(sceneA).LastIndexOf('/');
+                string sceneFolderPath = AssetDatabase.GetAssetPath(sceneA).Substring(0, lastIndexOfSlash);
+
+                manager = new SceneManager(AssetDatabase.GetAssetPath(sceneA), AssetDatabase.GetAssetPath(sceneB), sceneFolderPath);
+                manager.parse();
+
+                manager.compare();
+
+                manager.print(true);
+
+                parserDone = true;
+            }
+
+            EditorGUILayout.EndVertical();
+        }
+
+        if (parserDone)
+        {
+            manager.onGUI(position);
+        }
+
+        /*
         if (!performedMerge)
         {
             #region first UI screen
             EditorGUILayout.BeginVertical();
 
             GUILayout.Label("Scene A");
-            //SceneMerger.a.original = EditorGUILayout.ObjectField(SceneMerger.a.original, typeof(Object), true);
-            sceneA = EditorGUILayout.ObjectField(sceneA, typeof(Object), true);
+            SceneMerger.a.original = EditorGUILayout.ObjectField(SceneMerger.a.original, typeof(Object), true);
 
             GUILayout.Label("Scene B");
-            //SceneMerger.b.original = EditorGUILayout.ObjectField(SceneMerger.b.original, typeof(Object), true);
-            sceneB = EditorGUILayout.ObjectField(sceneB, typeof(Object), true);
+            SceneMerger.b.original = EditorGUILayout.ObjectField(SceneMerger.b.original, typeof(Object), true);
 
 
             if (GUILayout.Button("Start"))
             {
-                /*
                 merging = true;
 
                 BackgroundWorker worker = new BackgroundWorker();
@@ -87,14 +124,8 @@ public class DrMerge : EditorWindow {
                 SceneMerger.getPathsAndNames();
 
                 SceneMerger.activateProgressReports(fetchMergeProgress);
-                 * */
 
-                //worker.RunWorkerAsync();
-
-                parser = new DrMergeParser(AssetDatabase.GetAssetPath(sceneA), AssetDatabase.GetAssetPath(sceneB));
-                parser.parse();
-
-                parser.print(Application.dataPath + "/DrMerge/ParserLog.txt", true, true);
+                worker.RunWorkerAsync();
             }
 
             if (merging)
@@ -120,7 +151,7 @@ public class DrMerge : EditorWindow {
 
             //DiffDecider.fetchDifferences();
 
-            ddModel = new DiffDeciderModel();
+            //ddModel = new DiffDeciderModel();
 
             //showDifferences = new bool[DiffDecider.diffGos.Count];
             //selectedDiff = new short[DiffDecider.diffGos.Count];
@@ -138,13 +169,14 @@ public class DrMerge : EditorWindow {
                 ddModel.newGoOnGUI();
             }
 
-            showDiffGo = showDiffGo = EditorGUILayout.Foldout(showDiffGo, "Different GameObjects (" + ddModel.DiffEntriesCount + ")");
+            showDiffGo = EditorGUILayout.Foldout(showDiffGo, "Different GameObjects (" + ddModel.DiffEntriesCount + ")");
             if (showDiffGo)
             {
                 ddModel.diffGoOnGUI();
             }
             EditorGUILayout.EndVertical();
         }
+        */
     }
 
     private void Update()

@@ -1,32 +1,45 @@
 ﻿using UnityEngine;
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 
 public class Change
 {
-    public static List<long> allInvolvedObjectsA = new List<long>();
-    public static List<long> allInvolvedObjectsB = new List<long>();
+    public static int changeCount = 0;
 
-    public List<long> involvedObjectsA;
-    public List<long> involvedObjectsB;
+    DeserializedScene scene;
 
-    public Change()
+    public int nr;
+    public List<long> references;
+    public Change partner;
+
+    public bool chosen;
+    public bool expanded;
+
+    public Change(DeserializedScene s, bool chosen)
     {
-        involvedObjectsA = new List<long>();
-        involvedObjectsB = new List<long>();
+        this.chosen = chosen;
+        scene = s;
+
+        nr = changeCount;
+        changeCount++;
+
+        references = new List<long>();
     }
 
-    public void addInvolvedObjectA(long id)
+    public void setChosen(bool value)
     {
-        involvedObjectsA.Add(id);
-        allInvolvedObjectsA.Add(id);
+        chosen = value;
+        updateChosenInRefs();
+
+        partner.chosen = !value;
+        partner.updateChosenInRefs();
     }
 
-    public void addInvolvedObjectB(long id)
+    public void updateChosenInRefs()
     {
-        involvedObjectsB.Add(id);
-        allInvolvedObjectsB.Add(id);
+        foreach (long ID in references)
+        {
+            scene.objects[ID].chosen = this.chosen;
+        }
     }
 }
