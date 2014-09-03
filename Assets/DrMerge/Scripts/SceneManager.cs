@@ -16,12 +16,10 @@ public class SceneManager
     public const char SEPSYM = '¯';
     public Color prevColor;
 
+    public bool jobsDone;
+
     public SceneManager(string pathToA, string pathToB, string sceneFolderPath)
     {
-        SceneManager.sceneFolderPath = sceneFolderPath;
-        SceneManager.mergedScenePath = sceneFolderPath + "/MergedScene.unity";
-        SceneManager.logPath = Application.dataPath + "/DrMerge/Logs";
-
         List<string> allLines = new List<string>();
 
         using(StreamReader fin = new StreamReader(pathToA))
@@ -55,6 +53,13 @@ public class SceneManager
 
         string sceneNameB = pathToB.Substring(pathToB.LastIndexOf('/') + 1);
         sceneB.name = sceneNameB.Split('.')[0];
+
+        sceneA.opponent = sceneB;
+        sceneB.opponent = sceneA;
+
+        SceneManager.sceneFolderPath = sceneFolderPath;
+        SceneManager.mergedScenePath = sceneFolderPath + "/Merged_" + sceneA.name + "_" + sceneB.name + ".unity";
+        SceneManager.logPath = Application.dataPath + "/DrMerge/Logs";
     }
 
     public void compare()
@@ -62,6 +67,8 @@ public class SceneManager
         DeserializedScene.compare(sceneA, sceneB);
 
         printMerged(false);
+
+        EditorApplication.OpenScene(mergedScenePath);
     }
 
     public void parse()
@@ -114,18 +121,13 @@ public class SceneManager
         {
             sceneA.print(fout, true, true, debug);
             sceneB.print(fout, true, false, debug);
-
-            if (!debug)
-            {
-                //AssetDatabase.Refresh();
-                Debug.Log(mergedScenePath);
-                EditorApplication.OpenScene(mergedScenePath);
-            }
         }
     }
 
     public void onGUI(Rect editorWindow)
     {
+        List<Change> deleteAfter = new List<Change>();
+
         foreach (Change currentChange in sceneA.changes)
         {
             GUILayout.BeginVertical(GUI.skin.GetStyle("Box"));
@@ -139,6 +141,8 @@ public class SceneManager
                 currentChange.setChosen(true);
 
                 printMerged(false);
+
+                openSceneKeepSelection(mergedScenePath);
             }
 
             if (GUILayout.Button(">"))
@@ -146,80 +150,111 @@ public class SceneManager
                 currentChange.setChosen(false);
 
                 printMerged(false);
+
+                openSceneKeepSelection(mergedScenePath);
             }
 
             if (GUILayout.Button("Save"))
             {
-
+                deleteAfter.Add(currentChange);
             }
 
             GUILayout.EndHorizontal();
 
             if (currentChange.expanded)
             {
-                List<long> allIDs = new List<long>();
-
-                foreach (long ID in currentChange.references)
-                {
-                    if (!allIDs.Contains(ID))
-                        allIDs.Add(ID);
-                }
-                foreach (long ID in currentChange.partner.references)
-                {
-                    if (!allIDs.Contains(ID))
-                        allIDs.Add(ID);
-                }
+                List<long> allIDs = getAllChangeIDs(currentChange);                
 
                 foreach (long currentID in allIDs)
                 {
+                    bool isGO = false;
+
                     changeColor(new Color(0, 0, 0));
-
                     GUILayout.BeginHorizontal(GUI.skin.GetStyle("Box"));
-
                     resetColorToPrevious();
 
-                    changeColorOnCondition(currentChange.chosen, Color.green, Color.red);
-
-                    GUILayout.BeginVertical(GUILayout.MaxWidth(editorWindow.width / 2));
-
-                    if (sceneA.objects.ContainsKey(currentID))
-                    {
-                        sceneA.objects[currentID].onGUI();
-                    }
-                    else
-                    {
-                        GUILayout.Label("");
-                    }
-
-                    GUILayout.EndVertical();
-
-                    resetColorToPrevious();
-
-                    changeColorOnCondition(currentChange.partner.chosen, Color.green, Color.red);
-
-                    if (sceneB.objects.ContainsKey(currentID))
-                    {
-                        GUILayout.BeginVertical(GUILayout.MaxWidth(editorWindow.width / 2));
-
-                        sceneB.objects[currentID].onGUI();
-
-                        GUILayout.EndVertical();
-                    }
-                    else
-                    {
-                        GUILayout.Label("");
-                    }
-
-                    resetColorToPrevious();
+                    isGO = sceneA.drawChangedObjects(currentID, currentChange, editorWindow);
+                    isGO = sceneB.drawChangedObjects(currentID, currentChange.partner, editorWindow);
 
                     GUILayout.EndHorizontal();
+
+                    if (isGO)
+                    {
+                        showSelectButton(currentID);
+                    }
                 }
             }
             GUILayout.EndVertical();
         }
+
+        foreach (Change toDelete in deleteAfter)
+        {
+            sceneA.changes.Remove(toDelete);
+            sceneB.changes.Remove(toDelete.partner);
+        }
+
+        if (sceneA.changes.Count == 0 && sceneB.changes.Count == 0 && !jobsDone)
+        {
+            jobsDone = true;
+        }
+
+        deleteAfter.Clear();
     }
 
-    private void changeColorOnCondition(bool condition, Color trueCase, Color falseCase)
+    private void openSceneKeepSelection(string path)
+    {
+        string selectedName = "";
+        bool somethingWasSelected = false;
+
+        if (Selection.activeGameObject != null)
+        {
+            selectedName = Selection.activeGameObject.name;
+            somethingWasSelected = true;
+        }
+
+        EditorApplication.OpenScene(path);
+
+        if (somethingWasSelected)
+        {
+            Selection.activeGameObject = GameObject.Find(selectedName);
+        }
+    }
+
+    private List<long> getAllChangeIDs(Change currentChange)
+    {
+        List<long> allIDs = new List<long>();
+
+        foreach (long ID in currentChange.references)
+        {
+            if (!allIDs.Contains(ID))
+                allIDs.Add(ID);
+        }
+        foreach (long ID in currentChange.partner.references)
+        {
+            if (!allIDs.Contains(ID))
+                allIDs.Add(ID);
+        }
+
+        return allIDs;
+    }
+
+    private void showSelectButton(long currentID)
+    {
+        if (GUILayout.Button("Select GO"))
+        {
+            GameObject[] allGOs = GameObject.FindObjectsOfType<GameObject>();
+
+            foreach (GameObject currentGO in allGOs)
+            {
+                if (currentGO.name.EndsWith("" + currentID))
+                {
+                    Selection.activeGameObject = currentGO;
+                }
+            }
+        }
+    }
+
+    public void changeColorOnCondition(bool condition, Color trueCase, Color falseCase)
     {
         if (condition)
         {
@@ -231,13 +266,13 @@ public class SceneManager
         }
     }
 
-    private void changeColor(Color desiredColor)
+    public void changeColor(Color desiredColor)
     {
         prevColor = GUI.color;
         GUI.color = desiredColor;
     }
 
-    private void resetColorToPrevious()
+    public void resetColorToPrevious()
     {
         GUI.color = prevColor;
     }

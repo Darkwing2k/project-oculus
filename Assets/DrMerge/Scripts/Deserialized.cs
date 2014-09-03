@@ -8,6 +8,7 @@ using System.IO;
 public class DeserializedScene
 {
     public static SceneManager manager;
+    public DeserializedScene opponent;
 
     public string name;
     public int parseIndex;
@@ -18,6 +19,7 @@ public class DeserializedScene
     public Dictionary<long, DObject> objects;
 
     public List<Change> changes;
+    public static List<Change2> changes2 = new List<Change2>();
 
     public static Color prevColor;
 
@@ -45,23 +47,34 @@ public class DeserializedScene
         {
             if (sceneB.objects.ContainsKey(currentObjA.id))
             {
+                DObject currentObjB = sceneB.objects[currentObjA.id];
+
                 if (currentObjA.isEqualTo(sceneB.objects[currentObjA.id]))
                 {
                     currentObjA.result = DObject.CompareResult.EQUAL;
-                    sceneB.objects[currentObjA.id].result = DObject.CompareResult.EQUAL;
+                    currentObjB.result = DObject.CompareResult.EQUAL;
 
                     currentObjA.chosen = true;
-                    sceneB.objects[currentObjA.id].chosen = false;
+                    currentObjB.chosen = false;
                 }
                 else
                 {
                     currentObjA.result = DObject.CompareResult.DIFFERENT;
-                    sceneB.objects[currentObjA.id].result = DObject.CompareResult.DIFFERENT;
+                    currentObjB.result = DObject.CompareResult.DIFFERENT;
+
+                    Change2 tmp = new Change2(manager);
+                    tmp.objectsA.Add(currentObjA.id, currentObjA);
+                    tmp.objectsB.Add(currentObjB.id, currentObjB);
+                    changes2.Add(tmp);
                 }
             }
             else
             {
                 currentObjA.result = DObject.CompareResult.NEW;
+
+                Change2 tmp = new Change2(manager);
+                tmp.objectsA.Add(currentObjA.id, currentObjA);
+                changes2.Add(tmp);
             }
         }
 
@@ -70,16 +83,23 @@ public class DeserializedScene
             if (currentObjB.result == DObject.CompareResult.UNDECIDED)
             {
                 currentObjB.result = DObject.CompareResult.NEW;
+
+                Change2 tmp = new Change2(manager);
+                tmp.objectsB.Add(currentObjB.id, currentObjB);
+                changes2.Add(tmp);
             }
         }
 
-        sceneA.linkObjectsInChange(true);
-        sceneB.linkObjectsInChange(false);
+        sceneA.linkObjects(true);
+        sceneB.linkObjects(false);
 
         linkChanges(sceneA, sceneB);
+
+        sceneA.checkPartnerAndUpdate();
+        sceneB.checkPartnerAndUpdate();
     }
 
-    private void linkObjectsInChange(bool changeIsChosen)
+    private void linkObjects(bool changeIsChosen)
     {
         foreach (DObject currentObject in objects.Values)
         {
@@ -95,8 +115,6 @@ public class DeserializedScene
                 {
                     objects[currentID].change = ch;
                 }
-
-                ch.updateChosenInRefs();
 
                 changes.Add(ch);
             }
@@ -117,17 +135,31 @@ public class DeserializedScene
         }
     }
 
+    private void checkPartnerAndUpdate()
+    {
+        foreach (Change currentChange in changes)
+        {
+            currentChange.createPartnerIfNull();
+            currentChange.updateChosenInRefs();
+        }
+    }
+
     public void parse()
     {
         while (parseIndex < allSceneLines.Count)
         {
-            DObject tmpO = new DObject(objectCount);
+            DObject tmpO = new DObject(this, objectCount);
 
             objectCount++;
 
             tmpO.parse(allSceneLines, ref parseIndex);
 
             objects.Add(tmpO.id, tmpO);
+        }
+
+        foreach (DObject currentObj in objects.Values)
+        {
+            currentObj.refsOfDiffs = currentObj.getReferencesOfDiffs();
         }
     }
 
@@ -154,6 +186,35 @@ public class DeserializedScene
             current.print(fout, merged, debug);
         }
     }
+
+    public bool drawChangedObjects(long currentID, Change currentChange, Rect editorWindow)
+    {
+        bool isGO = false;
+
+        manager.changeColorOnCondition(currentChange.chosen, Color.green, Color.red);
+
+        GUILayout.BeginVertical(GUILayout.MaxWidth(editorWindow.width / 2));
+
+        if (this.objects.ContainsKey(currentID))
+        {
+            DObject tmp = this.objects[currentID];
+
+            if (tmp.type == 1)
+                isGO = true;
+
+            tmp.onGUI();
+        }
+        else
+        {
+            GUILayout.Label("");
+        }
+
+        GUILayout.EndVertical();
+
+        manager.resetColorToPrevious();
+
+        return isGO;
+    }
 }
 
 public abstract class Deserialized
@@ -165,8 +226,6 @@ public abstract class Deserialized
     public abstract void parse(List<string> allSceneLines, ref int index);
 
     public abstract List<long> getReferencesOfDiffs();
-
-    //public abstract void addReferencesToChange(Change ch);
 
     public abstract void print(StreamWriter fout, bool merged, bool debug);
 
@@ -180,10 +239,13 @@ public class DObject : Deserialized
     public string typeName;
     public int number;
 
+    public DeserializedScene scene;
+
     public Change change;
 
     public List<Deserialized> members;
     public List<int> differences;
+    public List<long> refsOfDiffs;
 
     public enum CompareResult { UNDECIDED, EQUAL, DIFFERENT, NEW };
     public CompareResult result;
@@ -191,10 +253,12 @@ public class DObject : Deserialized
     public bool expanded;
     public bool chosen;
 
-    public DObject(int n)
+    public DObject(DeserializedScene scene, int nr)
     {
         name = "";
-        number = n;
+        number = nr;
+
+        this.scene = scene;
 
         members = new List<Deserialized>();
         differences = new List<int>();
@@ -350,6 +414,16 @@ public class DObject : Deserialized
         else if (result == CompareResult.NEW)
         {
             GUILayout.Label(textToDisplay);
+        }
+    }
+
+    public void getAllRefsRecursive(HashSet<long> allRefs)
+    {
+        allRefs.Add(this.id);
+
+        foreach (long ID in refsOfDiffs)
+        {
+            scene.objects[ID].getAllRefsRecursive(allRefs);
         }
     }
 }

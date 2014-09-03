@@ -42,4 +42,42 @@ public class Change
             scene.objects[ID].chosen = this.chosen;
         }
     }
+
+    public void createPartnerIfNull()
+    {
+        if (partner == null)
+        {
+            Debug.Log(nr + " here. My partner was null!");
+
+            partner = new Change(scene.opponent, !chosen);
+
+            scene.opponent.changes.Add(partner);
+        }
+    }
+}
+
+
+public class Change2
+{
+    public SceneManager manager;
+
+    public Dictionary<long, DObject> objectsA;
+    public Dictionary<long, DObject> objectsB;
+
+    public int selected;
+    public bool expanded;
+
+    public static int changeCount = 0;
+    public int nr;
+
+    public Change2(SceneManager manager)
+    {
+        nr = changeCount;
+        changeCount++;
+
+        this.manager = manager;
+
+        objectsA = new Dictionary<long, DObject>();
+        objectsB = new Dictionary<long, DObject>();
+    }
 }

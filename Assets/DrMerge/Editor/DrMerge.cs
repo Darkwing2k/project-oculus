@@ -4,23 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 
-public class DrMerge : EditorWindow {
+public class DrMerge : EditorWindow 
+{
 
-    private bool performedMerge = false;
-    private bool merging = false;
-
-    private int counter;
-    private int counterMaxForRepaint = 10;
-    private float mergingProgress;
-
-    private bool showNewGo;
-    private bool showDiffGo;
-    private bool[] showDifferences;
-    private short[] selectedDiff;
-
-    private DiffDeciderModel ddModel;
-
-    // -----------------
     private SceneManager manager;
     private Object sceneA;
     private Object sceneB;
@@ -32,19 +18,23 @@ public class DrMerge : EditorWindow {
     {
         DrMerge window = (DrMerge)EditorWindow.GetWindow<DrMerge>("DrMerge");
         window.Show();
-        
+
+        window.position = new Rect(800, 100, 600, 800);
     }
 
-    private void reset()
+    private void reset(bool delete)
     {
-        performedMerge = false;
-        merging = false;
-        //newEntries.Clear();
-        mergingProgress = 0;
-        counter = 0;
+        if (delete)
+        {
+            AssetDatabase.Refresh();
+
+            EditorApplication.OpenScene(SceneManager.sceneFolderPath + "/" + manager.sceneA.name + ".unity");
+            AssetDatabase.DeleteAsset(SceneManager.mergedScenePath);
+        }
 
         manager = null;
         parserDone = false;
+        Change.changeCount = 0;
     }
 
     private void OnLostFocus()
@@ -61,7 +51,7 @@ public class DrMerge : EditorWindow {
     {
         if (GUILayout.Button("Reset"))
         {
-            reset();
+            reset(true);
         }
 
         if (!parserDone)
@@ -95,105 +85,24 @@ public class DrMerge : EditorWindow {
         if (parserDone)
         {
             manager.onGUI(position);
-        }
 
-        /*
-        if (!performedMerge)
-        {
-            #region first UI screen
-            EditorGUILayout.BeginVertical();
-
-            GUILayout.Label("Scene A");
-            SceneMerger.a.original = EditorGUILayout.ObjectField(SceneMerger.a.original, typeof(Object), true);
-
-            GUILayout.Label("Scene B");
-            SceneMerger.b.original = EditorGUILayout.ObjectField(SceneMerger.b.original, typeof(Object), true);
-
-
-            if (GUILayout.Button("Start"))
+            if (manager.jobsDone)
             {
-                merging = true;
+                if (GUILayout.Button("Done"))
+                {
+                    reset(false);
+                    AssetDatabase.Refresh();
 
-                BackgroundWorker worker = new BackgroundWorker();
-                worker.WorkerReportsProgress = false;
-                worker.WorkerSupportsCancellation = false;
+                    GameObject[] allGOs = GameObject.FindObjectsOfType<GameObject>();
 
-                worker.DoWork += (sender, e) => { SceneMerger.runComparison(); };
-                worker.RunWorkerCompleted += (sender, e) => { Debug.Log("feddich!"); performedMerge = true; };
+                    foreach (GameObject currentGO in allGOs)
+                    {
+                        currentGO.name = currentGO.name.Split(SceneManager.SEPSYM)[0];
+                    }
 
-                SceneMerger.getPathsAndNames();
-
-                SceneMerger.activateProgressReports(fetchMergeProgress);
-
-                worker.RunWorkerAsync();
-            }
-
-            if (merging)
-            {
-                EditorGUI.ProgressBar(new Rect(5, 100, this.position.width - 10, 20), mergingProgress, "Merging");
-            }
-
-            EditorGUILayout.EndVertical();
-            #endregion
-        }
-
-        if (performedMerge && merging)
-        {
-            Debug.Log("Merge done, Initialising DiffDecider");
-
-            AssetDatabase.Refresh();
-
-            EditorApplication.OpenScene(DrMergeUtil.relativeMergedScenePath);
-
-            //DiffDecider.fetchAllSceneLines();
-
-            //DiffDecider.fetchEntries();
-
-            //DiffDecider.fetchDifferences();
-
-            //ddModel = new DiffDeciderModel();
-
-            //showDifferences = new bool[DiffDecider.diffGos.Count];
-            //selectedDiff = new short[DiffDecider.diffGos.Count];
-
-            merging = false;
-        }
-
-        if(performedMerge && !merging)
-        {
-            EditorGUILayout.BeginVertical();
-
-            showNewGo = EditorGUILayout.Foldout(showNewGo, "New GameObjects (" + ddModel.NewEntriesCount + ")");
-            if (showNewGo)
-            {
-                ddModel.newGoOnGUI();
-            }
-
-            showDiffGo = EditorGUILayout.Foldout(showDiffGo, "Different GameObjects (" + ddModel.DiffEntriesCount + ")");
-            if (showDiffGo)
-            {
-                ddModel.diffGoOnGUI();
-            }
-            EditorGUILayout.EndVertical();
-        }
-        */
-    }
-
-    private void Update()
-    {
-        if (merging)
-        {
-            if (counter > counterMaxForRepaint)
-            {
-                this.Repaint();
+                    EditorApplication.SaveScene();
+                }
             }
         }
-    }
-
-    public void fetchMergeProgress(float percent)
-    {
-        mergingProgress = percent;
-
-        counter++;
     }
 }

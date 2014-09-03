@@ -84,84 +84,50 @@ Variable::     minRegionArea: 2
 Variable::     widthInaccuracy: 16.666666
 Variable::     heightInaccuracy: 10
 Variable::   m_NavMesh: {fileID: 0} 0
---- !u!1 &1276388402
+--- !u!1 &764086331
 Object Nr: 5
-Status: DIFFERENT
-Referencing: 1276388402 
-Change Nr: 2
-Change Partner: 0
+Status: EQUAL
 GameObject:
 Variable::   m_ObjectHideFlags: 0
 Variable::   m_PrefabParentObject: {fileID: 0} 0
 Variable::   m_PrefabInternal: {fileID: 0} 0
 Variable::   serializedVersion: 4
-DIFF: Array   ::   m_Component: 1276388406 1276388404
-Variable::   - 4: {fileID: 1276388406} 1276388406
-Variable::   - 65: {fileID: 1276388404} 1276388404
+Array   ::   m_Component: 764086332 764086335 764086334 764086333
+Variable::   - 4: {fileID: 764086332} 764086332
+Variable::   - 33: {fileID: 764086335} 764086335
+Variable::   - 65: {fileID: 764086334} 764086334
+Variable::   - 23: {fileID: 764086333} 764086333
 Variable::   m_Layer: 0
-Variable::   m_Name: Cube¯1276388402
+Variable::   m_Name: Julia¯764086331
 Variable::   m_TagString: Untagged
 Variable::   m_Icon: {fileID: 0} 0
 Variable::   m_NavMeshLayer: 0
 Variable::   m_StaticEditorFlags: 0
 Variable::   m_IsActive: 1
---- !u!65 &1276388404
+--- !u!4 &764086332
 Object Nr: 6
-Status: EQUAL
-BoxCollider:
-Variable::   m_ObjectHideFlags: 0
-Variable::   m_PrefabParentObject: {fileID: 0} 0
-Variable::   m_PrefabInternal: {fileID: 0} 0
-Variable::   m_GameObject: {fileID: 1276388402} 1276388402
-Variable::   m_Material: {fileID: 0} 0
-Variable::   m_IsTrigger: 0
-Variable::   m_Enabled: 1
-Variable::   serializedVersion: 2
-Variable::   m_Size: {x: 1, y: 1, z: 1}
-Variable::   m_Center: {x: 0, y: 0, z: 0}
---- !u!4 &1276388406
-Object Nr: 7
-Status: EQUAL
+Status: DIFFERENT
+Referencing: 764086332 
+Change Nr: 2
+Change Partner: 0
 Transform:
 Variable::   m_ObjectHideFlags: 0
 Variable::   m_PrefabParentObject: {fileID: 0} 0
 Variable::   m_PrefabInternal: {fileID: 0} 0
-Variable::   m_GameObject: {fileID: 1276388402} 1276388402
+Variable::   m_GameObject: {fileID: 764086331} 764086331
 Variable::   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-Variable::   m_LocalPosition: {x: -1, y: 0, z: 0}
+Variable::   m_LocalPosition: {x: 5, y: 0, z: 0}
 Variable::   m_LocalScale: {x: 1, y: 1, z: 1}
-Array   ::   m_Children: []
+DIFF: Array   ::   m_Children: []
 Variable::   m_Father: {fileID: 0} 0
---- !u!1 &1347779564
-Object Nr: 8
-Status: DIFFERENT
-Referencing: 1347779564 
-Change Nr: 3
-Change Partner: 1
-GameObject:
-Variable::   m_ObjectHideFlags: 0
-Variable::   m_PrefabParentObject: {fileID: 0} 0
-Variable::   m_PrefabInternal: {fileID: 0} 0
-Variable::   serializedVersion: 4
-DIFF: Array   ::   m_Component: 1347779568 1347779567 1347779565
-Variable::   - 4: {fileID: 1347779568} 1347779568
-Variable::   - 33: {fileID: 1347779567} 1347779567
-Variable::   - 23: {fileID: 1347779565} 1347779565
-Variable::   m_Layer: 0
-Variable::   m_Name: Sphere¯1347779564
-Variable::   m_TagString: Untagged
-Variable::   m_Icon: {fileID: 0} 0
-Variable::   m_NavMeshLayer: 0
-Variable::   m_StaticEditorFlags: 0
-Variable::   m_IsActive: 1
---- !u!23 &1347779565
-Object Nr: 9
+--- !u!23 &764086333
+Object Nr: 7
 Status: EQUAL
 Renderer:
 Variable::   m_ObjectHideFlags: 0
 Variable::   m_PrefabParentObject: {fileID: 0} 0
 Variable::   m_PrefabInternal: {fileID: 0} 0
-Variable::   m_GameObject: {fileID: 1347779564} 1347779564
+Variable::   m_GameObject: {fileID: 764086331} 764086331
 Variable::   m_Enabled: 1
 Variable::   m_CastShadows: 1
 Variable::   m_ReceiveShadows: 1
@@ -177,25 +143,191 @@ Variable::   m_ScaleInLightmap: 1
 Variable::   m_SortingLayer: 0
 Variable::   m_SortingOrder: 0
 Variable::   m_SortingLayerID: 0
---- !u!33 &1347779567
-Object Nr: 10
+--- !u!65 &764086334
+Object Nr: 8
+Status: EQUAL
+BoxCollider:
+Variable::   m_ObjectHideFlags: 0
+Variable::   m_PrefabParentObject: {fileID: 0} 0
+Variable::   m_PrefabInternal: {fileID: 0} 0
+Variable::   m_GameObject: {fileID: 764086331} 764086331
+Variable::   m_Material: {fileID: 0} 0
+Variable::   m_IsTrigger: 0
+Variable::   m_Enabled: 1
+Variable::   serializedVersion: 2
+Variable::   m_Size: {x: 1, y: 1, z: 1}
+Variable::   m_Center: {x: 0, y: 0, z: 0}
+--- !u!33 &764086335
+Object Nr: 9
 Status: EQUAL
 MeshFilter:
 Variable::   m_ObjectHideFlags: 0
 Variable::   m_PrefabParentObject: {fileID: 0} 0
 Variable::   m_PrefabInternal: {fileID: 0} 0
-Variable::   m_GameObject: {fileID: 1347779564} 1347779564
-Variable::   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0} 10207
---- !u!4 &1347779568
+Variable::   m_GameObject: {fileID: 764086331} 764086331
+Variable::   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0} 10202
+--- !u!1 &1943605175
+Object Nr: 10
+Status: EQUAL
+GameObject:
+Variable::   m_ObjectHideFlags: 0
+Variable::   m_PrefabParentObject: {fileID: 0} 0
+Variable::   m_PrefabInternal: {fileID: 0} 0
+Variable::   serializedVersion: 4
+Array   ::   m_Component: 1943605179 1943605178 1943605177 1943605176
+Variable::   - 4: {fileID: 1943605179} 1943605179
+Variable::   - 33: {fileID: 1943605178} 1943605178
+Variable::   - 65: {fileID: 1943605177} 1943605177
+Variable::   - 23: {fileID: 1943605176} 1943605176
+Variable::   m_Layer: 0
+Variable::   m_Name: child¯1943605175
+Variable::   m_TagString: Untagged
+Variable::   m_Icon: {fileID: 0} 0
+Variable::   m_NavMeshLayer: 0
+Variable::   m_StaticEditorFlags: 0
+Variable::   m_IsActive: 1
+--- !u!23 &1943605176
 Object Nr: 11
 Status: EQUAL
+Renderer:
+Variable::   m_ObjectHideFlags: 0
+Variable::   m_PrefabParentObject: {fileID: 0} 0
+Variable::   m_PrefabInternal: {fileID: 0} 0
+Variable::   m_GameObject: {fileID: 1943605175} 1943605175
+Variable::   m_Enabled: 1
+Variable::   m_CastShadows: 1
+Variable::   m_ReceiveShadows: 1
+Variable::   m_LightmapIndex: 255
+Variable::   m_LightmapTilingOffset: {x: 1, y: 1, z: 0, w: 0}
+Array   ::   m_Materials: 10302
+Variable::   - {fileID: 10302, guid: 0000000000000000f000000000000000, type: 0} 10302
+Variable::   m_SubsetIndices: 
+Variable::   m_StaticBatchRoot: {fileID: 0} 0
+Variable::   m_UseLightProbes: 0
+Variable::   m_LightProbeAnchor: {fileID: 0} 0
+Variable::   m_ScaleInLightmap: 1
+Variable::   m_SortingLayer: 0
+Variable::   m_SortingOrder: 0
+Variable::   m_SortingLayerID: 0
+--- !u!65 &1943605177
+Object Nr: 12
+Status: EQUAL
+BoxCollider:
+Variable::   m_ObjectHideFlags: 0
+Variable::   m_PrefabParentObject: {fileID: 0} 0
+Variable::   m_PrefabInternal: {fileID: 0} 0
+Variable::   m_GameObject: {fileID: 1943605175} 1943605175
+Variable::   m_Material: {fileID: 0} 0
+Variable::   m_IsTrigger: 0
+Variable::   m_Enabled: 1
+Variable::   serializedVersion: 2
+Variable::   m_Size: {x: 1, y: 1, z: 1}
+Variable::   m_Center: {x: 0, y: 0, z: 0}
+--- !u!33 &1943605178
+Object Nr: 13
+Status: EQUAL
+MeshFilter:
+Variable::   m_ObjectHideFlags: 0
+Variable::   m_PrefabParentObject: {fileID: 0} 0
+Variable::   m_PrefabInternal: {fileID: 0} 0
+Variable::   m_GameObject: {fileID: 1943605175} 1943605175
+Variable::   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0} 10202
+--- !u!4 &1943605179
+Object Nr: 14
+Status: DIFFERENT
+Referencing: 2113034478 1943605179 
+Change Nr: 3
+Change Partner: 1
 Transform:
 Variable::   m_ObjectHideFlags: 0
 Variable::   m_PrefabParentObject: {fileID: 0} 0
 Variable::   m_PrefabInternal: {fileID: 0} 0
-Variable::   m_GameObject: {fileID: 1347779564} 1347779564
+Variable::   m_GameObject: {fileID: 1943605175} 1943605175
 Variable::   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-Variable::   m_LocalPosition: {x: 1, y: 0, z: 0}
+DIFF: Variable::   m_LocalPosition: {x: 2, y: -2, z: 0}
 Variable::   m_LocalScale: {x: 1, y: 1, z: 1}
 Array   ::   m_Children: []
+DIFF: Variable::   m_Father: {fileID: 2113034478} 2113034478
+--- !u!1 &2113034474
+Object Nr: 15
+Status: EQUAL
+GameObject:
+Variable::   m_ObjectHideFlags: 0
+Variable::   m_PrefabParentObject: {fileID: 0} 0
+Variable::   m_PrefabInternal: {fileID: 0} 0
+Variable::   serializedVersion: 4
+Array   ::   m_Component: 2113034478 2113034477 2113034476 2113034475
+Variable::   - 4: {fileID: 2113034478} 2113034478
+Variable::   - 33: {fileID: 2113034477} 2113034477
+Variable::   - 65: {fileID: 2113034476} 2113034476
+Variable::   - 23: {fileID: 2113034475} 2113034475
+Variable::   m_Layer: 0
+Variable::   m_Name: Hans¯2113034474
+Variable::   m_TagString: Untagged
+Variable::   m_Icon: {fileID: 0} 0
+Variable::   m_NavMeshLayer: 0
+Variable::   m_StaticEditorFlags: 0
+Variable::   m_IsActive: 1
+--- !u!23 &2113034475
+Object Nr: 16
+Status: EQUAL
+Renderer:
+Variable::   m_ObjectHideFlags: 0
+Variable::   m_PrefabParentObject: {fileID: 0} 0
+Variable::   m_PrefabInternal: {fileID: 0} 0
+Variable::   m_GameObject: {fileID: 2113034474} 2113034474
+Variable::   m_Enabled: 1
+Variable::   m_CastShadows: 1
+Variable::   m_ReceiveShadows: 1
+Variable::   m_LightmapIndex: 255
+Variable::   m_LightmapTilingOffset: {x: 1, y: 1, z: 0, w: 0}
+Array   ::   m_Materials: 10302
+Variable::   - {fileID: 10302, guid: 0000000000000000f000000000000000, type: 0} 10302
+Variable::   m_SubsetIndices: 
+Variable::   m_StaticBatchRoot: {fileID: 0} 0
+Variable::   m_UseLightProbes: 0
+Variable::   m_LightProbeAnchor: {fileID: 0} 0
+Variable::   m_ScaleInLightmap: 1
+Variable::   m_SortingLayer: 0
+Variable::   m_SortingOrder: 0
+Variable::   m_SortingLayerID: 0
+--- !u!65 &2113034476
+Object Nr: 17
+Status: EQUAL
+BoxCollider:
+Variable::   m_ObjectHideFlags: 0
+Variable::   m_PrefabParentObject: {fileID: 0} 0
+Variable::   m_PrefabInternal: {fileID: 0} 0
+Variable::   m_GameObject: {fileID: 2113034474} 2113034474
+Variable::   m_Material: {fileID: 0} 0
+Variable::   m_IsTrigger: 0
+Variable::   m_Enabled: 1
+Variable::   serializedVersion: 2
+Variable::   m_Size: {x: 1, y: 1, z: 1}
+Variable::   m_Center: {x: 0, y: 0, z: 0}
+--- !u!33 &2113034477
+Object Nr: 18
+Status: EQUAL
+MeshFilter:
+Variable::   m_ObjectHideFlags: 0
+Variable::   m_PrefabParentObject: {fileID: 0} 0
+Variable::   m_PrefabInternal: {fileID: 0} 0
+Variable::   m_GameObject: {fileID: 2113034474} 2113034474
+Variable::   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0} 10202
+--- !u!4 &2113034478
+Object Nr: 19
+Status: DIFFERENT
+Referencing: 2113034478 1943605179 
+Change Nr: 3
+Change Partner: 1
+Transform:
+Variable::   m_ObjectHideFlags: 0
+Variable::   m_PrefabParentObject: {fileID: 0} 0
+Variable::   m_PrefabInternal: {fileID: 0} 0
+Variable::   m_GameObject: {fileID: 2113034474} 2113034474
+Variable::   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+Variable::   m_LocalPosition: {x: 3, y: 0, z: 0}
+Variable::   m_LocalScale: {x: 1, y: 1, z: 1}
+DIFF: Array   ::   m_Children: 1943605179
+Variable::   - {fileID: 1943605179} 1943605179
 Variable::   m_Father: {fileID: 0} 0
