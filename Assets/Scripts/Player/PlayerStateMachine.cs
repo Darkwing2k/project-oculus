@@ -87,6 +87,13 @@ public class PlayerStateMachine : MonoBehaviour
         }
     }
 
+    public void clearUsables()
+    {
+        currentUsables.Clear();
+
+        buttonInfo.SetActive(false);
+    }
+
     public void changePlayerState(PlayerStateEnum newState, Usable passOnUsable)
     {
         Debug.Log("playerstate changed to: " + newState);

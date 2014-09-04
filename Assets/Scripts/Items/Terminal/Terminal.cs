@@ -95,6 +95,8 @@ public class Terminal : MonoBehaviour {
 	private void deactivateTerminal() {
 		transform.collider.enabled = false;
 		transform.GetComponent<ReallyUsable>().enabled = false;
+
+        PlayerStateMachine.Instance.clearUsables();
 		PlayerStateMachine.Instance.changePlayerState(PlayerStateMachine.PlayerStateEnum.IDLE);
 	}
 }
