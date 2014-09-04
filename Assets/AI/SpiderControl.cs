@@ -85,6 +85,7 @@ public class SpiderControl : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate () {
 
+        
         if (timer >= timeToExecute && !WaitingOnCheckpoint)
         {
             if (!generalBehaviour.behaviourChangeLocked)
