@@ -9,7 +9,31 @@ public class SpiderControl : MonoBehaviour {
     public bool DEBUG_ExtendedBehaviourActive = true;
     public bool DEBUG_FollowOnCommand = false;
 
-	public EnemyBehaviour generalBehaviour;
+    private bool m_WaitingOnCheckpoint;
+    public bool WaitingOnCheckpoint {
+        get
+        {
+            return m_WaitingOnCheckpoint;
+        }
+        set
+        { 
+            if (value)
+            {
+                m_WaitingOnCheckpoint = value;
+                generalBehaviour.enemy.rigidbody.useGravity = false;
+                generalBehaviour.agent.enabled = false;
+                anim.Stop();
+            }
+            else
+            {
+                generalBehaviour.lastYPos = generalBehaviour.enemy.transform.position.y;
+                generalBehaviour.enemy.rigidbody.useGravity = true;
+                generalBehaviour.updateDelegate += waitUntilFallDownFinished;
+            }
+        } 
+    }
+
+	public GeneralBehaviour generalBehaviour;
 
     public Animation anim;
 
@@ -26,18 +50,16 @@ public class SpiderControl : MonoBehaviour {
 	float fallDownDistance = 4.0f;
 	float maxPlayerHeightForJumpAttack = 4.0f;
 
+    
+
 	public GameObject player;
 	public GameObject spiderEnemy;
 
 	public GameObject testRoom;
 
-    public delegate void executeInUpdateMethod();
-    public executeInUpdateMethod updateDelegate;
-    void dummy()
-    {
-    }
+    
 	void Start () {
-        updateDelegate = new executeInUpdateMethod(dummy);
+        
         anim = this.gameObject.GetComponent<Animation>();
 
         soundSource = this.gameObject.GetComponent<AudioSource>();
@@ -47,228 +69,229 @@ public class SpiderControl : MonoBehaviour {
 		NavMeshAgent navMeshAgent = spiderEnemy.GetComponent<NavMeshAgent>();
 		navMeshAgent.speed = speed;
 
-		generalBehaviour = new EnemyBehaviour(spiderEnemy, player, navMeshAgent, anim, soundSource, walkSound, jumpSound);
+		//generalBehaviour = new EnemyBehaviour(this, spiderEnemy, player, navMeshAgent, anim, soundSource, walkSound, jumpSound);
+        generalBehaviour.SetEnemyBehaviour(spiderEnemy, player, navMeshAgent, anim, soundSource, walkSound, jumpSound);
         generalBehaviour.DEBUG_startPos = spiderEnemy.transform.position;
         generalBehaviour.speed = speed;
-		generalBehaviour.changeBehaviour(new WanderBehaviour(generalBehaviour, this));
+		generalBehaviour.changeBehaviour(new WanderBehaviour(generalBehaviour));
 
 		generalBehaviour.setCurrentRoom(testRoom.GetComponent<RoomInfo>());
+
+        WaitingOnCheckpoint = true;
+
 		//InvokeRepeating("Execute", 0.0f, 0.05f);
 	}
 
 	// Update is called once per frame
 	void FixedUpdate () {
 
-        try
+        if (timer >= timeToExecute && !WaitingOnCheckpoint)
         {
-            if (timer >= timeToExecute)
+            if (!generalBehaviour.behaviourChangeLocked)
             {
-                //Debug.Log("IS BEHAVIOUR CHANGE LOCKED: " + generalBehaviour.behaviourChangeLocked);
-                if (!generalBehaviour.behaviourChangeLocked)
+                Vector3 playerPosition = player.transform.position;
+                Vector3 enemyPosition = spiderEnemy.transform.position;
+                float verticalDistance = playerPosition.y - enemyPosition.y;
+                playerPosition.y = 0.0f;
+                enemyPosition.y = 0.0f;
+                float positionDelta = (playerPosition - enemyPosition).magnitude;
+
+
+                if (generalBehaviour.currentBehaviour is WanderBehaviour)
                 {
-                    Vector3 playerPosition = player.transform.position;
-                    Vector3 enemyPosition = spiderEnemy.transform.position;
-                    float verticalDistance = playerPosition.y - enemyPosition.y;
-                    playerPosition.y = 0.0f;
-                    enemyPosition.y = 0.0f;
-                    float positionDelta = (playerPosition - enemyPosition).magnitude;
-
-
-                    if (generalBehaviour.currentBehaviour is WanderBehaviour)
+                    if (GeneralBehaviour.playerPositionKnown)
                     {
-                        if (generalBehaviour.playerPositionKnown)
-                        {
-                            generalBehaviour.changeBehaviour(new FollowBehaviour(generalBehaviour, this));
-                            generalBehaviour.anim.Play();
+                        generalBehaviour.changeBehaviour(new FollowBehaviour(generalBehaviour));
+                        generalBehaviour.anim.Play();
 
-                            generalBehaviour.soundSource.clip = generalBehaviour.walkSound;
-                            generalBehaviour.soundSource.loop = true;
-                            generalBehaviour.soundSource.Play();
-
-                        }
+                        generalBehaviour.soundSource.clip = generalBehaviour.walkSound;
+                        generalBehaviour.soundSource.loop = true;
+                        generalBehaviour.soundSource.Play();
                     }
-                    else if (generalBehaviour.currentBehaviour is FollowBehaviour)
+                }
+                else if (generalBehaviour.currentBehaviour is FollowBehaviour)
+                {
+                    if (generalBehaviour.timeoutLostPlayerSight && !GeneralBehaviour.playerPositionKnown && !generalBehaviour.isClimbingOnCeiling)
                     {
-                        if (!generalBehaviour.playerPositionKnown)
-                        {
-                            generalBehaviour.changeBehaviour(new WanderBehaviour(generalBehaviour, this));
-                        }
-                        else if (DEBUG_ExtendedBehaviourActive && generalBehaviour.isClimbingOnCeiling && FallDownAttackBehaviour.isPlayerReachable(verticalDistance, positionDelta))
-                        {
-                            generalBehaviour.changeBehaviour(new FallDownAttackBehaviour(generalBehaviour));
-                        }
-                        else if (!generalBehaviour.isClimbingOnCeiling && verticalDistance < maxPlayerHeightForJumpAttack &&
-                                 positionDelta < jumpDistance &&
-                                 !JumpAttackBehaviour.isObstacleInWay(spiderEnemy, player.transform.position))
-                        {
-                            generalBehaviour.changeBehaviour(new JumpAttackBehaviour(generalBehaviour));
-                        }
-                        else if (DEBUG_ExtendedBehaviourActive && verticalDistance > maxPlayerHeightForJumpAttack)
-                        {
-                            generalBehaviour.changeBehaviour(new ClimbUpNextWallBehaviour(generalBehaviour, this));
-                        }
+                        generalBehaviour.changeBehaviour(new WanderBehaviour(generalBehaviour));
                     }
-                    else if (DEBUG_ExtendedBehaviourActive && generalBehaviour.currentBehaviour is ClimbUpNextWallBehaviour)
+                    else if (generalBehaviour.timeoutLostPlayerSight && !GeneralBehaviour.playerPositionKnown && generalBehaviour.isClimbingOnCeiling)
                     {
-                        if (!generalBehaviour.playerPositionKnown)
-                        {
-                            generalBehaviour.changeBehaviour(new WanderBehaviour(generalBehaviour, this));
-                        }
-                        else if (FallDownAttackBehaviour.isPlayerReachable(verticalDistance, positionDelta))
-                        {
-                            generalBehaviour.changeBehaviour(new FallDownAttackBehaviour(generalBehaviour));
-                        }
-                        else
-                        {
-                            generalBehaviour.changeBehaviour(new FollowBehaviour(generalBehaviour, this));
-                        }
+                        generalBehaviour.changeBehaviour(new FallOnFloorBehaviour(generalBehaviour));
                     }
-                    else if (generalBehaviour.currentBehaviour is JumpAttackBehaviour)
+                    else if (DEBUG_ExtendedBehaviourActive && GeneralBehaviour.playerPositionKnown && generalBehaviour.isClimbingOnCeiling && FallDownAttackBehaviour.isPlayerReachable(verticalDistance, positionDelta))
                     {
-                        if (!generalBehaviour.playerPositionKnown)
-                        {
-                            generalBehaviour.changeBehaviour(new WanderBehaviour(generalBehaviour, this));
-                        }
-                        else if (DEBUG_ExtendedBehaviourActive && verticalDistance > maxPlayerHeightForJumpAttack)
-                        {
-                            generalBehaviour.changeBehaviour(new ClimbUpNextWallBehaviour(generalBehaviour, this));
-                        }
-                        else if (positionDelta > jumpDistance
-                                 || JumpAttackBehaviour.isObstacleInWay(spiderEnemy, player.transform.position))
-                        {
-                            generalBehaviour.changeBehaviour(new FollowBehaviour(generalBehaviour, this));
-                        }
-                        else
-                        {
-                            generalBehaviour.changeBehaviour(new JumpAttackBehaviour(generalBehaviour));
-                        }
-                    }
-                    else if (DEBUG_ExtendedBehaviourActive && generalBehaviour.currentBehaviour is FallDownAttackBehaviour)
-                    {
-                        if (!generalBehaviour.playerPositionKnown)
-                        {
-                            generalBehaviour.changeBehaviour(new WanderBehaviour(generalBehaviour, this));
-                        }
-                        else if (positionDelta < jumpDistance && verticalDistance < maxPlayerHeightForJumpAttack
-                                 && !JumpAttackBehaviour.isObstacleInWay(spiderEnemy, player.transform.position))
-                        {
-                            generalBehaviour.changeBehaviour(new JumpAttackBehaviour(generalBehaviour));
-                        }
-                        else
-                        {
-                            generalBehaviour.changeBehaviour(new FollowBehaviour(generalBehaviour, this));
-                        }
-                    }
-
-
-                    //Debug.Log ("IS CLIMBING ON CEILING: " + generalBehaviour.isClimbingOnCeiling);
-                    //Debug.Log ("PLAYER POSITION KNOWN: " + generalBehaviour.playerPositionKnown);
-                    //Debug.Log ("POSITION DELTA: " + positionDelta);
-                    /*
-                    if (generalBehaviour.isClimbingOnCeiling && generalBehaviour.playerPositionKnown && positionDelta < jumpDistance && !(generalBehaviour.currentBehaviour is FallDownAttackBehaviour))
-                    {
-                        Debug.Log("FALL DOWN");
                         generalBehaviour.changeBehaviour(new FallDownAttackBehaviour(generalBehaviour));
                     }
-                    //Debug.Log("PositionDelta" + positionDelta);
-                    else if (!generalBehaviour.isClimbingOnCeiling && generalBehaviour.playerPositionKnown && positionDelta < jumpDistance && !(generalBehaviour.currentBehaviour is JumpAttackBehaviour))
+                    else if (!generalBehaviour.isClimbingOnCeiling && verticalDistance < maxPlayerHeightForJumpAttack &&
+                                positionDelta < jumpDistance && GeneralBehaviour.playerPositionKnown &&
+                                !JumpAttackBehaviour.isObstacleInWay(spiderEnemy, player.transform.position))
                     {
                         generalBehaviour.changeBehaviour(new JumpAttackBehaviour(generalBehaviour));
                     }
-                    else if (generalBehaviour.playerPositionKnown && !(generalBehaviour.currentBehaviour is FollowBehaviour))
+                    else if (DEBUG_ExtendedBehaviourActive && GeneralBehaviour.playerPositionKnown && verticalDistance > maxPlayerHeightForJumpAttack)
+                    {
+                        generalBehaviour.changeBehaviour(new ClimbUpNextWallBehaviour(generalBehaviour));
+                    }
+                }
+                else if (DEBUG_ExtendedBehaviourActive && generalBehaviour.currentBehaviour is ClimbUpNextWallBehaviour)
+                {
+                    if (!GeneralBehaviour.playerPositionKnown && !generalBehaviour.isClimbingOnCeiling)
+                    {
+                        generalBehaviour.changeBehaviour(new WanderBehaviour(generalBehaviour));
+                    }
+                    else if (FallDownAttackBehaviour.isPlayerReachable(verticalDistance, positionDelta))
+                    {
+                        generalBehaviour.changeBehaviour(new FallDownAttackBehaviour(generalBehaviour));
+                    }
+                    else
                     {
                         generalBehaviour.changeBehaviour(new FollowBehaviour(generalBehaviour));
                     }
-                    else if (!generalBehaviour.playerPositionKnown && !(generalBehaviour.currentBehaviour is WanderBehaviour))
+                }
+                else if (generalBehaviour.currentBehaviour is JumpAttackBehaviour)
+                {
+                    if (!GeneralBehaviour.playerPositionKnown)
                     {
                         generalBehaviour.changeBehaviour(new WanderBehaviour(generalBehaviour));
-                    }*/
+                    }
+                    else if (DEBUG_ExtendedBehaviourActive && verticalDistance > maxPlayerHeightForJumpAttack)
+                    {
+                        generalBehaviour.changeBehaviour(new ClimbUpNextWallBehaviour(generalBehaviour));
+                    }
+                    else if (positionDelta > jumpDistance
+                                || JumpAttackBehaviour.isObstacleInWay(spiderEnemy, player.transform.position))
+                    {
+                        generalBehaviour.changeBehaviour(new FollowBehaviour(generalBehaviour));
+                    }
+                    else
+                    {
+                        generalBehaviour.changeBehaviour(new JumpAttackBehaviour(generalBehaviour));
+                    }
                 }
-                generalBehaviour.execute(timer);
-                timer = 0.0f;
+                else if (DEBUG_ExtendedBehaviourActive && generalBehaviour.currentBehaviour is FallDownAttackBehaviour)
+                {
+                    if (!GeneralBehaviour.playerPositionKnown)
+                    {
+                        generalBehaviour.changeBehaviour(new WanderBehaviour(generalBehaviour));
+                    }
+                    else if (positionDelta < jumpDistance && verticalDistance < maxPlayerHeightForJumpAttack
+                                && !JumpAttackBehaviour.isObstacleInWay(spiderEnemy, player.transform.position))
+                    {
+                        generalBehaviour.changeBehaviour(new JumpAttackBehaviour(generalBehaviour));
+                    }
+                    else
+                    {
+                        generalBehaviour.changeBehaviour(new FollowBehaviour(generalBehaviour));
+                    }
+                }
+                else if (DEBUG_ExtendedBehaviourActive && generalBehaviour.currentBehaviour is FallOnFloorBehaviour)
+                {
+                    if (!GeneralBehaviour.playerPositionKnown)
+                    {
+                        generalBehaviour.changeBehaviour(new WanderBehaviour(generalBehaviour));
+                    }
+                    else if (!generalBehaviour.isClimbingOnCeiling && verticalDistance < maxPlayerHeightForJumpAttack &&
+                                positionDelta < jumpDistance &&
+                                !JumpAttackBehaviour.isObstacleInWay(spiderEnemy, player.transform.position))
+                    {
+                        generalBehaviour.changeBehaviour(new JumpAttackBehaviour(generalBehaviour));
+                    }
+                    else if (DEBUG_ExtendedBehaviourActive && verticalDistance > maxPlayerHeightForJumpAttack)
+                    {
+                        generalBehaviour.changeBehaviour(new ClimbUpNextWallBehaviour(generalBehaviour));
+                    }
+                    else
+                    {
+                        generalBehaviour.changeBehaviour(new FollowBehaviour(generalBehaviour));
+                    }
+                }
+
+
+                //Debug.Log ("IS CLIMBING ON CEILING: " + generalBehaviour.isClimbingOnCeiling);
+                //Debug.Log ("PLAYER POSITION KNOWN: " + generalBehaviour.playerPositionKnown);
+                //Debug.Log ("POSITION DELTA: " + positionDelta);
+                /*
+                if (generalBehaviour.isClimbingOnCeiling && generalBehaviour.playerPositionKnown && positionDelta < jumpDistance && !(generalBehaviour.currentBehaviour is FallDownAttackBehaviour))
+                {
+                    Debug.Log("FALL DOWN");
+                    generalBehaviour.changeBehaviour(new FallDownAttackBehaviour(generalBehaviour));
+                }
+                //Debug.Log("PositionDelta" + positionDelta);
+                else if (!generalBehaviour.isClimbingOnCeiling && generalBehaviour.playerPositionKnown && positionDelta < jumpDistance && !(generalBehaviour.currentBehaviour is JumpAttackBehaviour))
+                {
+                    generalBehaviour.changeBehaviour(new JumpAttackBehaviour(generalBehaviour));
+                }
+                else if (generalBehaviour.playerPositionKnown && !(generalBehaviour.currentBehaviour is FollowBehaviour))
+                {
+                    generalBehaviour.changeBehaviour(new FollowBehaviour(generalBehaviour));
+                }
+                else if (!generalBehaviour.playerPositionKnown && !(generalBehaviour.currentBehaviour is WanderBehaviour))
+                {
+                    generalBehaviour.changeBehaviour(new WanderBehaviour(generalBehaviour));
+                }*/
             }
-            else
-            {
-                timer += Time.deltaTime;
-            }
+            generalBehaviour.execute(timer);
+            timer = 0.0f;
         }
-        catch (Exception e)
+        else
         {
-            generalBehaviour.DEBUG_resetSpider();
+            timer += Time.deltaTime;
         }
+        
 	}
 
 	
 	void Update()
 	{
-        try
+        // Debug Code
+        if (Input.GetKeyDown(KeyCode.C))
         {
-            // Debug Code
-            if (Input.GetKeyDown(KeyCode.C))
-            {
-                generalBehaviour.playerPositionKnown = !generalBehaviour.playerPositionKnown;
-            }
-            //if (Input.GetKeyDown(KeyCode.V))
-            //{
-            //    generalBehaviour.changeBehaviour(new ClimbUpNextWallBehaviour(generalBehaviour, this));
-            //}
-            if (Input.GetKeyDown(KeyCode.U))
-            {
-                generalBehaviour.DEBUG_resetSpider();
-            }
-            if (Input.GetKeyDown(KeyCode.M))
-            {
-                this.DEBUG_FollowOnCommand = !this.DEBUG_FollowOnCommand;
-            }
-            /*
-            if (generalBehaviour.currentBehaviour is FallDownAttackBehaviour)
-            {
-                Debug.Log (generalBehaviour.enemy.rigidbody.velocity);
-            }*/
-            //
-
-            checkIfEnemyHitsPlayer();
-
-            updateDelegate();
-
-            if (!DEBUG_FollowOnCommand)
-                isEnemyInSight();
+            GeneralBehaviour.playerPositionKnown = !GeneralBehaviour.playerPositionKnown;
         }
-        catch (Exception e)
+        //if (Input.GetKeyDown(KeyCode.V))
+        //{
+        //    generalBehaviour.changeBehaviour(new ClimbUpNextWallBehaviour(generalBehaviour, this));
+        //}
+        if (Input.GetKeyDown(KeyCode.U))
         {
             generalBehaviour.DEBUG_resetSpider();
         }
-	}
-
-	private void checkIfEnemyHitsPlayer()
-	{
-		if (generalBehaviour.enemy.collider.bounds.Intersects(generalBehaviour.player.collider.bounds))
-		{
-			//Debug.Log("PLAYER IS HIT");
-			generalBehaviour.playerIsHit = true;
-		}
-	}
-
-    private void isEnemyInSight()
-    {
-        Ray ray = new Ray(generalBehaviour.enemy.transform.position, generalBehaviour.player.transform.position - generalBehaviour.enemy.transform.position);
-        RaycastHit hit;
-
-        Debug.DrawRay(generalBehaviour.enemy.transform.position, generalBehaviour.player.transform.position - generalBehaviour.enemy.transform.position);
-        if (Physics.Raycast(ray, out hit, EnemyBehaviour.ownLayerMask))
+        if (Input.GetKeyDown(KeyCode.M))
         {
-            if (hit.collider.gameObject.tag.Equals("Player"))
-            {
-                generalBehaviour.playerPositionKnown = true;
-            }
-            else
-            {
-                generalBehaviour.playerPositionKnown = false;
-            }
+            this.DEBUG_FollowOnCommand = !this.DEBUG_FollowOnCommand;
         }
-        
-    }
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            this.WaitingOnCheckpoint = !this.WaitingOnCheckpoint;
+        }
+        /*
+        if (generalBehaviour.currentBehaviour is FallDownAttackBehaviour)
+        {
+            Debug.Log (generalBehaviour.enemy.rigidbody.velocity);
+        }*/
+        //
 
-    
+
+
+        generalBehaviour.checkIfEnemyHitsPlayer();
+
+        generalBehaviour.updateDelegate();
+
+        if (!DEBUG_FollowOnCommand)
+            generalBehaviour.isEnemyInSight();
+        
+	}
+
+
+    public void waitUntilFallDownFinished()
+    {
+        if (generalBehaviour.isFallDownFinished() && generalBehaviour.collisionWithObject)
+        {
+            generalBehaviour.agent.enabled = true;
+            m_WaitingOnCheckpoint = false;
+            generalBehaviour.updateDelegate -= waitUntilFallDownFinished;
+        }
+    }
 
 }

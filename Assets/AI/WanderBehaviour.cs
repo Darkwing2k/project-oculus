@@ -17,73 +17,42 @@ public class WanderBehaviour : IBehaviour {
 
 	public bool pathSet;
 
-	private EnemyBehaviour generalBehaviour;
+    private bool processingLookAtNextPosition = false;
 
-    private SpiderControl control;
+	private GeneralBehaviour generalBehaviour;
 
-	public WanderBehaviour(EnemyBehaviour generalBehaviour, SpiderControl control)
+	public WanderBehaviour(GeneralBehaviour generalBehaviour)
 	{
 		this.generalBehaviour = generalBehaviour;
 		this.pathSet = false;
-        this.control = control;
+        generalBehaviour.agent.enabled = true;
 	}
 
 	public void execute(float timePassed)
 	{
-        try
+        if (!this.pathSet)
         {
-            if (!this.pathSet)
-            {
-                // get next random position
-                this.nextPosition = (UnityEngine.Random.insideUnitSphere * radius);
-                this.nextPosition.y = 0.0f;
-
-                int random = UnityEngine.Random.Range(0, 4);
-                if (random == 0)
-                    minDistance = new Vector3(-minWalkDistance, 0.0f, -minWalkDistance);
-                else if (random == 1)
-                    minDistance = new Vector3(minWalkDistance, 0.0f, -minWalkDistance);
-                else if (random == 2)
-                    minDistance = new Vector3(-minWalkDistance, 0.0f, minWalkDistance);
-                else
-                    minDistance = new Vector3(minWalkDistance, 0.0f, minWalkDistance);
-
-                //Debug.Log (random + ", " + minDistance.ToString());
-                Vector3 enemyPosition = generalBehaviour.enemy.transform.position;
-                this.nextPosition += enemyPosition + minDistance;
-
-                // if a point near to nextPosition is found, set it as destination
-                NavMeshHit hit;
-                if (NavMesh.SamplePosition(nextPosition, out hit, radius, 1))
-                {
-                    nextPosition = hit.position;
-                    generalBehaviour.agent.SetDestination(nextPosition);
-                    Debug.Log("Next Position: " + nextPosition);
-                    this.pathSet = true;
-                    nextPosition.y = generalBehaviour.enemy.transform.position.y;
-
-                }
-            }
-            else if (isNextPositionReached())
-            {
+            // get next random position
+            findNextPosition();
+        }
+        else if (isNextPositionReached())
+        {
+            if (!generalBehaviour.isClimbingOnCeiling)
                 generalBehaviour.agent.Stop();
-                wait(timePassed);
-            }
+            else
+                generalBehaviour.enemy.rigidbody.velocity = Vector3.zero;
+            wait(timePassed);
+        }
 
-            //TODO: if spider is on ceiling, traverse link won't work, so first jump on floor
-            OffMeshLinkData data = generalBehaviour.agent.nextOffMeshLinkData;
-            if (data.valid && !generalBehaviour.processingOffMeshLink)
-            {
-                generalBehaviour.targetLinkData = data;
-                control.updateDelegate += generalBehaviour.ProcessOffMeshLink;
-                generalBehaviour.processingOffMeshLink = true;
-            }
-        }
-        catch (Exception e)
+        //TODO: if spider is on ceiling, traverse link won't work, so first jump on floor
+        OffMeshLinkData data = generalBehaviour.agent.nextOffMeshLinkData;
+        if (data.valid && !generalBehaviour.processingOffMeshLink)
         {
-            Debug.Log(e.Message);
-            generalBehaviour.DEBUG_resetSpider();
+            generalBehaviour.targetLinkData = data;
+            generalBehaviour.updateDelegate += generalBehaviour.ProcessOffMeshLink;
+            generalBehaviour.processingOffMeshLink = true;
         }
+        
 	}
 
     /// <summary>
@@ -96,6 +65,54 @@ public class WanderBehaviour : IBehaviour {
     //        return true;
     //    return false;
     //}
+
+    private void findNextPosition()
+    {
+        this.nextPosition = (UnityEngine.Random.insideUnitSphere * radius);
+        this.nextPosition.y = 0.0f;
+
+        int random = UnityEngine.Random.Range(0, 4);
+        if (random == 0)
+            minDistance = new Vector3(-minWalkDistance, 0.0f, -minWalkDistance);
+        else if (random == 1)
+            minDistance = new Vector3(minWalkDistance, 0.0f, -minWalkDistance);
+        else if (random == 2)
+            minDistance = new Vector3(-minWalkDistance, 0.0f, minWalkDistance);
+        else
+            minDistance = new Vector3(minWalkDistance, 0.0f, minWalkDistance);
+
+        //Debug.Log (random + ", " + minDistance.ToString());
+        Vector3 enemyPosition = generalBehaviour.enemy.transform.position;
+        this.nextPosition += enemyPosition + minDistance;
+
+        // if a point near to nextPosition is found, set it as destination
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(nextPosition, out hit, radius, 1))
+        {
+            nextPosition = hit.position;
+            if (!generalBehaviour.isClimbingOnCeiling)
+            {
+                generalBehaviour.agent.SetDestination(nextPosition);
+            }
+            else
+            {
+                //nextPosition.y = generalBehaviour.enemy.transform.position.y;
+                //Vector3 targetVelocity = (nextPosition - generalBehaviour.enemy.transform.position).normalized * generalBehaviour.speed;
+                //generalBehaviour.enemy.rigidbody.velocity = targetVelocity;
+
+                //if (!processingLookAtNextPosition)
+                //{
+                //    generalBehaviour.enemy.transform.LookAt(nextPosition);
+                //    //targetLookDirection = generalBehaviour.player.transform.position - generalBehaviour.enemy.transform.position;
+                //    //currLookDirection = generalBehaviour.enemy.transform.forward;
+
+                //    //control.updateDelegate += ProcessTurnFaceToPlayer;
+                //    //processingLookAtPlayer = true;
+                //}
+            }
+            this.pathSet = true;
+        }
+    }
 
 	private bool isNextPositionReached()
 	{

@@ -13,32 +13,37 @@ using System.Collections;
 //TODO: doesn't hit player, when he's at max. height
 public class FallDownAttackBehaviour : IBehaviour
 {
-	private EnemyBehaviour generalBehaviour;
+	private GeneralBehaviour generalBehaviour;
 
 	private bool fallDownInProgress;
 
 	private static Vector3 correctionVector = Vector3.zero;
 
+    private float t;
+    private float lastRotationAngle = 0.0f;
+    //private Vector3 currRotation, targetRotation;
+
 	/// <summary>
 	/// Initializes a new instance of the <see cref="FallDownAttackBehaviour"/> class.
 	/// Bahaviour change is locked until Attack finished.
 	/// </summary>
-	public FallDownAttackBehaviour (EnemyBehaviour generalBehaviour)
+	public FallDownAttackBehaviour (GeneralBehaviour generalBehaviour)
 	{
 		this.generalBehaviour = generalBehaviour;
 		fallDownInProgress = false;
 		generalBehaviour.behaviourChangeLocked = true;
+        generalBehaviour.lastYPos = generalBehaviour.enemy.transform.position.y;
 	}
 
 	public void execute(float timePassed)
 	{
 		if (fallDownInProgress)
 		{
-			if (isFallDownAttackFinished())
+			if (generalBehaviour.isFallDownFinished())
 			{
                 generalBehaviour.enemy.rigidbody.useGravity = false;
                 generalBehaviour.enemy.rigidbody.velocity = Vector3.zero;
-				generalBehaviour.agent.baseOffset = EnemyBehaviour.defaultNavMeshBaseOffset;
+				generalBehaviour.agent.baseOffset = GeneralBehaviour.defaultNavMeshBaseOffset;
 				generalBehaviour.agent.enabled = true;
 				generalBehaviour.isClimbingOnCeiling = false;
 				fallDownInProgress = false;
@@ -107,6 +112,12 @@ public class FallDownAttackBehaviour : IBehaviour
 
         generalBehaviour.collisionWithObject = false;
 		fallDownInProgress = true;
+
+        generalBehaviour.updateDelegate += generalBehaviour.ProcessTurnWhileFalling;
+
+        generalBehaviour.soundSource.clip = generalBehaviour.jumpSound;
+        generalBehaviour.soundSource.loop = false;
+        generalBehaviour.soundSource.Play();
 	}
 
 	private Vector3 calculateFallDownVector(Vector3 positionDelta)
@@ -114,18 +125,7 @@ public class FallDownAttackBehaviour : IBehaviour
 		return positionDelta + correctionVector;
 	}
 
-	private bool isFallDownAttackFinished()
-	{
-		if (generalBehaviour.enemy.transform.position.y < 2.0f)
-		{
-			return true;
-		}
-        else if (generalBehaviour.collisionWithObject)
-        {
-            return true;
-        }
-		return false;
-	}
+    
 }
 
 

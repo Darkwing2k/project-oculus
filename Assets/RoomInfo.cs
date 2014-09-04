@@ -3,6 +3,8 @@ using System.Collections;
 
 public class RoomInfo : MonoBehaviour {
 
+    public static int ROOM_COLLIDER_LAYER_MASK = 1 << 11;
+
 	public ArrayList climbableWalls = new ArrayList();
 
 	public GameObject bottom, ceiling;
