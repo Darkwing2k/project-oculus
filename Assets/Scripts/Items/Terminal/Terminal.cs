@@ -7,6 +7,8 @@ public class Terminal : MonoBehaviour {
 
 	public TerminalButton activeButton;
 
+	public Triggerable[] triggers;
+
 	private bool buttonTriggeredOnce;
 	public TextMesh inputfield;
 
@@ -67,16 +69,32 @@ public class Terminal : MonoBehaviour {
 		}
 	}
 
-	public void Activate() {
+	public void Use() {
 		activeButton.Select();
 		inputfield.text = "";
 		currentState = TerminalState.ENABLED;
 		zoomer.ZoomIn();
 	}
 
-	public void Deactivate() {
+	public void StopUse() {
 		activeButton.Deselect();
 		currentState = TerminalState.DISABLED;
 		zoomer.ZoomOut();
+	}
+
+	public void ValidateAndTrigger() {
+		if (SecretCodeGenerator.Instance.Code.Equals(this.Text)) {
+			foreach (Triggerable t in triggers) {
+				t.trigger();
+			}
+			StopUse();
+			deactivateTerminal();
+		}
+	}
+
+	private void deactivateTerminal() {
+		transform.collider.enabled = false;
+		transform.GetComponent<ReallyUsable>().enabled = false;
+		PlayerStateMachine.Instance.changePlayerState(PlayerStateMachine.PlayerStateEnum.IDLE);
 	}
 }

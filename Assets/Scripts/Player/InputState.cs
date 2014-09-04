@@ -7,7 +7,7 @@ public class InputState : PlayerState {
 
 	public override void enterState(Usable usableRef, List<Usable> all) {
 		psm.FlightControlEnabled = false;
-		terminal.Activate();
+		terminal.Use();
 	}
 
 	public override void handleInput(PlayerStateMachine.InputType inputT, List<Usable> usables) {
@@ -18,7 +18,7 @@ public class InputState : PlayerState {
 
 	public override void exitState() {
 		psm.FlightControlEnabled = true;
-		terminal.Deactivate();
+		terminal.StopUse();
 	}
 
 	// Update is called once per frame

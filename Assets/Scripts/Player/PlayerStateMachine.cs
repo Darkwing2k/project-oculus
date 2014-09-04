@@ -4,13 +4,23 @@ using System.Collections.Generic;
 
 public class PlayerStateMachine : MonoBehaviour 
 {
+	#region Statics
+
+	private static PlayerStateMachine instance;
+
+	public static PlayerStateMachine Instance {
+		get { return instance; }
+	}
+
+	#endregion
+
     public GameObject buttonInfo;
     public List<Usable> currentUsables;
 
     public enum PlayerStateEnum { IDLE, LIFT, LASER, HACK, INPUT };
     public PlayerStateEnum currentState;
 
-    public enum InputType { USE };
+    public enum InputType { USE, START };
 
     public Dictionary<PlayerStateEnum, PlayerState> states;
 
@@ -20,6 +30,15 @@ public class PlayerStateMachine : MonoBehaviour
         get { return flightControlActive; }
         set { flightControlActive = value; }
     }
+
+	void Awake() {
+		if (instance != null && instance != this) {
+			DestroyImmediate(gameObject);
+			return;
+		} else {
+			instance = this;
+		}
+	}
 
 	// Use this for initialization
 	void Start () 
@@ -40,10 +59,11 @@ public class PlayerStateMachine : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
     {
-	    if(Input.GetButtonDown("Use"))
-        {
+	    if(Input.GetButtonDown("Use")) {
             states[currentState].handleInput(InputType.USE, currentUsables);
-        }
+		} else if (Input.GetButtonDown("Start")) {
+			states[currentState].handleInput(InputType.START, null);
+		}
 	}
 
     public void registerUsable(Usable u)

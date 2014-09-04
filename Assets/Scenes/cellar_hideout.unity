@@ -2904,6 +2904,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 582811566}
+  - 114: {fileID: 582811567}
   m_Layer: 0
   m_Name: Menu
   m_TagString: Untagged
@@ -2924,6 +2925,17 @@ Transform:
   - {fileID: 2106382484}
   - {fileID: 323016806}
   m_Father: {fileID: 427774543}
+--- !u!114 &582811567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 582811565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6ad58d5f955f64469971f226eaed44a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &585889825
 GameObject:
   m_ObjectHideFlags: 0
@@ -4035,6 +4047,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainMenu: {fileID: 0}
   level: {fileID: 0}
+  currentState: 0
 --- !u!4 &716412795
 Transform:
   m_ObjectHideFlags: 0

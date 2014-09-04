@@ -11,7 +11,13 @@ public class IdlePlayerState : PlayerState
 
     public override void handleInput(PlayerStateMachine.InputType t, List<Usable> usables)
     {
-        if(t == PlayerStateMachine.InputType.USE && usables.Count > 0)
+		if (t == PlayerStateMachine.InputType.START) 
+		{
+			if (GameManager.Instance.currentState != GameState.Change) {
+				GameManager.Instance.LoadMenu();
+			}
+		}
+		else if(t == PlayerStateMachine.InputType.USE && usables.Count > 0)
         {
             Usable closest = shortestDistanceTo(usables);
 

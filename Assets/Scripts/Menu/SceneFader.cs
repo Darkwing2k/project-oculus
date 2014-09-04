@@ -4,7 +4,7 @@ using System.Collections;
 public class SceneFader {
 
 	private Texture2D fadeTexture;
-	private float fadeSpeed = 1.0f;
+	private float fadeSpeed = 2.0f;
 	
 	private Color currentColor;
 	private bool isFadingIn;

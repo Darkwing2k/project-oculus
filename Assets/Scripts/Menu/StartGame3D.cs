@@ -30,6 +30,13 @@ public class StartGame3D : Menu3D {
 	void OnEnable() {
 		text3D.gameObject.SetActive(true);
 		text3D.transform.position = origin.position;
+
+		if (!GameManager.Instance.IsLevelLoaded) {
+			text3D.text = "Start Game";
+		} else {
+			text3D.text = "Resume Game";
+		}
+
 		t = 0.0f;
 
 		if (monitor1 != null) {
@@ -54,8 +61,10 @@ public class StartGame3D : Menu3D {
 		}
 
 		if (Input.GetButtonDown("Action")) {
-			GameManager.Instance.LoadLevelAsync(1);
+			GameManager.Instance.LoadLevel(1);
 			this.enabled = false;
 		}
 	}
+
+
 }
