@@ -7,6 +7,8 @@ public class EnergyStation : MonoBehaviour
     public GameObject playerRef;
     public PlayerStateMachine psm;
 
+    public Animation animation;
+
     public List<Triggerable> objectsToTrigger;
     public List<Light> lightsToTrigger;
     public bool powered;
@@ -24,6 +26,13 @@ public class EnergyStation : MonoBehaviour
             energyCell.prepareLifting(this.transform.parent, cellPosition, cellRotation, this);
             powered = true;
         }
+        else
+        {
+            if (animation != null)
+            {
+                animation.Play();
+            }
+        }
 
         playerRef = GameObject.FindGameObjectWithTag("Player");
         psm = playerRef.GetComponent<PlayerStateMachine>();
@@ -32,7 +41,7 @@ public class EnergyStation : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
     {
-	
+
 	}
 
     private void trigger()
@@ -53,6 +62,10 @@ public class EnergyStation : MonoBehaviour
     public void takeCell()
     {
         energyCell.prepareRelease();
+
+        animation["Take 001"].speed = 1;
+        animation.Play();
+
         trigger();
     }
 
@@ -60,6 +73,11 @@ public class EnergyStation : MonoBehaviour
     {
         energyCell = cell;
         energyCell.prepareLifting(this.transform.parent, cellPosition, cellRotation, this);
+
+        animation["Take 001"].speed = -1;
+        animation["Take 001"].time = animation["Take 001"].length;
+        animation.Play();
+
         trigger();
     }
 
