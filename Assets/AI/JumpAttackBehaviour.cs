@@ -3,7 +3,7 @@ using System.Collections;
 
 public class JumpAttackBehaviour : IBehaviour {
 
-	EnemyBehaviour generalBehaviour;
+	GeneralBehaviour generalBehaviour;
 
 	private bool jumpInProgress;
 
@@ -12,7 +12,7 @@ public class JumpAttackBehaviour : IBehaviour {
 
 	private static Vector3 jumpCorrectionVector = new Vector3(0.0f, 5.0f, 0.0f);
 
-	public JumpAttackBehaviour(EnemyBehaviour generalBehaviour)
+	public JumpAttackBehaviour(GeneralBehaviour generalBehaviour)
 	{
 		this.generalBehaviour = generalBehaviour;
 		jumpInProgress = false;
@@ -64,7 +64,6 @@ public class JumpAttackBehaviour : IBehaviour {
 		if (angle < minJumpAngle)
 			angle = minJumpAngle;
 		*/
-        Debug.Log(jumpCorrectionVector.ToString());
 		Vector3 jumpVector = positionDelta + jumpCorrectionVector;
 		//generalBehaviour.agent.Stop();
 		generalBehaviour.agent.enabled = false;
@@ -81,7 +80,6 @@ public class JumpAttackBehaviour : IBehaviour {
 	//TODO: try to implement a more general, height independent, method (maybe floor collider?)
 	private bool isJumpCompleted()
 	{
-        Debug.Log("timePassedSinceJump: " + timePassedSinceJump);
 		if (timePassedSinceJump > timeToCheckIfJumpCompleted)
 		{
 			if (generalBehaviour.enemy.transform.position.y < 2.0f)
@@ -98,7 +96,7 @@ public class JumpAttackBehaviour : IBehaviour {
 		Ray ray = new Ray(enemy.transform.position, playerPosition - enemy.transform.position);
 
         
-		if (Physics.SphereCast(ray, ((BoxCollider)enemy.collider).size.x, out hit, Mathf.Infinity, ~EnemyBehaviour.ownLayerMask))
+		if (Physics.SphereCast(ray, ((BoxCollider)enemy.collider).size.x, out hit, Mathf.Infinity, ~GeneralBehaviour.OWN_LAYER_MASK))
 		{
 			if (!hit.transform.gameObject.tag.Equals("Player"))
 			{

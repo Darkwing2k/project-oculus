@@ -3,11 +3,11 @@ using System.Collections;
 
 public class LookForPlayerAfterLostContact : IBehaviour {
 
-	private EnemyBehaviour generalBehaviour;
+	private GeneralBehaviour generalBehaviour;
 	private Vector3 lastPlayerPosition;
 
 
-	public LookForPlayerAfterLostContact(EnemyBehaviour generalBehaviour, Vector3 lastPlayerPosition)
+	public LookForPlayerAfterLostContact(GeneralBehaviour generalBehaviour, Vector3 lastPlayerPosition)
 	{
 		this.generalBehaviour = generalBehaviour;
 		this.lastPlayerPosition = lastPlayerPosition;

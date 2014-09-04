@@ -3,7 +3,7 @@ using System.Collections;
 
 public class ClimbUpNextWallBehaviour : IBehaviour {
 
-	private EnemyBehaviour generalBehaviour;
+	private GeneralBehaviour generalBehaviour;
 
 	private bool pathToNextWallSet;
 
@@ -25,11 +25,8 @@ public class ClimbUpNextWallBehaviour : IBehaviour {
 
 	Vector3 nearestWallPosition;
 
-    SpiderControl control;
-
-    public ClimbUpNextWallBehaviour(EnemyBehaviour generalBehaviour, SpiderControl control)
+    public ClimbUpNextWallBehaviour(GeneralBehaviour generalBehaviour)
 	{
-        this.control = control;
 		generalBehaviour.behaviourChangeLocked = true;
 		this.generalBehaviour = generalBehaviour;
 
@@ -43,19 +40,21 @@ public class ClimbUpNextWallBehaviour : IBehaviour {
 		// only execute, if there is a climbable wall in this room
 		if (generalBehaviour.currentRoom.climbableWalls.Count > 0)
 		{
-			if (!wallFound)
-			{
-				FindNextWallToClimb();
-				wallFound = true;
-			}
-
-			ClimbFoundWall(nearestWallPosition);
+            if (!wallFound && !generalBehaviour.climbableWallReached)
+            {
+                FindNextWallToClimb();
+                wallFound = true;
+            }
+            else
+            {
+                ClimbFoundWall(nearestWallPosition);
+            }
 		}
 		//TODO: implement the case, if no wall is climbable in this room
 		else
 		{
 			Debug.Log ("NO CLIMBABLE WALL IN THIS ROOM");
-			generalBehaviour.changeBehaviour(new WanderBehaviour(generalBehaviour, control));
+			generalBehaviour.changeBehaviour(new WanderBehaviour(generalBehaviour));
 		}
 	}
 	
@@ -87,7 +86,7 @@ public class ClimbUpNextWallBehaviour : IBehaviour {
 	private void ClimbFoundWall(Vector3 nearestWallPosition)
 	{
 		// set the path to the next wall
-		if (!pathToNextWallSet)
+		if (!pathToNextWallSet && !generalBehaviour.climbableWallReached)
 		{
 			generalBehaviour.agent.SetDestination(nearestWallPosition);
 			pathToNextWallSet = true;
@@ -95,7 +94,7 @@ public class ClimbUpNextWallBehaviour : IBehaviour {
 		// if wall is reached and the enemy is not already climbing the wall, climb it now
 		else if (generalBehaviour.climbableWallReached && !generalBehaviour.isClimbingOnWall)
 		{
-            //generalBehaviour.agent.enabled = false;
+            pathToNextWallSet = true;
             generalBehaviour.enemy.rigidbody.useGravity = false;
 			generalBehaviour.agent.Stop();
             generalBehaviour.agent.enabled = false;
@@ -105,7 +104,7 @@ public class ClimbUpNextWallBehaviour : IBehaviour {
             currLookRotation = generalBehaviour.enemy.transform.forward;
             targetLookRotation = Vector3.up;
 
-            Debug.Log(currLookRotation + ", " + targetLookRotation);
+            //Debug.Log(currLookRotation + ", " + targetLookRotation);
 
 			t1 = 0.0f;
             t2 = 0.0f;
@@ -113,23 +112,28 @@ public class ClimbUpNextWallBehaviour : IBehaviour {
             generalBehaviour.agent.velocity = Vector3.zero;
             generalBehaviour.enemy.rigidbody.angularVelocity = Vector3.zero;
 
-			//generalBehaviour.enemy.rigidbody.AddForce(Vector3.up * SpiderControl.speed, ForceMode.VelocityChange);
 			generalBehaviour.isClimbingOnWall = true;
-            control.updateDelegate += ProcessClimbing;
-            control.updateDelegate += ProcessTurnFace;
+            generalBehaviour.updateDelegate += ProcessClimbing;
+            generalBehaviour.updateDelegate += ProcessTurnFace;
 		}
 		// then, if ceiling is reached, change the behaviour
 		else if (generalBehaviour.isClimbingOnWall && generalBehaviour.isClimbingOnCeiling)
-		{
+        {
             currRotation = generalBehaviour.enemy.transform.rotation;
             targetRotation = currRotation;
-            targetLookRotation.x -= 90.0f;
+            targetRotation.x += 90.0f;
+            
+
+            //Debug.Log("CURRENT ROTATION: " + currRotation);
+            //Debug.Log("TARGET ROTATION: " + targetRotation);
+
 			generalBehaviour.isClimbingOnWall = false;
             generalBehaviour.agent.enabled = true;
             generalBehaviour.agent.baseOffset = generalBehaviour.enemy.transform.position.y;
 			generalBehaviour.behaviourChangeLocked = false;
-            control.updateDelegate -= ProcessClimbing;
-            control.updateDelegate += ProcessTurnOnCeiling;
+
+            
+            generalBehaviour.updateDelegate += ProcessTurnOnCeiling;
 		}
 	}
 
@@ -146,6 +150,7 @@ public class ClimbUpNextWallBehaviour : IBehaviour {
         if ((t1 / timeToLerpUpMovement) > 1.0f)
         {
             generalBehaviour.isClimbingOnCeiling = true;
+            generalBehaviour.updateDelegate -= ProcessClimbing;
         }
     }
 
@@ -156,7 +161,7 @@ public class ClimbUpNextWallBehaviour : IBehaviour {
         if (t2 > 1.0f)
         {
             t2 = 0.0f;
-            control.updateDelegate -= ProcessTurnFace;
+            generalBehaviour.updateDelegate -= ProcessTurnFace;
         }
     }
 
@@ -168,7 +173,7 @@ public class ClimbUpNextWallBehaviour : IBehaviour {
         if (t2 > 1.0f)
         {
             t2 = 0.0f;
-            control.updateDelegate -= ProcessTurnOnCeiling;
+            generalBehaviour.updateDelegate -= ProcessTurnOnCeiling;
         }
     }
 }

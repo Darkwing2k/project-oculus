@@ -3,7 +3,7 @@ using System.Collections;
 
 public class OutsideNavMeshBehaviour : IBehaviour {
 
-	private EnemyBehaviour generalBehaviour;
+	private GeneralBehaviour generalBehaviour;
 
 	private bool pathToNavMeshSet;
 
@@ -14,7 +14,7 @@ public class OutsideNavMeshBehaviour : IBehaviour {
 	private Vector3 foundPosition;
 
 
-	public OutsideNavMeshBehaviour(EnemyBehaviour generalBehaviour)
+	public OutsideNavMeshBehaviour(GeneralBehaviour generalBehaviour)
 	{
 		this.generalBehaviour = generalBehaviour;
 		this.pathToNavMeshSet = false;
