@@ -5,6 +5,8 @@ using System.Collections.Generic;
 public class DropZone : MonoBehaviour 
 {
 
+    public bool triggerByWeight;
+
     public GameObject key;
 
     public Triggerable objectToTrigger;
@@ -17,11 +19,6 @@ public class DropZone : MonoBehaviour
 	void Start () 
     {
         audio = GetComponent<AudioSource>();
-
-        if (key == null)
-        {
-            print("DropZone " + gameObject.name + " has no key!");
-        }
 	}
 	
 	// Update is called once per frame
@@ -39,7 +36,9 @@ public class DropZone : MonoBehaviour
                 objectToTrigger.trigger();
                 pressed = true;
             }
-            audio.Play();
+
+            if(audio != null)
+                audio.Play();
         }
     }
 
