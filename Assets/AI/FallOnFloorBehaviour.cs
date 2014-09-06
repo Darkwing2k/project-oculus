@@ -24,6 +24,7 @@ public class FallOnFloorBehaviour : IBehaviour
             generalBehaviour.enemy.rigidbody.useGravity = true;
             generalBehaviour.updateDelegate += generalBehaviour.ProcessTurnWhileFalling;
             falling = true;
+            generalBehaviour.collisionWithObject = false;
         }
         else if (!isOnFloor && generalBehaviour.isFallDownFinished())
         {

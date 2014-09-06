@@ -44,7 +44,7 @@ public class SpiderControl : MonoBehaviour {
 	public float speed = 2.0f;
 
 	float timer = 0.0f;
-	float timeToExecute = 0.4f;
+	float timeToExecute = 0.2f;
 
 	float jumpDistance = 4.0f;
 	float fallDownDistance = 4.0f;
@@ -59,7 +59,7 @@ public class SpiderControl : MonoBehaviour {
 
     
 	void Start () {
-        
+
         anim = this.gameObject.GetComponent<Animation>();
 
         soundSource = this.gameObject.GetComponent<AudioSource>();
@@ -68,6 +68,19 @@ public class SpiderControl : MonoBehaviour {
 		player = GameObject.FindWithTag("Player");
 		NavMeshAgent navMeshAgent = spiderEnemy.GetComponent<NavMeshAgent>();
 		navMeshAgent.speed = speed;
+
+        //check in which room spider is
+        RoomInfo[] roomScripts = FindObjectsOfType<RoomInfo>();
+
+        foreach (var obj in roomScripts)
+        {
+            if (obj.gameObject.collider.bounds.Intersects(spiderEnemy.collider.bounds))
+            {
+                this.testRoom = obj.gameObject;
+                break;
+            }
+        }
+
 
 		//generalBehaviour = new EnemyBehaviour(this, spiderEnemy, player, navMeshAgent, anim, soundSource, walkSound, jumpSound);
         generalBehaviour.SetEnemyBehaviour(spiderEnemy, player, navMeshAgent, anim, soundSource, walkSound, jumpSound);
@@ -92,7 +105,9 @@ public class SpiderControl : MonoBehaviour {
             {
                 Vector3 playerPosition = player.transform.position;
                 Vector3 enemyPosition = spiderEnemy.transform.position;
-                float verticalDistance = playerPosition.y - enemyPosition.y;
+                float verticalDistance = Math.Abs(playerPosition.y - enemyPosition.y);
+                Debug.Log(verticalDistance);
+                
                 playerPosition.y = 0.0f;
                 enemyPosition.y = 0.0f;
                 float positionDelta = (playerPosition - enemyPosition).magnitude;
@@ -112,6 +127,7 @@ public class SpiderControl : MonoBehaviour {
                 }
                 else if (generalBehaviour.currentBehaviour is FollowBehaviour)
                 {
+                    Debug.Log(DEBUG_ExtendedBehaviourActive + ", " + GeneralBehaviour.playerPositionKnown + ", " + (verticalDistance > maxPlayerHeightForJumpAttack));
                     if (generalBehaviour.timeoutLostPlayerSight && !GeneralBehaviour.playerPositionKnown && !generalBehaviour.isClimbingOnCeiling)
                     {
                         generalBehaviour.changeBehaviour(new WanderBehaviour(generalBehaviour));

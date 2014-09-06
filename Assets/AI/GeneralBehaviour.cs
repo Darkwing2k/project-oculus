@@ -182,16 +182,17 @@ public class GeneralBehaviour : MonoBehaviour {
 
     public bool isFallDownFinished()
     {
-        float heightDelta = lastYPos - enemy.transform.position.y;
-        
-        if (heightDelta < 0.05f)
+        float heightDelta = System.Math.Abs(lastYPos - enemy.transform.position.y);
+
+        if (heightDelta < 0.05f && collisionWithObject)
         {
+            Debug.Log("Fall completed!");
             return true;
         }
-        else if (collisionWithObject)
-        {
-            return true;
-        }
+        //else if (collisionWithObject)
+        //{
+        //    return true;
+        //}
         lastYPos = enemy.transform.position.y;
         
         return false;

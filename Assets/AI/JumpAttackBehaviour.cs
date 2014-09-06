@@ -5,9 +5,9 @@ public class JumpAttackBehaviour : IBehaviour {
 
 	GeneralBehaviour generalBehaviour;
 
-	private bool jumpInProgress;
+	private bool jumpInProgress, checking;
 
-	private static float timeToCheckIfJumpCompleted = 0.8f;
+	private static float timeToCheckIfJumpCompleted = 0.1f;
 	private float timePassedSinceJump;
 
 	private static Vector3 jumpCorrectionVector = new Vector3(0.0f, 5.0f, 0.0f);
@@ -17,6 +17,7 @@ public class JumpAttackBehaviour : IBehaviour {
 		this.generalBehaviour = generalBehaviour;
 		jumpInProgress = false;
 		timePassedSinceJump = 0.0f;
+        checking = false;
 	}
 
 	public void execute(float timePassed)
@@ -25,23 +26,10 @@ public class JumpAttackBehaviour : IBehaviour {
 		{
 			attackWithJump();
 		}
-		else
+		else if (!checking)
 		{
-			timePassedSinceJump += timePassed;
-			if (isJumpCompleted())
-			{
-				generalBehaviour.enemy.rigidbody.useGravity = false;
-				generalBehaviour.agent.enabled = true;
-				generalBehaviour.behaviourChangeLocked = false;
-                generalBehaviour.enemy.rigidbody.velocity = Vector3.zero;
-				timePassedSinceJump = 0.0f;
-				jumpInProgress = false;
-                generalBehaviour.anim.Play();
-
-                generalBehaviour.soundSource.clip = generalBehaviour.walkSound;
-                generalBehaviour.soundSource.loop = true;
-                generalBehaviour.soundSource.Play();
-			}
+            generalBehaviour.updateDelegate += checkJumpCompleted;
+            checking = true;
 		}
 			
 	}
@@ -71,21 +59,44 @@ public class JumpAttackBehaviour : IBehaviour {
 		generalBehaviour.enemy.rigidbody.useGravity = true;
 		generalBehaviour.enemy.rigidbody.AddForce(jumpVector, ForceMode.Impulse);
         generalBehaviour.anim.Stop();
+        generalBehaviour.collisionWithObject = false;
 
         generalBehaviour.soundSource.clip = generalBehaviour.jumpSound;
         generalBehaviour.soundSource.loop = false;
         generalBehaviour.soundSource.Play();
 	}
 
-	//TODO: try to implement a more general, height independent, method (maybe floor collider?)
+    private void checkJumpCompleted()
+    {
+        timePassedSinceJump += Time.deltaTime;
+        if (isJumpCompleted())
+        {
+            generalBehaviour.enemy.rigidbody.useGravity = false;
+            generalBehaviour.agent.enabled = true;
+            generalBehaviour.behaviourChangeLocked = false;
+            generalBehaviour.enemy.rigidbody.velocity = Vector3.zero;
+            timePassedSinceJump = 0.0f;
+            jumpInProgress = false;
+            generalBehaviour.anim.Play();
+
+            generalBehaviour.soundSource.clip = generalBehaviour.walkSound;
+            generalBehaviour.soundSource.loop = true;
+            generalBehaviour.soundSource.Play();
+
+            generalBehaviour.updateDelegate -= checkJumpCompleted;
+        }
+    }
+
 	private bool isJumpCompleted()
 	{
 		if (timePassedSinceJump > timeToCheckIfJumpCompleted)
 		{
-			if (generalBehaviour.enemy.transform.position.y < 2.0f)
-			{
-				return true;
-			}
+            if (generalBehaviour.isFallDownFinished())
+                return true;
+            //if (generalBehaviour.enemy.transform.position.y < 2.0f)
+            //{
+            //    return true;
+            //}
 		}
 		return false;
 	}
