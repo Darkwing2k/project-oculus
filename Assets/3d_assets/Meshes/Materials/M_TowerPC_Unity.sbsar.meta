@@ -6,7 +6,7 @@ SubstanceImporter:
   - serializedVersion: 10
     name: M_TowerPC_Unity_001
     prototypeName: M_TowerPC_Unity_001
-    shaderName: Custom/ImD Ubershader
+    shaderName: Bumped Diffuse
     inputs:
     - name: $outputsize
       value:
@@ -45,25 +45,23 @@ SubstanceImporter:
             texture: {instanceID: 0}
             scale: {x: 1, y: 1}
             offset: {x: 0, y: 0}
-        data:
-          first:
-            name: _BumpDetailMap
-          second:
-            texture: {instanceID: 0}
-            scale: {x: 1, y: 1}
-            offset: {x: 0, y: 0}
-        data:
-          first:
-            name: _DataMap
-          second:
-            texture: {instanceID: 0}
-            scale: {x: 1, y: 1}
-            offset: {x: 0, y: 0}
       floats:
+        data:
+          first:
+            name: _EmissionLM
+          second: 0
         data:
           first:
             name: _Shininess
           second: .228854537
+        data:
+          first:
+            name: _Parallax
+          second: .0199999996
+        data:
+          first:
+            name: _Outline
+          second: .00999999978
         data:
           first:
             name: _AlphaCutoff
@@ -79,8 +77,16 @@ SubstanceImporter:
           second: {r: .5, g: .5, b: .5, a: 1}
         data:
           first:
+            name: _OutlineColor
+          second: {r: 0, g: 1, b: 0, a: 1}
+        data:
+          first:
             name: _EmissiveColor
           second: {r: .5859375, g: 0, b: 0, a: 0}
+        data:
+          first:
+            name: _ReflectColor
+          second: {r: 1, g: 1, b: 1, a: .5}
     textureParameters:
     - name: M_TowerPC_Unity_001_diffuse
       alphaSource: 5
@@ -122,7 +128,7 @@ SubstanceImporter:
   - serializedVersion: 10
     name: M_Metal_Galvanised_Unity
     prototypeName: M_Metal_Galvanised_Unity
-    shaderName: Custom/ImD Ubershader
+    shaderName: Bumped Specular
     inputs:
     - name: $outputsize
       value:
@@ -157,20 +163,6 @@ SubstanceImporter:
         data:
           first:
             name: _BumpMap
-          second:
-            texture: {instanceID: 0}
-            scale: {x: 1, y: 1}
-            offset: {x: 0, y: 0}
-        data:
-          first:
-            name: _BumpDetailMap
-          second:
-            texture: {instanceID: 0}
-            scale: {x: 1, y: 1}
-            offset: {x: 0, y: 0}
-        data:
-          first:
-            name: _DataMap
           second:
             texture: {instanceID: 0}
             scale: {x: 1, y: 1}
