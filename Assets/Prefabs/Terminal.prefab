@@ -1040,6 +1040,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2bb7a0d5a495204db2376d942573de7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  terminalCode: 13373
   activeButton: {fileID: 11400004}
   triggers:
   - {fileID: 0}

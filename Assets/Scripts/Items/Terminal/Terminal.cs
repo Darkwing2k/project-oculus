@@ -5,6 +5,8 @@ public class Terminal : MonoBehaviour {
 
 	private enum TerminalState { ENABLED, DISABLED };
 
+	public string terminalCode = "13373";
+	
 	public TerminalButton activeButton;
 
 	public Triggerable[] triggers;
@@ -56,6 +58,7 @@ public class Terminal : MonoBehaviour {
 			}
 
 			if (Input.GetButtonDown("Action")) {
+				inputfield.renderer.material.color = Color.white;
 				activeButton.Press(this);
 			}
 		}
@@ -64,7 +67,7 @@ public class Terminal : MonoBehaviour {
 	public string Text {
 		get { return inputfield.text; }
 		set { 
-			if (inputfield.text.Length < 8)
+			if (value.Length < 8)
 				inputfield.text = value; 
 		}
 	}
@@ -83,12 +86,15 @@ public class Terminal : MonoBehaviour {
 	}
 
 	public void ValidateAndTrigger() {
-		if (SecretCodeGenerator.Instance.Code.Equals(this.Text)) {
+		if (this.Text.Equals(terminalCode)) {
 			foreach (Triggerable t in triggers) {
 				t.trigger();
 			}
 			StopUse();
 			deactivateTerminal();
+			inputfield.renderer.material.color = Color.green;
+		} else {
+			inputfield.renderer.material.color = Color.red;
 		}
 	}
 
