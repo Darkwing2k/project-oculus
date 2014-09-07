@@ -25,9 +25,9 @@ public class GameManager : MonoBehaviour {
 
 	private SceneFader fader;
 
-	private bool changeLevel;
+	private bool unloadLevel = false;
 	private bool loadingLevel;
-	private int currentLevelIndex = 0;
+	private int currentLevelIndex = -1;
 
 	public GameState currentState = GameState.Menu;
 
@@ -63,6 +63,11 @@ public class GameManager : MonoBehaviour {
 				case GameState.Menu:
 					mainMenu.SetActive(true);
 					levelActivation(false);
+
+					if (unloadLevel) {
+						UnloadLevel();
+					}
+
 					fader.FadeIn();
 					break;
 				case GameState.Gameplay:
@@ -79,7 +84,7 @@ public class GameManager : MonoBehaviour {
 		}
 
 		// muss hier gemacht werden, da das LevelObjekt nicht direkt nach "LoadLevelAdditive" gefunden werden kann
-		if (level == null && currentLevelIndex != 0) {
+		if (level == null && currentLevelIndex > -1) {
 			level = GameObject.FindGameObjectWithTag("Level");
 			if (level != null) {
 				levelActivation(true);
@@ -127,9 +132,14 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void LoadMenu() {
+		LoadMenu(false);
+	}
+
+	public void LoadMenu(bool unloadLevel) {
 		if (currentState == GameState.Change) {
 			return;
 		}
+		this.unloadLevel = unloadLevel;
 		currentState = GameState.Change;
 		nextState = GameState.Menu;
 		fader.FadeOutAndStay();

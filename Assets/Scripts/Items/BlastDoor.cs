@@ -4,9 +4,30 @@ using System.Collections.Generic;
 
 public class BlastDoor : Triggerable
 {
+    public OffMeshLink[] relatedOffMeshLinks;
+
     public enum DoorState {OPEN, CLOSED, CLOSING, OPENING};
-    public DoorState currentState;
+
+    private DoorState m_currentState;
+    public DoorState currentState
+    {
+        get
+        {
+            return m_currentState;
+        }
+        set
+        {
+            m_currentState = value;
+            foreach (var link in relatedOffMeshLinks)
+                if (currentState == DoorState.OPEN)
+                    link.activated = true;
+                else
+                    link.activated = false;
+        }
+    }
+
     public DoorState desiredState;
+    
 
     private BlastDoorPiece[] doorPieces;
 

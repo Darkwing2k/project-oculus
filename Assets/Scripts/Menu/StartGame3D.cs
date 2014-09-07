@@ -8,7 +8,6 @@ public class StartGame3D : Menu3D {
 	public TextMesh text3D;
 
 	public GameObject monitor1;
-	public GameObject monitor2;
 	public Material activeMaterial;
 
 	private Material originMaterial;
@@ -41,7 +40,6 @@ public class StartGame3D : Menu3D {
 
 		if (monitor1 != null) {
 			monitor1.renderer.material = activeMaterial;
-			monitor2.renderer.material = activeMaterial;
 		}
 	}
 
@@ -50,7 +48,6 @@ public class StartGame3D : Menu3D {
 
 		if (monitor1 != null) {
 			monitor1.renderer.material = originMaterial;
-			monitor2.renderer.material = originMaterial;
 		}
 	}
 
