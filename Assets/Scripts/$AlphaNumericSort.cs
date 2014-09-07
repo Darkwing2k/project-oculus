@@ -2,7 +2,7 @@
 using UnityEditor;
 using System.Collections;
 
-public class AlphaNumericSort : BaseHierarchySort
+/*public class AlphaNumericSort : BaseHierarchySort
 {
 	public override int Compare(GameObject lhs, GameObject rhs)
 	{
@@ -11,4 +11,4 @@ public class AlphaNumericSort : BaseHierarchySort
 		if (rhs == null) return 1;
 		return EditorUtility.NaturalCompare(lhs.name, rhs.name);
 	}
-}
+}*/

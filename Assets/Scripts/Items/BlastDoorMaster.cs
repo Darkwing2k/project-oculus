@@ -2,25 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class BlastDoorMaster : Triggerable 
+public class BlastDoorMaster : Triggerable, Resettable
 {
     public BlastDoor[] doors;
 
     public float delay;
 
     public bool triggerOnCollision;
-
-	// Use this for initialization
-	void Start () 
-    {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () 
-    {
-	
-	}
 
     public override void trigger()
     {
@@ -43,4 +31,12 @@ public class BlastDoorMaster : Triggerable
             this.trigger();
         }
     }
+
+	public void SetReferencesOnRespawn()
+	{
+		for(int i=0; i<doors.Length; i++) {
+			GameObject neededReference = GameObject.Find ("/" + doors[i].name);
+			doors[i] = neededReference.GetComponent<BlastDoor>();
+		}
+	}
 }

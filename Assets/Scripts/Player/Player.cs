@@ -12,6 +12,8 @@ public class Player : MonoBehaviour
 
     public Transform eyeCenter;
 
+    public Checkpoint checkpoint;
+
     public bool noClip;
 
 	// Use this for initialization
@@ -46,6 +48,16 @@ public class Player : MonoBehaviour
         {
             noClip = !noClip;
             this.gameObject.collider.enabled = !noClip;
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            checkpoint.Respawn();
+        }
+
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            gameObject.GetComponent<PlayerStateMachine>().changePlayerState(PlayerStateMachine.PlayerStateEnum.TUTORIAL);
         }
 	}
 }

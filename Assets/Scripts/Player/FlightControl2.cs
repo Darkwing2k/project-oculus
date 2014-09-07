@@ -14,6 +14,10 @@ public class FlightControl2 : MonoBehaviour
     public float maxDirectionalVelocity;
     public float currentDirectionalVelocity;
 
+	public bool horizontalMovementLocked;
+	public bool verticalMovementLocked;
+	public bool rotationLocked;
+
     private AudioSource audio;
 
     private float yawVerTarget = 0f;
@@ -72,13 +76,18 @@ public class FlightControl2 : MonoBehaviour
         {
             if (playerRef.useGamepad)
             {
-                lStickV = Input.GetAxis("LStickV");
-                lStickH = Input.GetAxis("LStickH");
+				if(!horizontalMovementLocked) {
+					lStickV = Input.GetAxis("LStickV");
+                	lStickH = Input.GetAxis("LStickH");
+				}
 
-                shoulder = Input.GetAxis("Shoulder");
+				if(!verticalMovementLocked)
+                	shoulder = Input.GetAxis("Shoulder");
 
-                rStickV = Input.GetAxis("RStickV");
-                rStickH = Input.GetAxis("RStickH");
+				if(!rotationLocked) {
+                	rStickV = Input.GetAxis("RStickV");
+                	rStickH = Input.GetAxis("RStickH");
+				}
             }
             else
             {
@@ -102,6 +111,8 @@ public class FlightControl2 : MonoBehaviour
 
             audio.volume = moveVol;
             audio.pitch = movePitch;
+
+			playerRef.GetComponent<TutorialState>().panningDone = true;
         }
 
         // ====== Movement on y Axis =======================================
@@ -115,6 +126,8 @@ public class FlightControl2 : MonoBehaviour
         {
             audio.volume = moveVol;
             audio.pitch = movePitch;
+
+			playerRef.GetComponent<TutorialState>().elevatingDone = true;
         }
 
         // ===== Angular Movement ==========================================
@@ -124,6 +137,8 @@ public class FlightControl2 : MonoBehaviour
         if (Mathf.Abs(rStickH) > 0.3f)
         {
             yawVelTarget = rStickH * yawVelMax;
+
+			playerRef.GetComponent<TutorialState>().rotatingDone = true;
         }
         else
         {

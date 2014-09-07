@@ -16,6 +16,11 @@ public class InputState : PlayerState {
 		}
 	}
 
+    public override void InternalUpdate()
+    {
+
+    }
+
 	public override void exitState() {
 		psm.FlightControlEnabled = true;
 		terminal.StopUse();

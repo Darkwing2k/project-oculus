@@ -33,7 +33,7 @@ public class SecurityCamera : MonoBehaviour
     public bool playerInCollider;
     public bool playerVisible;
 
-    private Light camLight;
+    public Light camLight;
     public Color normalColor;
     public Color startledColor;
     public Color alarmedColor;

@@ -22,6 +22,11 @@ public class HackState : PlayerState
         
     }
 
+    public override void InternalUpdate()
+    {
+     
+    }
+
     public override void exitState()
     {
         

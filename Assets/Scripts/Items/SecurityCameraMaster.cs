@@ -16,6 +16,9 @@ public class SecurityCameraMaster : Triggerable
 
     public bool camerasReactToPlayer;
 
+    public bool shortEvent;
+    public float timer;
+
 	// Use this for initialization
 	void Start () 
     {
@@ -42,6 +45,28 @@ public class SecurityCameraMaster : Triggerable
             {
                 playerSeenAt = Vector3.zero;
                 infoAge = 0;
+            }
+        }
+
+        if (triggered && shortEvent)
+        {
+            timer -= Time.deltaTime;
+
+            if (timer < 0)
+            {
+                camerasReactToPlayer = false;
+                triggered = false;
+                shortEvent = false;
+
+                foreach (SecurityCamera currentCam in secCams)
+                {
+                    currentCam.alarmed = false;
+                    currentCam.playerInCollider = false;
+                    currentCam.playerVisible = false;
+
+                    currentCam.changeStateTo(SecurityCamera.ActionState.RETURN);
+                    currentCam.camLight.color = currentCam.normalColor;
+                }
             }
         }
 	}
