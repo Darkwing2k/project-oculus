@@ -60,6 +60,8 @@ public class SpiderControl : MonoBehaviour {
     
 	void Start () {
 
+        DisableRenderOnStart();
+
         anim = this.gameObject.GetComponent<Animation>();
 
         soundSource = this.gameObject.GetComponent<AudioSource>();
@@ -146,7 +148,7 @@ public class SpiderControl : MonoBehaviour {
                     {
                         generalBehaviour.changeBehaviour(new JumpAttackBehaviour(generalBehaviour));
                     }
-                    else if (DEBUG_ExtendedBehaviourActive && GeneralBehaviour.playerPositionKnown && verticalDistance > maxPlayerHeightForJumpAttack)
+                    else if (DEBUG_ExtendedBehaviourActive && GeneralBehaviour.playerPositionKnown && verticalDistance > maxPlayerHeightForJumpAttack && !generalBehaviour.isClimbingOnCeiling)
                     {
                         generalBehaviour.changeBehaviour(new ClimbUpNextWallBehaviour(generalBehaviour));
                     }
@@ -308,6 +310,16 @@ public class SpiderControl : MonoBehaviour {
             generalBehaviour.agent.enabled = true;
             m_WaitingOnCheckpoint = false;
             generalBehaviour.updateDelegate -= waitUntilFallDownFinished;
+        }
+    }
+
+    private void DisableRenderOnStart()
+    {
+        GameObject[] objectsToDisable = GameObject.FindGameObjectsWithTag("DisableRenderOnStart");
+
+        foreach (var obj in objectsToDisable)
+        {
+            obj.renderer.enabled = false;
         }
     }
 

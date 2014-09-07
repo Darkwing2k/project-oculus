@@ -99,6 +99,7 @@ public class GeneralBehaviour : MonoBehaviour {
     //TODO: check if next offmeshlink is reached
     public void ProcessOffMeshLink()
     {
+        
         //if (this.agent.isOnOffMeshLink && !traversingLink)
         //{
         //    this.enemy.rigidbody.AddForce((targetLinkData.endPos - targetLinkData.startPos).normalized * speed, ForceMode.VelocityChange);
