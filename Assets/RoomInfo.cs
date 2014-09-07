@@ -7,9 +7,7 @@ public class RoomInfo : MonoBehaviour {
 
 	public ArrayList climbableWalls = new ArrayList();
 
-	public GameObject bottom, ceiling;
-
-	public float roomHeight;
+	public GameObject ceiling;
 
 	SpiderControl control;
 

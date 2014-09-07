@@ -9,7 +9,7 @@ public class ClimbUpNextWallBehaviour : IBehaviour {
 
 	private bool wallFound;
 
-	private float startBaseOffset, targetBaseOffset, t1;
+	private float targetYPos;
 
     private Vector3 currLookRotation, targetLookRotation;
 
@@ -20,7 +20,7 @@ public class ClimbUpNextWallBehaviour : IBehaviour {
     private float timeToLerpUpMovement = 2.0f;
 
     private float lastRotation = 0.0f;
-
+    
 	private static float wallDistanceDefault;
 
 	Vector3 nearestWallPosition;
@@ -98,19 +98,18 @@ public class ClimbUpNextWallBehaviour : IBehaviour {
             generalBehaviour.enemy.rigidbody.useGravity = false;
 			generalBehaviour.agent.Stop();
             generalBehaviour.agent.enabled = false;
-            startBaseOffset = generalBehaviour.enemy.transform.position.y;
-			targetBaseOffset = generalBehaviour.currentRoom.ceiling.transform.position.y;
+
+			targetYPos = generalBehaviour.currentRoom.ceiling.transform.position.y - 0.5f;
 
             currLookRotation = generalBehaviour.enemy.transform.forward;
             targetLookRotation = Vector3.up;
 
-            //Debug.Log(currLookRotation + ", " + targetLookRotation);
-
-			t1 = 0.0f;
             t2 = 0.0f;
             generalBehaviour.enemy.rigidbody.velocity = Vector3.zero;
             generalBehaviour.agent.velocity = Vector3.zero;
             generalBehaviour.enemy.rigidbody.angularVelocity = Vector3.zero;
+
+            generalBehaviour.enemy.rigidbody.velocity = Vector3.up * generalBehaviour.speed;
 
 			generalBehaviour.isClimbingOnWall = true;
             generalBehaviour.updateDelegate += ProcessClimbing;
@@ -122,17 +121,12 @@ public class ClimbUpNextWallBehaviour : IBehaviour {
             currRotation = generalBehaviour.enemy.transform.rotation;
             targetRotation = currRotation;
             targetRotation.x += 90.0f;
-            
-
-            //Debug.Log("CURRENT ROTATION: " + currRotation);
-            //Debug.Log("TARGET ROTATION: " + targetRotation);
 
 			generalBehaviour.isClimbingOnWall = false;
-            generalBehaviour.agent.enabled = true;
-            generalBehaviour.agent.baseOffset = generalBehaviour.enemy.transform.position.y;
+            //generalBehaviour.agent.enabled = true;
+            //generalBehaviour.agent.baseOffset = generalBehaviour.enemy.transform.position.y;
 			generalBehaviour.behaviourChangeLocked = false;
 
-            
             generalBehaviour.updateDelegate += ProcessTurnOnCeiling;
 		}
 	}
@@ -141,15 +135,19 @@ public class ClimbUpNextWallBehaviour : IBehaviour {
     {
         generalBehaviour.enemy.rigidbody.angularVelocity = Vector3.zero;
 
-        Vector3 pos = generalBehaviour.enemy.transform.position;
-        pos.y = Mathf.Lerp(startBaseOffset, targetBaseOffset, t1 / timeToLerpUpMovement);
-
-        generalBehaviour.enemy.transform.position = pos;
-        t1 += Time.deltaTime;
-
-        if ((t1 / timeToLerpUpMovement) > 1.0f)
-        {
+        if (generalBehaviour.enemy.transform.position.y >= targetYPos)
             generalBehaviour.isClimbingOnCeiling = true;
+
+        //Vector3 pos = generalBehaviour.enemy.transform.position;
+        //pos.y = Mathf.Lerp(startBaseOffset, targetBaseOffset, t1 / timeToLerpUpMovement);
+
+        //generalBehaviour.enemy.transform.position = pos;
+        //t1 += Time.deltaTime;
+
+        if (generalBehaviour.isClimbingOnCeiling)//((t1 / timeToLerpUpMovement) > 1.0f)
+        {
+            //generalBehaviour.isClimbingOnCeiling = true;
+            generalBehaviour.enemy.rigidbody.velocity = Vector3.zero;
             generalBehaviour.updateDelegate -= ProcessClimbing;
         }
     }
