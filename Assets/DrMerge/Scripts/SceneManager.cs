@@ -7,6 +7,8 @@ using System.IO;
 
 public class SceneManager
 {
+    public ChangeManager changeManager;
+
     public DeserializedScene sceneA;
     public DeserializedScene sceneB;
 
@@ -14,7 +16,8 @@ public class SceneManager
     public static string mergedScenePath;
     public static string logPath;
     public const char SEPSYM = '¯';
-    public Color prevColor;
+
+    public Vector2 scrollPos;
 
     public bool jobsDone;
 
@@ -65,6 +68,18 @@ public class SceneManager
     public void compare()
     {
         DeserializedScene.compare(sceneA, sceneB);
+
+        sceneA.fillRefSets();
+        sceneB.fillRefSets();
+
+        HashSet<long> changeIDs = new HashSet<long>();
+
+        DeserializedScene.changeCount = 0;
+
+        sceneA.getAllIDsOfChangedComponents(changeIDs);
+        sceneB.getAllIDsOfChangedComponents(changeIDs);
+
+        changeManager = new ChangeManager(this, changeIDs);
 
         printMerged(false);
 
@@ -128,153 +143,26 @@ public class SceneManager
     {
         List<Change> deleteAfter = new List<Change>();
 
-        foreach (Change currentChange in sceneA.changes)
+        scrollPos = GUILayout.BeginScrollView(scrollPos);
+
+        foreach (ChangeView currentView in changeManager.changeViews.Values)
         {
-            GUILayout.BeginVertical(GUI.skin.GetStyle("Box"));
-
-            GUILayout.BeginHorizontal(GUI.skin.GetStyle("Box"));
-
-            currentChange.expanded = EditorGUILayout.Foldout(currentChange.expanded, "Change " + currentChange.nr);
-
-            if (GUILayout.Button("<"))
-            {
-                currentChange.setChosen(true);
-
-                printMerged(false);
-
-                openSceneKeepSelection(mergedScenePath);
-            }
-
-            if (GUILayout.Button(">"))
-            {
-                currentChange.setChosen(false);
-
-                printMerged(false);
-
-                openSceneKeepSelection(mergedScenePath);
-            }
-
-            if (GUILayout.Button("Save"))
-            {
-                deleteAfter.Add(currentChange);
-            }
-
-            GUILayout.EndHorizontal();
-
-            if (currentChange.expanded)
-            {
-                List<long> allIDs = getAllChangeIDs(currentChange);                
-
-                foreach (long currentID in allIDs)
-                {
-                    bool isGO = false;
-
-                    changeColor(new Color(0, 0, 0));
-                    GUILayout.BeginHorizontal(GUI.skin.GetStyle("Box"));
-                    resetColorToPrevious();
-
-                    isGO = sceneA.drawChangedObjects(currentID, currentChange, editorWindow);
-                    isGO = sceneB.drawChangedObjects(currentID, currentChange.partner, editorWindow);
-
-                    GUILayout.EndHorizontal();
-
-                    if (isGO)
-                    {
-                        showSelectButton(currentID);
-                    }
-                }
-            }
-            GUILayout.EndVertical();
+            currentView.onGUI(editorWindow, deleteAfter);
         }
+
+        GUILayout.EndScrollView();
 
         foreach (Change toDelete in deleteAfter)
         {
-            sceneA.changes.Remove(toDelete);
-            sceneB.changes.Remove(toDelete.partner);
+            changeManager.removeChange(toDelete);
         }
 
-        if (sceneA.changes.Count == 0 && sceneB.changes.Count == 0 && !jobsDone)
+        if (changeManager.changes.Count == 0 && !jobsDone)
         {
             jobsDone = true;
         }
 
         deleteAfter.Clear();
-    }
-
-    private void openSceneKeepSelection(string path)
-    {
-        string selectedName = "";
-        bool somethingWasSelected = false;
-
-        if (Selection.activeGameObject != null)
-        {
-            selectedName = Selection.activeGameObject.name;
-            somethingWasSelected = true;
-        }
-
-        EditorApplication.OpenScene(path);
-
-        if (somethingWasSelected)
-        {
-            Selection.activeGameObject = GameObject.Find(selectedName);
-        }
-    }
-
-    private List<long> getAllChangeIDs(Change currentChange)
-    {
-        List<long> allIDs = new List<long>();
-
-        foreach (long ID in currentChange.references)
-        {
-            if (!allIDs.Contains(ID))
-                allIDs.Add(ID);
-        }
-        foreach (long ID in currentChange.partner.references)
-        {
-            if (!allIDs.Contains(ID))
-                allIDs.Add(ID);
-        }
-
-        return allIDs;
-    }
-
-    private void showSelectButton(long currentID)
-    {
-        if (GUILayout.Button("Select GO"))
-        {
-            GameObject[] allGOs = GameObject.FindObjectsOfType<GameObject>();
-
-            foreach (GameObject currentGO in allGOs)
-            {
-                if (currentGO.name.EndsWith("" + currentID))
-                {
-                    Selection.activeGameObject = currentGO;
-                }
-            }
-        }
-    }
-
-    public void changeColorOnCondition(bool condition, Color trueCase, Color falseCase)
-    {
-        if (condition)
-        {
-            changeColor(trueCase);
-        }
-        else
-        {
-            changeColor(falseCase);
-        }
-    }
-
-    public void changeColor(Color desiredColor)
-    {
-        prevColor = GUI.color;
-        GUI.color = desiredColor;
-    }
-
-    public void resetColorToPrevious()
-    {
-        GUI.color = prevColor;
     }
 }
 

@@ -7,7 +7,7 @@ using System.ComponentModel;
 public class DrMerge : EditorWindow 
 {
 
-    private SceneManager manager;
+    private SceneManager sceneManager;
     private Object sceneA;
     private Object sceneB;
 
@@ -28,13 +28,12 @@ public class DrMerge : EditorWindow
         {
             AssetDatabase.Refresh();
 
-            EditorApplication.OpenScene(SceneManager.sceneFolderPath + "/" + manager.sceneA.name + ".unity");
+            EditorApplication.OpenScene(SceneManager.sceneFolderPath + "/" + sceneManager.sceneA.name + ".unity");
             AssetDatabase.DeleteAsset(SceneManager.mergedScenePath);
         }
 
-        manager = null;
+        sceneManager = null;
         parserDone = false;
-        Change.changeCount = 0;
     }
 
     private void OnLostFocus()
@@ -69,12 +68,12 @@ public class DrMerge : EditorWindow
                 int lastIndexOfSlash = AssetDatabase.GetAssetPath(sceneA).LastIndexOf('/');
                 string sceneFolderPath = AssetDatabase.GetAssetPath(sceneA).Substring(0, lastIndexOfSlash);
 
-                manager = new SceneManager(AssetDatabase.GetAssetPath(sceneA), AssetDatabase.GetAssetPath(sceneB), sceneFolderPath);
-                manager.parse();
+                sceneManager = new SceneManager(AssetDatabase.GetAssetPath(sceneA), AssetDatabase.GetAssetPath(sceneB), sceneFolderPath);
+                sceneManager.parse();
 
-                manager.compare();
+                sceneManager.compare();
 
-                manager.print(true);
+                sceneManager.print(true);
 
                 parserDone = true;
             }
@@ -84,9 +83,11 @@ public class DrMerge : EditorWindow
 
         if (parserDone)
         {
-            manager.onGUI(position);
+            SceneView.RepaintAll();
 
-            if (manager.jobsDone)
+            sceneManager.onGUI(position);
+
+            if (sceneManager.jobsDone)
             {
                 if (GUILayout.Button("Done"))
                 {
