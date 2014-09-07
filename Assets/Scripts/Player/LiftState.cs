@@ -32,6 +32,11 @@ public class LiftState : PlayerState
         }
     }
 
+    public override void InternalUpdate()
+    {
+
+    }
+
     public override void exitState()
     {
         print("releasing object");

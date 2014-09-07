@@ -323,4 +323,13 @@ public class SpiderControl : MonoBehaviour {
         }
     }
 
+    void OnCollisionEnter(Collision c)
+    {
+        if (c.gameObject.GetInstanceID() == player.GetInstanceID())
+        {
+            Player playerScript = player.GetComponent<Player>();
+            playerScript.checkpoint.Respawn();
+        }
+    }
+
 }

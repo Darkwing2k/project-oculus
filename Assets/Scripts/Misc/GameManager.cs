@@ -119,6 +119,7 @@ public class GameManager : MonoBehaviour {
 			Destroy(level);
 			level = null;
 		}
+		unloadLevel = false;
 	}
 
 	public void LoadLevel(int levelIndex) {

@@ -12,6 +12,8 @@ public abstract class PlayerState : MonoBehaviour
 
     public abstract void enterState(Usable closest, List<Usable> all);
 
+	public abstract void InternalUpdate();
+
     public abstract void exitState();
 
     void Start()

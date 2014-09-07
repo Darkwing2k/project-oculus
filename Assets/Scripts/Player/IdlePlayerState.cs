@@ -25,6 +25,11 @@ public class IdlePlayerState : PlayerState
         }
     }
 
+    public override void InternalUpdate()
+    {
+
+    }
+
     public override void exitState()
     {
 
