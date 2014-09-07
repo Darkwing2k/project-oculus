@@ -23,10 +23,14 @@ public class FollowBehaviour : IBehaviour {
 	{
         this.timer = 0.0f;
         this.generalBehaviour = generalBehaviour;
-		if (generalBehaviour.isClimbingOnCeiling)
-		{
-			generalBehaviour.agent.enabled = false;
-		}
+        if (generalBehaviour.isClimbingOnCeiling)
+        {
+            generalBehaviour.agent.enabled = false;
+        }
+        else
+        {
+            generalBehaviour.agent.enabled = true;
+        }
 	}
 
 	//TODO: check, if player is reachable

@@ -99,6 +99,7 @@ public class GeneralBehaviour : MonoBehaviour {
     //TODO: check if next offmeshlink is reached
     public void ProcessOffMeshLink()
     {
+        
         //if (this.agent.isOnOffMeshLink && !traversingLink)
         //{
         //    this.enemy.rigidbody.AddForce((targetLinkData.endPos - targetLinkData.startPos).normalized * speed, ForceMode.VelocityChange);
@@ -182,16 +183,17 @@ public class GeneralBehaviour : MonoBehaviour {
 
     public bool isFallDownFinished()
     {
-        float heightDelta = lastYPos - enemy.transform.position.y;
-        
-        if (heightDelta < 0.05f)
+        float heightDelta = System.Math.Abs(lastYPos - enemy.transform.position.y);
+
+        if (heightDelta < 0.05f && collisionWithObject)
         {
+            Debug.Log("Fall completed!");
             return true;
         }
-        else if (collisionWithObject)
-        {
-            return true;
-        }
+        //else if (collisionWithObject)
+        //{
+        //    return true;
+        //}
         lastYPos = enemy.transform.position.y;
         
         return false;

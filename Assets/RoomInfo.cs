@@ -7,9 +7,7 @@ public class RoomInfo : MonoBehaviour {
 
 	public ArrayList climbableWalls = new ArrayList();
 
-	public GameObject bottom, ceiling;
-
-	public float roomHeight;
+	public GameObject ceiling;
 
 	SpiderControl control;
 
@@ -29,7 +27,7 @@ public class RoomInfo : MonoBehaviour {
 
         
 		control = GameObject.FindGameObjectWithTag("Spider").GetComponent<SpiderControl>();
-		roomHeight = ceiling.transform.position.y - bottom.transform.position.y - 1.0f;
+		//roomHeight = ceiling.transform.position.y - bottom.transform.position.y - 1.0f;
 
 
 	}
@@ -42,19 +40,19 @@ public class RoomInfo : MonoBehaviour {
             control.generalBehaviour.DEBUG_startPos = DEBUG_startPos.position;
 
             // DEBUG
-            for (int i = 0; i <= 9; i++)
-            {
-                if (i >= 3 && transform.root.gameObject.name.Equals("Room_" + i))
-                {
-                    control.DEBUG_ExtendedBehaviourActive = false;
-                    break;
-                }
-                else if (transform.root.gameObject.name.Equals("Room_Office") || transform.root.gameObject.name.Equals("Room_Storage"))
-                {
-                    control.DEBUG_ExtendedBehaviourActive = true;
-                    break;
-                }
-            }
+            //for (int i = 0; i <= 9; i++)
+            //{
+            //    if (i >= 3 && transform.root.gameObject.name.Equals("Room_" + i))
+            //    {
+            //        control.DEBUG_ExtendedBehaviourActive = false;
+            //        break;
+            //    }
+            //    else if (transform.root.gameObject.name.Equals("Room_Office") || transform.root.gameObject.name.Equals("Room_Storage"))
+            //    {
+            //        control.DEBUG_ExtendedBehaviourActive = true;
+            //        break;
+            //    }
+            //}
 		}
         
 	}
