@@ -2,16 +2,17 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class DropZone : MonoBehaviour 
+public class DropZone : Triggerable 
 {
-
-    public bool triggerByWeight;
-
     public GameObject key;
 
     public Triggerable objectToTrigger;
 
+    public bool powered;
+
     public bool pressed;
+
+    public bool keyPresent;
 
     private AudioSource audio;
 
@@ -19,6 +20,7 @@ public class DropZone : MonoBehaviour
 	void Start () 
     {
         audio = GetComponent<AudioSource>();
+        triggerOnce = false;
 	}
 	
 	// Update is called once per frame
@@ -27,27 +29,71 @@ public class DropZone : MonoBehaviour
 	
 	}
 
+    public override void trigger()
+    {
+        triggered = !triggered;
+        powered = !powered;
+
+        powerChanged();
+    }
+
     void OnCollisionEnter(Collision c)
     {
-        if (key.GetInstanceID() == c.gameObject.GetInstanceID() && !pressed)
+        if (key.GetInstanceID() == c.gameObject.GetInstanceID())
         {
-            if (objectToTrigger != null)
-            {
-                objectToTrigger.trigger();
-                pressed = true;
-            }
+            keyPresent = true;
 
-            if(audio != null)
-                audio.Play();
+            keyPresenceChanged();
         }
     }
 
     void OnCollisionExit(Collision c)
     {
-        if (key.GetInstanceID() == c.gameObject.GetInstanceID() && pressed)
+        if (key.GetInstanceID() == c.gameObject.GetInstanceID())
         {
-            objectToTrigger.trigger();
-            pressed = false;
+            keyPresent = false;
+
+            keyPresenceChanged();
         }
+    }
+
+    private void powerChanged()
+    {
+        if (pressed && !powered)
+        {
+            changePressTo(false);
+        }
+
+        if (keyPresent && powered)
+        {
+            changePressTo(true);
+        }
+    }
+
+    private void keyPresenceChanged()
+    {
+        if (pressed && !keyPresent)
+        {
+            changePressTo(false);
+        }
+
+        if (keyPresent && powered)
+        {
+            changePressTo(true);
+        }
+    }
+
+    private void changePressTo(bool newPress)
+    {
+        if (newPress)
+        {
+            if (audio != null)
+            {
+                audio.Play();
+            }
+        }
+
+        pressed = newPress;
+        objectToTrigger.trigger();
     }
 }

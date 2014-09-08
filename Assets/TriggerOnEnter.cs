@@ -7,7 +7,13 @@ public class TriggerOnEnter : MonoBehaviour
     public List<Triggerable> toTrigger;
     public bool triggerOnce;
     public bool triggered;
-	
+
+    public AudioSource audio;
+
+    void Start()
+    {
+        audio = this.gameObject.GetComponent<AudioSource>();
+    }
 
     void OnTriggerEnter()
     {
@@ -17,6 +23,11 @@ public class TriggerOnEnter : MonoBehaviour
             foreach (Triggerable current in toTrigger)
             {
                 current.trigger();
+
+                if (audio != null)
+                {
+                    audio.Play();
+                }
             }
             triggered = true;
         }

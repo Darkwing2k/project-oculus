@@ -10,6 +10,8 @@ public class Cutable : Usable
 
     public List<Component> destroyWhenCut;
 
+    public List<Triggerable> triggerOnCut;
+
     public override void use()
     {
         
@@ -26,6 +28,11 @@ public class Cutable : Usable
             Destroy(c);
 
         destroyWhenCut.Clear();
+
+        foreach (Triggerable current in triggerOnCut)
+        {
+            current.trigger();
+        }
 
         isCut = true;
 

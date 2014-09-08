@@ -6,7 +6,7 @@ public class Buzzer : MonoBehaviour
 {
     public float targetHeight;
     public float force;
-    public float maxDist;
+    public float pressedHeight;
 
     public List<Triggerable> objectsToTrigger;
 
@@ -15,16 +15,16 @@ public class Buzzer : MonoBehaviour
 	// Use this for initialization
 	void Start () 
     {
-        targetHeight = this.transform.position.y;
+        targetHeight = this.transform.localPosition.y;
 	}
 
     void FixedUpdate()
     {
-        if (transform.position.y < targetHeight)
+        if (this.transform.localPosition.y < targetHeight)
         {
             this.rigidbody.AddForce(0, force, 0, ForceMode.Force);
 
-            if (targetHeight - transform.position.y > maxDist && this.rigidbody.velocity.y < 0)
+            if (this.transform.localPosition.y < pressedHeight)
             {
                 changePressed(true);
             }

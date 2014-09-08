@@ -7,8 +7,9 @@ public class LaserState : PlayerState
     public Cutable currentTarget;
     public List<Cutable> possibleTargets;
 
-    private AudioSource laserSoundSrc;
-    public AudioClip laserSound;
+    public AudioSource laserSoundSrc;
+    public Texture laserActionButtonInfoTexture;
+    private Texture previousTexture;
 
     private float timer = 0;
     private float timerMax = 2;
@@ -144,6 +145,7 @@ public class LaserState : PlayerState
             if (Input.GetButton("Action"))
             {
                 laser.enabled = true;
+                laserSoundSrc.Play();
 
                 if (laserCanHitTarget)
                     timer += Time.deltaTime;
@@ -151,6 +153,7 @@ public class LaserState : PlayerState
             else
             {
                 laser.enabled = false;
+                laserSoundSrc.Pause();
             }
 
             // if the duration max is reached, the target is cut and the state will be changed to TARGETING
@@ -211,6 +214,9 @@ public class LaserState : PlayerState
                 case LaserStateInternal.LASERING:
                     {
                         //when leaving lasering state, destroy laser and crosshair
+
+                        psm.buttonInfo.GetComponent<CrosshairBehaviour>().crosshairImg = previousTexture;
+                        laserSoundSrc.gameObject.SetActive(false);
 
                         Destroy(laser.gameObject);
 
@@ -303,10 +309,10 @@ public class LaserState : PlayerState
                         laser = laserGO.GetComponent<LineRenderer>();
                         laserGO.transform.parent = playerScript.eyeCenter;
 
-                        laserSoundSrc =  this.gameObject.AddComponent<AudioSource>();
+                        previousTexture = psm.buttonInfo.GetComponent<CrosshairBehaviour>().crosshairImg;
+                        psm.buttonInfo.GetComponent<CrosshairBehaviour>().crosshairImg = laserActionButtonInfoTexture;
 
-                        laserSoundSrc.loop = false;
-                        laserSoundSrc.clip = laserSound;
+                        laserSoundSrc.gameObject.SetActive(true);
 
                         Vector3 laserStartPos = playerScript.eyeCenter.transform.position + laserPos;
 

@@ -4,6 +4,10 @@ using System.Collections.Generic;
 
 public class Player : MonoBehaviour 
 {
+
+    public AudioSource voiceSource;
+    public VoiceTrigger tutVoiceTrigger;
+
     public bool useOculus;
     public bool useGamepad;
 
@@ -15,6 +19,7 @@ public class Player : MonoBehaviour
     public Checkpoint checkpoint;
 
     public bool noClip;
+    public bool tutorial;
 
 	// Use this for initialization
 	void Start () 
@@ -44,11 +49,25 @@ public class Player : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
     {
+        if (tutorial)
+        {
+            if(GameManager.Instance != null)
+                GameManager.Instance.Fader.FadeIn();
+
+            gameObject.GetComponent<PlayerStateMachine>().changePlayerState(PlayerStateMachine.PlayerStateEnum.TUTORIAL);
+
+            tutVoiceTrigger.trigger();
+
+            tutorial = false;
+        }
+
+        /*
         if (Input.GetKeyDown(KeyCode.Joystick1Button4) || Input.GetKeyDown(KeyCode.Space))
         {
             noClip = !noClip;
             this.gameObject.collider.enabled = !noClip;
         }
+        */
 
         if (Input.GetKeyDown(KeyCode.R))
         {

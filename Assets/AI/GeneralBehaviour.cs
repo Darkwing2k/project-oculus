@@ -7,7 +7,6 @@ public class GeneralBehaviour : MonoBehaviour {
     public static bool playerPositionKnown = false;
     public static float defaultNavMeshBaseOffset;
 
-
 	public GameObject enemy;
 	public GameObject player;
 	public NavMeshAgent agent;

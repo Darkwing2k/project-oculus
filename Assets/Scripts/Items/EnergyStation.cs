@@ -34,6 +34,11 @@ public class EnergyStation : MonoBehaviour
             }
         }
 
+        foreach (Light currentLight in lightsToTrigger)
+        {
+            currentLight.enabled = powered;
+        }
+
         playerRef = GameObject.FindGameObjectWithTag("Player");
         psm = playerRef.GetComponent<PlayerStateMachine>();
 	}
@@ -63,8 +68,11 @@ public class EnergyStation : MonoBehaviour
     {
         energyCell.prepareRelease();
 
-        animation["Take 001"].speed = 1;
-        animation.Play();
+        if (animation != null)
+        {
+            animation["Take 001"].speed = 1;
+            animation.Play();
+        }
 
         trigger();
     }
@@ -74,9 +82,12 @@ public class EnergyStation : MonoBehaviour
         energyCell = cell;
         energyCell.prepareLifting(this.transform.parent, cellPosition, cellRotation, this);
 
-        animation["Take 001"].speed = -1;
-        animation["Take 001"].time = animation["Take 001"].length;
-        animation.Play();
+        if (animation != null)
+        {
+            animation["Take 001"].speed = -1;
+            animation["Take 001"].time = animation["Take 001"].length;
+            animation.Play();
+        }
 
         trigger();
     }

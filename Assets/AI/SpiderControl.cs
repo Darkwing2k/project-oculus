@@ -92,7 +92,7 @@ public class SpiderControl : MonoBehaviour {
 
 		generalBehaviour.setCurrentRoom(testRoom.GetComponent<RoomInfo>());
 
-        WaitingOnCheckpoint = true;
+        WaitingOnCheckpoint = false;
 
 		//InvokeRepeating("Execute", 0.0f, 0.05f);
 	}

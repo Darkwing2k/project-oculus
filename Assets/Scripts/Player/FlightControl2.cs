@@ -18,7 +18,7 @@ public class FlightControl2 : MonoBehaviour
 	public bool verticalMovementLocked;
 	public bool rotationLocked;
 
-    private AudioSource audio;
+    public AudioSource audio;
 
     private float yawVerTarget = 0f;
     private float yawVerValue = 0f;
@@ -54,8 +54,6 @@ public class FlightControl2 : MonoBehaviour
     {
         playerRef = this.gameObject.GetComponent<Player>();
         psm = this.gameObject.GetComponent<PlayerStateMachine>();
-
-        audio = this.gameObject.GetComponentInChildren<AudioSource>();
 
         maxDirectionalVelocity = 0;
         currentDirectionalVelocity = 0;
