@@ -3,7 +3,9 @@ using System.Collections;
 
 public class RoomInfo : MonoBehaviour {
 
-    public static int ROOM_COLLIDER_LAYER_MASK = 1 << 11;
+    public GameObject spawnPoint;
+
+    public static int ROOM_COLLIDER_LAYER_MASK = 1 << 2;
 
 	public ArrayList climbableWalls = new ArrayList();
 
@@ -19,12 +21,11 @@ public class RoomInfo : MonoBehaviour {
 		GameObject[] allClimbableWalls = GameObject.FindGameObjectsWithTag("ClimbableWallCollider");
 		foreach (GameObject climbableWall in allClimbableWalls)
 		{
-			if(climbableWall.transform.parent.gameObject.Equals(transform.root.gameObject))
+			if(climbableWall.transform.parent.gameObject.Equals(transform.gameObject))
 			{
 				climbableWalls.Add(climbableWall);
 			}
 		}
-
         
 		control = GameObject.FindGameObjectWithTag("Spider").GetComponent<SpiderControl>();
 		//roomHeight = ceiling.transform.position.y - bottom.transform.position.y - 1.0f;
@@ -54,7 +55,19 @@ public class RoomInfo : MonoBehaviour {
             //    }
             //}
 		}
-        
+        else if (spawnPoint != null && c.gameObject.tag.Equals("Player") && control.generalBehaviour.currentRoom != this && !control.generalBehaviour.behaviourChangeLocked)
+        {
+            if (control.generalBehaviour.currentBehaviour is WanderBehaviour)
+            {
+                control.generalBehaviour.agent.Stop();
+                control.generalBehaviour.agent.enabled = false;
+                control.spiderEnemy.transform.position = spawnPoint.transform.position;
+                control.generalBehaviour.agent.enabled = true;
+                control.generalBehaviour.agent.Resume();
+                control.generalBehaviour.currentRoom = this;
+            }
+
+        }
 	}
 
 }

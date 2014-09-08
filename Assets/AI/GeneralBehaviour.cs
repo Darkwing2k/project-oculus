@@ -7,6 +7,9 @@ public class GeneralBehaviour : MonoBehaviour {
     public static bool playerPositionKnown = false;
     public static float defaultNavMeshBaseOffset;
 
+    public int jumpCount;
+    public int maxJumps;
+
 	public GameObject enemy;
 	public GameObject player;
 	public NavMeshAgent agent;
@@ -81,7 +84,7 @@ public class GeneralBehaviour : MonoBehaviour {
 
 	public void execute(float timePassed)
 	{
-		Debug.Log(currentBehaviour.ToString());
+        Debug.Log(currentBehaviour.ToString());
 		currentBehaviour.execute(timePassed);
 	}
 

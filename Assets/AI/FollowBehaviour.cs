@@ -42,7 +42,7 @@ public class FollowBehaviour : IBehaviour {
             this.timer += timePassed;
             if (!pathSet)
             {
-                playerPosition.y = 0.0f;
+                playerPosition.y = generalBehaviour.enemy.transform.position.y;
                 generalBehaviour.agent.SetDestination(playerPosition);
                 pathSet = true;
             }
@@ -52,13 +52,13 @@ public class FollowBehaviour : IBehaviour {
                 pathSet = false;
             }
 
-            OffMeshLinkData data = generalBehaviour.agent.nextOffMeshLinkData;
-            if (data.valid && !generalBehaviour.processingOffMeshLink)
-            {
-                generalBehaviour.targetLinkData = data;
-                generalBehaviour.updateDelegate += generalBehaviour.ProcessOffMeshLink;
-                generalBehaviour.processingOffMeshLink = true;
-            }
+            //OffMeshLinkData data = generalBehaviour.agent.nextOffMeshLinkData;
+            //if (data.valid && !generalBehaviour.processingOffMeshLink)
+            //{
+            //    generalBehaviour.targetLinkData = data;
+            //    generalBehaviour.updateDelegate += generalBehaviour.ProcessOffMeshLink;
+            //    generalBehaviour.processingOffMeshLink = true;
+            //}
 		}
 		else
 		{

@@ -108,7 +108,6 @@ public class SpiderControl : MonoBehaviour {
                 Vector3 playerPosition = player.transform.position;
                 Vector3 enemyPosition = spiderEnemy.transform.position;
                 float verticalDistance = Math.Abs(playerPosition.y - enemyPosition.y);
-                Debug.Log(verticalDistance);
                 
                 playerPosition.y = 0.0f;
                 enemyPosition.y = 0.0f;
@@ -264,10 +263,10 @@ public class SpiderControl : MonoBehaviour {
 	void Update()
 	{
         // Debug Code
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            GeneralBehaviour.playerPositionKnown = !GeneralBehaviour.playerPositionKnown;
-        }
+        //if (Input.GetKeyDown(KeyCode.C))
+        //{
+        //    GeneralBehaviour.playerPositionKnown = !GeneralBehaviour.playerPositionKnown;
+        //}
         //if (Input.GetKeyDown(KeyCode.V))
         //{
         //    generalBehaviour.changeBehaviour(new ClimbUpNextWallBehaviour(generalBehaviour, this));
@@ -276,14 +275,14 @@ public class SpiderControl : MonoBehaviour {
         {
             generalBehaviour.DEBUG_resetSpider();
         }
-        if (Input.GetKeyDown(KeyCode.M))
-        {
-            this.DEBUG_FollowOnCommand = !this.DEBUG_FollowOnCommand;
-        }
-        if (Input.GetKeyDown(KeyCode.G))
-        {
-            this.WaitingOnCheckpoint = !this.WaitingOnCheckpoint;
-        }
+        //if (Input.GetKeyDown(KeyCode.M))
+        //{
+        //    this.DEBUG_FollowOnCommand = !this.DEBUG_FollowOnCommand;
+        //}
+        //if (Input.GetKeyDown(KeyCode.G))
+        //{
+        //    this.WaitingOnCheckpoint = !this.WaitingOnCheckpoint;
+        //}
         /*
         if (generalBehaviour.currentBehaviour is FallDownAttackBehaviour)
         {

@@ -7,7 +7,7 @@ public class JumpAttackBehaviour : IBehaviour {
 
 	private bool jumpInProgress, checking;
 
-	private static float timeToCheckIfJumpCompleted = 0.1f;
+	private static float timeToCheckIfJumpCompleted = 0.8f;
 	private float timePassedSinceJump;
 
 	private static Vector3 jumpCorrectionVector = new Vector3(0.0f, 5.0f, 0.0f);
@@ -22,16 +22,15 @@ public class JumpAttackBehaviour : IBehaviour {
 
 	public void execute(float timePassed)
 	{
-		if (!jumpInProgress)
-		{
-			attackWithJump();
-		}
-		else if (!checking)
-		{
+        if (!jumpInProgress)
+        {
+            attackWithJump();
+        }
+        else if (!checking)
+        {
             generalBehaviour.updateDelegate += checkJumpCompleted;
             checking = true;
-		}
-			
+        }
 	}
 
 	private void attackWithJump()
@@ -82,6 +81,9 @@ public class JumpAttackBehaviour : IBehaviour {
             generalBehaviour.soundSource.clip = generalBehaviour.walkSound;
             generalBehaviour.soundSource.loop = true;
             generalBehaviour.soundSource.Play();
+
+            if (generalBehaviour.jumpCount < generalBehaviour.maxJumps)
+                generalBehaviour.changeBehaviour(new ClimbUpNextWallBehaviour(generalBehaviour));
 
             generalBehaviour.updateDelegate -= checkJumpCompleted;
         }
