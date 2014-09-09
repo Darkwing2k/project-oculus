@@ -3,19 +3,25 @@ using System.Collections;
 
 public class TriggerSpider : Triggerable {
 
+    private bool started = false;
+
     SpiderControl spiderControl;
     AudioSource soundSource;
     public AudioClip jumpSound;
 
 	// Use this for initialization
 	void Start () {
-        spiderControl = GameObject.FindGameObjectWithTag("Spider").GetComponent<SpiderControl>();
-        soundSource = this.gameObject.GetComponent<AudioSource>();
+        
 	}
 	
 	// Update is called once per frame
-	void Update () {
-	
+	void FixedUpdate () {
+        if (!started)
+        {
+            spiderControl = GameObject.FindGameObjectWithTag("Spider").GetComponent<SpiderControl>();
+            soundSource = this.gameObject.GetComponent<AudioSource>();
+            started = true;
+        }
 	}
 
     public override void trigger()

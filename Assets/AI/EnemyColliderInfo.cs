@@ -9,15 +9,22 @@ public class EnemyColliderInfo : MonoBehaviour
 {
     public SpiderControl control;
 
+    private bool started = false;
+
     public void Start()
     {
-        control = GameObject.FindGameObjectWithTag("Spider").GetComponent<SpiderControl>();
     }
 
     public void OnCollisionEnter(Collision c)
     {
         if (!c.gameObject.tag.Equals("Player"))
             control.generalBehaviour.collisionWithObject = true;
+    }
+
+    void FixedUpdate()
+    {
+        control = GameObject.FindGameObjectWithTag("Spider").GetComponent<SpiderControl>();
+        started = true;
     }
 }
 

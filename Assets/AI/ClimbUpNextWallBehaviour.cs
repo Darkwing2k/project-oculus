@@ -40,7 +40,7 @@ public class ClimbUpNextWallBehaviour : IBehaviour {
 		// only execute, if there is a climbable wall in this room
 		if (generalBehaviour.currentRoom.climbableWalls.Count > 0)
 		{
-            if (!wallFound && !generalBehaviour.climbableWallReached)
+            if (!wallFound)
             {
                 FindNextWallToClimb();
                 wallFound = true;
@@ -63,7 +63,8 @@ public class ClimbUpNextWallBehaviour : IBehaviour {
 	private void FindNextWallToClimb()
 	{
 		GameObject wall = (GameObject)generalBehaviour.currentRoom.climbableWalls[0];
-		nearestWallPosition = wall.transform.position;
+        nearestWallPosition = wall.GetComponentInChildren<Transform>().GetChild(0).position;
+        //Debug.Log("NAME: " + wall.GetComponentInChildren<Transform>().GetChild(0).position);
 		float wallDistance = (generalBehaviour.enemy.transform.position - nearestWallPosition).magnitude;
 		float nextWallDistance;
 		for (int i = 1; i < generalBehaviour.currentRoom.climbableWalls.Count; i++)
@@ -72,12 +73,14 @@ public class ClimbUpNextWallBehaviour : IBehaviour {
 			if (wallDistance < wallDistanceDefault)
 				return;
 			wall = (GameObject)generalBehaviour.currentRoom.climbableWalls[i];
-			nextWallDistance = (generalBehaviour.enemy.transform.position - wall.transform.position).magnitude;
+            Vector3 wallPos = wall.GetComponentInChildren<Transform>().GetChild(0).position;
+			nextWallDistance = (generalBehaviour.enemy.transform.position - wallPos).magnitude;
 			// if new distance is shorter, update to nearest wall
 			if (wallDistance > nextWallDistance)
 			{
 				wallDistance = nextWallDistance;
-				nearestWallPosition = wall.transform.position;
+                nearestWallPosition = wallPos;
+                //nearestWallPosition.y = generalBehaviour.enemy.transform.position.y;
 			}
 		}
 	}

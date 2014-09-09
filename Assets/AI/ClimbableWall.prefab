@@ -10,9 +10,25 @@ GameObject:
   - 4: {fileID: 400000}
   - 65: {fileID: 6500000}
   - 114: {fileID: 11400000}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: ClimbableWall
   m_TagString: ClimbableWallCollider
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &100002
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 400002}
+  - 135: {fileID: 13500000}
+  m_Layer: 2
+  m_Name: AgentTarget
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -24,10 +40,23 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100000}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.80709839, y: 3.5596962, z: 66.2253647}
+  m_LocalPosition: {x: 129.065186, y: -4.54203796, z: 45.4639816}
   m_LocalScale: {x: 1, y: 5.7365551, z: 3.52103305}
-  m_Children: []
+  m_Children:
+  - {fileID: 400002}
   m_Father: {fileID: 0}
+  m_RootOrder: 0
+--- !u!4 &400002
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100002}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: .0215454102, y: -.473204881, z: -.0389244966}
+  m_LocalScale: {x: 1, y: .174320653, z: .284007549}
+  m_Children: []
+  m_Father: {fileID: 400000}
   m_RootOrder: 0
 --- !u!65 &6500000
 BoxCollider:
@@ -52,6 +81,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb60a0bed669d314ea4dbf0789d7e86b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!135 &13500000
+SphereCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100002}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: .5
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

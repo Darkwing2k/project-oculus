@@ -7,8 +7,8 @@ public class GeneralBehaviour : MonoBehaviour {
     public static bool playerPositionKnown = false;
     public static float defaultNavMeshBaseOffset;
 
-    public int jumpCount;
-    public int maxJumps;
+    public static int jumpCount;
+    public static int maxJumps = 5;
 
 	public GameObject enemy;
 	public GameObject player;
@@ -85,6 +85,8 @@ public class GeneralBehaviour : MonoBehaviour {
 	public void execute(float timePassed)
 	{
         Debug.Log(currentBehaviour.ToString());
+        if (agent.enabled && currentBehaviour is ClimbUpNextWallBehaviour)
+            Debug.Log("Next Pos: " + agent.nextPosition);
 		currentBehaviour.execute(timePassed);
 	}
 

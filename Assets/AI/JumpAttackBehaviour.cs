@@ -24,7 +24,17 @@ public class JumpAttackBehaviour : IBehaviour {
 	{
         if (!jumpInProgress)
         {
-            attackWithJump();
+            Debug.Log(GeneralBehaviour.jumpCount + ", " +  GeneralBehaviour.maxJumps);
+            if (GeneralBehaviour.jumpCount < GeneralBehaviour.maxJumps)
+            {
+                attackWithJump();
+                GeneralBehaviour.jumpCount++;
+            }
+            else
+            {
+                GeneralBehaviour.jumpCount = 0;
+                generalBehaviour.changeBehaviour(new ClimbUpNextWallBehaviour(generalBehaviour));
+            }
         }
         else if (!checking)
         {
@@ -81,9 +91,6 @@ public class JumpAttackBehaviour : IBehaviour {
             generalBehaviour.soundSource.clip = generalBehaviour.walkSound;
             generalBehaviour.soundSource.loop = true;
             generalBehaviour.soundSource.Play();
-
-            if (generalBehaviour.jumpCount < generalBehaviour.maxJumps)
-                generalBehaviour.changeBehaviour(new ClimbUpNextWallBehaviour(generalBehaviour));
 
             generalBehaviour.updateDelegate -= checkJumpCompleted;
         }

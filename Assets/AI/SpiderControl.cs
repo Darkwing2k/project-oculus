@@ -6,6 +6,8 @@ using System;
 //TODO: after jumpAttack or fallDown, enemy is possibly not on NavMesh anymore -> error calling setDestination
 public class SpiderControl : MonoBehaviour {
 
+    private bool started = false;
+
     public bool DEBUG_ExtendedBehaviourActive = true;
     public bool DEBUG_FollowOnCommand = false;
 
@@ -60,47 +62,52 @@ public class SpiderControl : MonoBehaviour {
     
 	void Start () {
 
-        DisableRenderOnStart();
-
-        anim = this.gameObject.GetComponent<Animation>();
-
-        soundSource = this.gameObject.GetComponent<AudioSource>();
-
-		spiderEnemy = GameObject.FindWithTag("Spider");
-		player = GameObject.FindWithTag("Player");
-		NavMeshAgent navMeshAgent = spiderEnemy.GetComponent<NavMeshAgent>();
-		navMeshAgent.speed = speed;
-
-        //check in which room spider is
-        RoomInfo[] roomScripts = FindObjectsOfType<RoomInfo>();
-
-        foreach (var obj in roomScripts)
-        {
-            if (obj.gameObject.collider.bounds.Intersects(spiderEnemy.collider.bounds))
-            {
-                this.testRoom = obj.gameObject;
-                break;
-            }
-        }
-
-
-		//generalBehaviour = new EnemyBehaviour(this, spiderEnemy, player, navMeshAgent, anim, soundSource, walkSound, jumpSound);
-        generalBehaviour.SetEnemyBehaviour(spiderEnemy, player, navMeshAgent, anim, soundSource, walkSound, jumpSound);
-        generalBehaviour.DEBUG_startPos = spiderEnemy.transform.position;
-        generalBehaviour.speed = speed;
-		generalBehaviour.changeBehaviour(new WanderBehaviour(generalBehaviour));
-
-		generalBehaviour.setCurrentRoom(testRoom.GetComponent<RoomInfo>());
-
-        WaitingOnCheckpoint = false;
-
-		//InvokeRepeating("Execute", 0.0f, 0.05f);
 	}
 
 	// Update is called once per frame
 	void FixedUpdate () {
 
-        
+        if (!started)
+        {
+            DisableRenderOnStart();
+
+            anim = this.gameObject.GetComponent<Animation>();
+
+            soundSource = this.gameObject.GetComponent<AudioSource>();
+
+            spiderEnemy = GameObject.FindWithTag("Spider");
+            player = GameObject.FindWithTag("Player");
+            NavMeshAgent navMeshAgent = spiderEnemy.GetComponent<NavMeshAgent>();
+            navMeshAgent.speed = speed;
+
+            //check in which room spider is
+            RoomInfo[] roomScripts = FindObjectsOfType<RoomInfo>();
+
+            foreach (var obj in roomScripts)
+            {
+                if (obj.gameObject.collider.bounds.Intersects(spiderEnemy.collider.bounds))
+                {
+                    this.testRoom = obj.gameObject;
+                    break;
+                }
+            }
+
+
+            //generalBehaviour = new EnemyBehaviour(this, spiderEnemy, player, navMeshAgent, anim, soundSource, walkSound, jumpSound);
+            generalBehaviour.SetEnemyBehaviour(spiderEnemy, player, navMeshAgent, anim, soundSource, walkSound, jumpSound);
+            generalBehaviour.DEBUG_startPos = spiderEnemy.transform.position;
+            generalBehaviour.speed = speed;
+            generalBehaviour.changeBehaviour(new WanderBehaviour(generalBehaviour));
+
+            generalBehaviour.setCurrentRoom(testRoom.GetComponent<RoomInfo>());
+
+            WaitingOnCheckpoint = true;
+
+            started = true;
+            //InvokeRepeating("Execute", 0.0f, 0.05f);
+        }
+
+
         if (timer >= timeToExecute && !WaitingOnCheckpoint)
         {
             if (!generalBehaviour.behaviourChangeLocked)
@@ -108,6 +115,7 @@ public class SpiderControl : MonoBehaviour {
                 Vector3 playerPosition = player.transform.position;
                 Vector3 enemyPosition = spiderEnemy.transform.position;
                 float verticalDistance = Math.Abs(playerPosition.y - enemyPosition.y);
+                Debug.Log("Vert. Dist. " + verticalDistance);
                 
                 playerPosition.y = 0.0f;
                 enemyPosition.y = 0.0f;
@@ -281,7 +289,7 @@ public class SpiderControl : MonoBehaviour {
         //}
         //if (Input.GetKeyDown(KeyCode.G))
         //{
-        //    this.WaitingOnCheckpoint = !this.WaitingOnCheckpoint;
+        //    this.gameObject.GetComponent<TriggerSpider>().trigger();
         //}
         /*
         if (generalBehaviour.currentBehaviour is FallDownAttackBehaviour)

@@ -35,6 +35,8 @@ public class RoomInfo : MonoBehaviour {
 
 	void OnTriggerEnter(Collider c)
 	{
+        Debug.Log((spawnPoint != null) + ", " + (c.gameObject.tag.Equals("Player")) + ", " + control.generalBehaviour.currentRoom != this + ", " + !control.generalBehaviour.behaviourChangeLocked + ", " + !control.WaitingOnCheckpoint);
+
 		if (c.gameObject.tag.Equals("Spider"))
 		{
 			control.generalBehaviour.setCurrentRoom(this);
@@ -55,7 +57,7 @@ public class RoomInfo : MonoBehaviour {
             //    }
             //}
 		}
-        else if (spawnPoint != null && c.gameObject.tag.Equals("Player") && control.generalBehaviour.currentRoom != this && !control.generalBehaviour.behaviourChangeLocked)
+        else if (spawnPoint != null && c.gameObject.tag.Equals("Player") && control.generalBehaviour.currentRoom != this && !control.generalBehaviour.behaviourChangeLocked && !control.WaitingOnCheckpoint)
         {
             if (control.generalBehaviour.currentBehaviour is WanderBehaviour)
             {
