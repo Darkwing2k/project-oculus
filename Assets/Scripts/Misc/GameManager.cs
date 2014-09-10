@@ -1,8 +1,6 @@
 using UnityEngine;
 using System.Collections;
 
-public delegate void LevelWillBeLoaded();
-public delegate void LevelWasLoaded();
 
 public class GameManager : MonoBehaviour {
 	
@@ -18,7 +16,20 @@ public class GameManager : MonoBehaviour {
 	#endregion
 
 	public GameObject mainMenu;
-	public GameObject level;
+
+    private static GameObject m_level;
+    public static GameObject level
+    {
+        get
+        {
+            return m_level;
+        }
+        set
+        {
+            m_level = value;
+            DontDestroyOnLoad(level);
+        }
+    }
 
 	//public event LevelWillBeLoaded OnLevelWillBeLoaded;
 	//public event LevelWasLoaded OnLevelWasLoaded;
@@ -29,9 +40,9 @@ public class GameManager : MonoBehaviour {
 	private bool loadingLevel;
 	private int currentLevelIndex = -1;
 
-	public GameState currentState = GameState.Menu;
+	public GameState currentState = GameState.MainMenu;
 
-	private GameState nextState = GameState.Menu;
+	private GameState nextState = GameState.MainMenu;
 
 	public SceneFader Fader {
 		get { return fader; }
@@ -47,7 +58,6 @@ public class GameManager : MonoBehaviour {
 		}
 
 		fader = new SceneFader();
-		//OnLevelWasLoaded += new LevelWasLoaded(this.LevelWasLoaded);
 	}
 	
 	// Use this for initialization
@@ -60,24 +70,35 @@ public class GameManager : MonoBehaviour {
 	void Update () {
 		if (currentState == GameState.Change && !fader.IsFadingOut) {
 			switch (nextState) {
-				case GameState.Menu:
-					mainMenu.SetActive(true);
-					levelActivation(false);
+                //case GameState.MainMenu:
+                //    mainMenu.SetActive(true);
+                //    levelActivation(false);
+                //    //Application.LoadLevel(0);
 
-					if (unloadLevel) {
-						UnloadLevel();
-					}
+                //    if (unloadLevel) {
+                //        UnloadLevel();
+                //    }
 
-					fader.FadeIn();
-					break;
+                //    fader.FadeIn();
+                //    break;
+                case GameState.GameMenu:
+                    levelActivation(false);
+                    Application.LoadLevel(0);
+                    fader.FadeIn();
+                    break;
 				case GameState.Gameplay:
-					mainMenu.SetActive(false);
-					if (IsLevelLoaded) {
+                    
+					if (IsLevelLoaded) 
+                    {
+                        mainMenu = GameObject.FindGameObjectWithTag("MainMenu");
 						levelActivation(true);
+                        DestroyImmediate(mainMenu);
 						fader.FadeIn();
-					} else {
-						Application.LoadLevel(currentLevelIndex);
 					}
+                    else
+                    {
+                        Application.LoadLevel(currentLevelIndex);
+                    }
 					break;
 			}
 			currentState = nextState;
@@ -91,6 +112,15 @@ public class GameManager : MonoBehaviour {
 				fader.FadeIn();
 			}
 		}
+
+        if (Input.GetKeyDown(KeyCode.Escape) && currentState == GameState.Gameplay)
+        {
+            LoadMenu();
+        }
+        else if (Input.GetKeyDown(KeyCode.Escape) && currentState == GameState.GameMenu)
+        {
+            LoadLevel(currentLevelIndex);
+        }
 
 		fader.Update();
 	}
@@ -142,57 +172,17 @@ public class GameManager : MonoBehaviour {
 		}
 		this.unloadLevel = unloadLevel;
 		currentState = GameState.Change;
-		nextState = GameState.Menu;
+		nextState = GameState.GameMenu;
 		fader.FadeOutAndStay();
 	}
 
 	private void levelActivation(bool activate) {
-        foreach (Transform child in level.transform)
-        {
-            child.gameObject.SetActive(activate);    
-        }
+            foreach (Transform child in level.transform)
+            {
+                child.gameObject.SetActive(activate);
+            }
 	}
 
-	/*
-	private void LevelWasLoaded() {
-		loadingLevel = false;
-		level = GameObject.FindGameObjectWithTag("Level");
-
-		foreach (Transform child in level.transform) {
-			Debug.Log(child.gameObject.name + " aktiviert");
-			child.gameObject.SetActive(true);
-		}
-
-		fader.FadeIn();
-	}
-	*/
-
-
-	/*
-	// Async Level loading test 
-	public void LoadLevelAsync(int levelIndex) {
-		changeLevel = true;
-		currentLevelIndex = levelIndex;
-		fader.FadeOutAndStay();
-	}
-
-	public void ReloadLevelAsync() {
-		if (currentLevelIndex != 0) {
-			UnloadLevel();
-			LoadLevelAsync(currentLevelIndex);
-		}
-	}
-
-	private IEnumerator LoadLevelCoroutine(int levelIndex) {
-		if (OnLevelWillBeLoaded != null)
-			OnLevelWillBeLoaded();
-		
-		yield return Application.LoadLevelAdditiveAsync(levelIndex);
-
-		if (OnLevelWasLoaded != null)
-			OnLevelWasLoaded();
-	}
-	*/
 }
 
-public enum GameState { Menu, Gameplay, Change };
+public enum GameState { MainMenu, GameMenu, Gameplay, Change };
