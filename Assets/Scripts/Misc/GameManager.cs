@@ -76,7 +76,7 @@ public class GameManager : MonoBehaviour {
 						levelActivation(true);
 						fader.FadeIn();
 					} else {
-						Application.LoadLevelAdditive(currentLevelIndex);
+						Application.LoadLevel(currentLevelIndex);
 					}
 					break;
 			}
@@ -147,9 +147,10 @@ public class GameManager : MonoBehaviour {
 	}
 
 	private void levelActivation(bool activate) {
-		foreach (Transform child in level.transform) {
-			child.gameObject.SetActive(activate);
-		}
+        foreach (Transform child in level.transform)
+        {
+            child.gameObject.SetActive(activate);    
+        }
 	}
 
 	/*

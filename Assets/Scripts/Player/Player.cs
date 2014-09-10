@@ -49,6 +49,10 @@ public class Player : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
     {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            useGamepad = !useGamepad;
+        }
         if (tutorial)
         {
             if(GameManager.Instance != null)
@@ -61,13 +65,13 @@ public class Player : MonoBehaviour
             tutorial = false;
         }
 
-        /*
-        if (Input.GetKeyDown(KeyCode.Joystick1Button4) || Input.GetKeyDown(KeyCode.Space))
-        {
-            noClip = !noClip;
-            this.gameObject.collider.enabled = !noClip;
-        }
-        */
+
+        //if (Input.GetKeyDown(KeyCode.Joystick1Button4) || Input.GetKeyDown(KeyCode.Space))
+        //{
+        //    noClip = !noClip;
+        //    this.gameObject.collider.enabled = !noClip;
+        //}
+        
 
         if (Input.GetKeyDown(KeyCode.R))
         {
