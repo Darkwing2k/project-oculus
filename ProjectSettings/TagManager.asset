@@ -17,7 +17,7 @@ TagManager:
   Builtin Layer 2: Ignore Raycast
   Builtin Layer 3: 
   Builtin Layer 4: Water
-  Builtin Layer 5: UI
+  Builtin Layer 5: 
   Builtin Layer 6: 
   Builtin Layer 7: 
   User Layer 8: 
@@ -33,7 +33,7 @@ TagManager:
   User Layer 18: 
   User Layer 19: 
   User Layer 20: 
-  User Layer 21: 
+  User Layer 21: Directional Lighted
   User Layer 22: 
   User Layer 23: 
   User Layer 24: 
@@ -48,4 +48,8 @@ TagManager:
   - name: Default
     userID: 0
     uniqueID: 0
+    locked: 0
+  - name: Directional Lighted
+    userID: 1
+    uniqueID: 1466082223
     locked: 0
