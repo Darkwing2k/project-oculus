@@ -45,13 +45,13 @@ public class WanderBehaviour : IBehaviour {
         }
 
         //TODO: if spider is on ceiling, traverse link won't work, so first jump on floor
-        OffMeshLinkData data = generalBehaviour.agent.nextOffMeshLinkData;
-        if (data.valid && !generalBehaviour.processingOffMeshLink)
-        {
-            generalBehaviour.targetLinkData = data;
-            generalBehaviour.updateDelegate += generalBehaviour.ProcessOffMeshLink;
-            generalBehaviour.processingOffMeshLink = true;
-        }
+        //OffMeshLinkData data = generalBehaviour.agent.nextOffMeshLinkData;
+        //if (data.valid && !generalBehaviour.processingOffMeshLink)
+        //{
+        //    generalBehaviour.targetLinkData = data;
+        //    generalBehaviour.updateDelegate += generalBehaviour.ProcessOffMeshLink;
+        //    generalBehaviour.processingOffMeshLink = true;
+        //}
         
 	}
 

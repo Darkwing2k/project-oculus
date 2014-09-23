@@ -115,7 +115,6 @@ public class SpiderControl : MonoBehaviour {
                 Vector3 playerPosition = player.transform.position;
                 Vector3 enemyPosition = spiderEnemy.transform.position;
                 float verticalDistance = Math.Abs(playerPosition.y - enemyPosition.y);
-                Debug.Log("Vert. Dist. " + verticalDistance);
                 
                 playerPosition.y = 0.0f;
                 enemyPosition.y = 0.0f;
@@ -136,7 +135,6 @@ public class SpiderControl : MonoBehaviour {
                 }
                 else if (generalBehaviour.currentBehaviour is FollowBehaviour)
                 {
-                    Debug.Log(DEBUG_ExtendedBehaviourActive + ", " + GeneralBehaviour.playerPositionKnown + ", " + (verticalDistance > maxPlayerHeightForJumpAttack));
                     if (generalBehaviour.timeoutLostPlayerSight && !GeneralBehaviour.playerPositionKnown && !generalBehaviour.isClimbingOnCeiling)
                     {
                         generalBehaviour.changeBehaviour(new WanderBehaviour(generalBehaviour));

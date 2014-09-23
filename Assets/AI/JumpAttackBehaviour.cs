@@ -24,7 +24,6 @@ public class JumpAttackBehaviour : IBehaviour {
 	{
         if (!jumpInProgress)
         {
-            Debug.Log(GeneralBehaviour.jumpCount + ", " +  GeneralBehaviour.maxJumps);
             if (GeneralBehaviour.jumpCount < GeneralBehaviour.maxJumps)
             {
                 attackWithJump();

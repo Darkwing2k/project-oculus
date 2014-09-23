@@ -14,6 +14,7 @@ public class GeneralBehaviour : MonoBehaviour {
 	public GameObject player;
 	public NavMeshAgent agent;
     public IBehaviour currentBehaviour;
+    public string DEBUG_currentBehaviourStr;
     public RoomInfo currentRoom;
 
     public Animation anim;
@@ -22,10 +23,11 @@ public class GeneralBehaviour : MonoBehaviour {
     public AudioClip walkSound;
     public AudioClip jumpSound;
 
-    public OffMeshLinkData targetLinkData;
-    public OffMeshLink endLink;
-    public bool processingOffMeshLink;
-    public bool traversingLink = false;
+    public OffMeshLinkData currLinkData, nextLinkData;
+    public bool processingOffMeshLink = false;
+    public bool offMeshLinkStartPosReached = false;
+    public bool reachingOffMeshLinkStartPos = false;
+    public bool traversingOffMeshLink = false;
 
 	public static int OWN_LAYER_MASK = 1 << 9;
     public int layerMaskToIgnore = ~OWN_LAYER_MASK & ~RoomInfo.ROOM_COLLIDER_LAYER_MASK;
@@ -79,15 +81,21 @@ public class GeneralBehaviour : MonoBehaviour {
 		this.player = player;
 		this.agent = enemyNavMeshAgent;
 		defaultNavMeshBaseOffset = enemyNavMeshAgent.baseOffset;
-        enemyNavMeshAgent.autoTraverseOffMeshLink = true;
+        //enemyNavMeshAgent.autoTraverseOffMeshLink = true;
 	}
 
 	public void execute(float timePassed)
 	{
-        Debug.Log(currentBehaviour.ToString());
-        if (agent.enabled && currentBehaviour is ClimbUpNextWallBehaviour)
-            Debug.Log("Next Pos: " + agent.nextPosition);
+        //Debug.Log(currentBehaviour.ToString());
+
 		currentBehaviour.execute(timePassed);
+
+        if (this.agent.enabled && this.agent.nextOffMeshLinkData.valid && !this.processingOffMeshLink)
+        {
+            nextLinkData = this.agent.nextOffMeshLinkData;
+            this.updateDelegate += ProcessOffMeshLink;
+            processingOffMeshLink = true;
+        }
 	}
 
 	public void setCurrentRoom(RoomInfo room)
@@ -98,27 +106,69 @@ public class GeneralBehaviour : MonoBehaviour {
 	public void changeBehaviour(IBehaviour newBehaviour)
 	{
 		currentBehaviour = newBehaviour;
+        DEBUG_currentBehaviourStr = currentBehaviour.GetType().Name;
 	}
 
-    //TODO: check if next offmeshlink is reached
-    public void ProcessOffMeshLink()
+    private void ProcessOffMeshLink()
     {
+        if (!this.traversingOffMeshLink && this.agent.isOnOffMeshLink && this.agent.currentOffMeshLinkData.startPos.Equals(this.nextLinkData.startPos))
+        {
+            currLinkData = this.agent.currentOffMeshLinkData;
+            if (currLinkData.valid)
+            {
+                if (Mathf.Abs(currLinkData.startPos.y - currLinkData.endPos.y) <= 1.0f)
+                {
+                    this.updateDelegate += ReachOffMeshLinkStartPos;
 
-        //if (this.agent.isOnOffMeshLink && !traversingLink)
-        //{
-        //    this.enemy.rigidbody.AddForce((targetLinkData.endPos - targetLinkData.startPos).normalized * speed, ForceMode.VelocityChange);
-        //    traversingLink = true;
-        //}
-        //else if (agent.isOnOffMeshLink)
-        //{
-        //    SpiderControl control = GameObject.FindGameObjectWithTag("Spider").GetComponent<SpiderControl>();
-        //    enemy.rigidbody.velocity = Vector3.zero;
-        //    agent.CompleteOffMeshLink();
-        //    agent.Resume();
-        //    control.updateDelegate -= ProcessOffMeshLink;
-        //    traversingLink = false;
-        //    processingOffMeshLink = false;
-        //}
+                    this.traversingOffMeshLink = true;
+                }
+                else
+                {
+                    this.agent.CompleteOffMeshLink();
+                    traversingOffMeshLink = false;
+                    processingOffMeshLink = false;
+                    this.updateDelegate -= ProcessOffMeshLink;
+                }
+            }
+        }
+        else if (offMeshLinkStartPosReached)
+        {
+            Debug.Log("Curr Velocity: " + enemy.rigidbody.velocity);
+            if (currLinkData.offMeshLink.endTransform.collider.bounds.Intersects(enemy.collider.bounds))
+            {
+                traversingOffMeshLink = false;
+                this.updateDelegate -= ProcessOffMeshLink;
+                processingOffMeshLink = false;
+                this.enemy.rigidbody.useGravity = true;
+                this.agent.CompleteOffMeshLink();
+                reachingOffMeshLinkStartPos = false;
+                offMeshLinkStartPosReached = false;
+            }
+        }
+    }
+
+    private void ReachOffMeshLinkStartPos()
+    {
+        if (!this.reachingOffMeshLinkStartPos)
+        {
+            Vector3 targetVel = (this.currLinkData.startPos - this.enemy.transform.position).normalized * this.speed;
+
+            this.enemy.rigidbody.useGravity = false;
+            this.enemy.rigidbody.velocity = targetVel;
+            reachingOffMeshLinkStartPos = true;
+        }
+        else
+        {
+            Debug.Log((this.currLinkData.startPos - this.enemy.transform.position).magnitude);
+            if ((this.currLinkData.startPos - this.enemy.transform.position).magnitude < 0.1f)
+            {
+                offMeshLinkStartPosReached = true;
+                this.updateDelegate -= ReachOffMeshLinkStartPos;
+
+                Vector3 targetVel = (currLinkData.endPos - currLinkData.startPos).normalized * this.speed;
+                this.enemy.rigidbody.velocity = targetVel;
+            }
+        }
     }
 
 
@@ -142,6 +192,7 @@ public class GeneralBehaviour : MonoBehaviour {
         enemy.transform.position = DEBUG_startPos;
         agent.baseOffset = defaultNavMeshBaseOffset;
         changeBehaviour(new WanderBehaviour(this));
+        this.behaviourChangeLocked = false;
     }
 
 
@@ -191,7 +242,6 @@ public class GeneralBehaviour : MonoBehaviour {
 
         if (heightDelta < 0.05f && collisionWithObject)
         {
-            Debug.Log("Fall completed!");
             return true;
         }
         //else if (collisionWithObject)
