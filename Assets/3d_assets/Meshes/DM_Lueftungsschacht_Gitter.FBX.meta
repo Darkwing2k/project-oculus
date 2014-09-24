@@ -17,6 +17,9 @@ ModelImporter:
     100022: Cylinder001
     100024: Cylinder002
     100026: //RootNode
+    100028: SM_Lueftungsschacht_Gitter
+    100030: SM_Lueftungsschacht_Rahmen
+    100032: SM_Lueftungsschacht_Verschluss
     400000: Box001
     400002: Box002
     400004: Box005
@@ -31,6 +34,9 @@ ModelImporter:
     400022: Cylinder001
     400024: Cylinder002
     400026: //RootNode
+    400028: SM_Lueftungsschacht_Gitter
+    400030: SM_Lueftungsschacht_Rahmen
+    400032: SM_Lueftungsschacht_Verschluss
     2300000: Box001
     2300002: Box002
     2300004: Box005
@@ -44,6 +50,9 @@ ModelImporter:
     2300020: Box013
     2300022: Cylinder001
     2300024: Cylinder002
+    2300026: SM_Lueftungsschacht_Gitter
+    2300028: SM_Lueftungsschacht_Rahmen
+    2300030: SM_Lueftungsschacht_Verschluss
     3300000: Box001
     3300002: Box002
     3300004: Box005
@@ -57,6 +66,9 @@ ModelImporter:
     3300020: Box013
     3300022: Cylinder001
     3300024: Cylinder002
+    3300026: SM_Lueftungsschacht_Gitter
+    3300028: SM_Lueftungsschacht_Rahmen
+    3300030: SM_Lueftungsschacht_Verschluss
     4300000: Box001
     4300002: Box002
     4300004: Cylinder001
@@ -70,6 +82,9 @@ ModelImporter:
     4300020: Box011
     4300022: Box012
     4300024: Box013
+    4300026: SM_Lueftungsschacht_Rahmen
+    4300028: SM_Lueftungsschacht_Gitter
+    4300030: SM_Lueftungsschacht_Verschluss
     6400000: Box001
     6400002: Box002
     6400004: Box005
@@ -83,6 +98,9 @@ ModelImporter:
     6400020: Box013
     6400022: Cylinder001
     6400024: Cylinder002
+    6400026: SM_Lueftungsschacht_Gitter
+    6400028: SM_Lueftungsschacht_Rahmen
+    6400030: SM_Lueftungsschacht_Verschluss
     9500000: //RootNode
   materials:
     importMaterials: 1
