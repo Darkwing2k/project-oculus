@@ -21,7 +21,7 @@ public class EnergyStation : MonoBehaviour
 	// Use this for initialization
 	void Start () 
     {
-        if (energyCell != null && energyCell.imAnEnergyCell)
+        if (energyCell != null && energyCell.isEnergyCell)
         {
             energyCell.prepareLifting(this.transform.parent, cellPosition, cellRotation, this);
             powered = true;
@@ -97,8 +97,28 @@ public class EnergyStation : MonoBehaviour
         if (c.gameObject.GetInstanceID() == playerRef.GetInstanceID())
         {
             LiftState ls = playerRef.GetComponent<LiftState>();
-
             ls.closeStation = this;
+
+            if (ls.lifted != null && ls.lifted.isEnergyCell)
+            { 
+                psm.buttonInfo.SetActive(true);
+            }
+        }
+    }
+
+    void OnTriggerStay(Collider c)
+    {
+        if (c.gameObject.GetInstanceID() == playerRef.GetInstanceID())
+        {
+            if (! psm.buttonInfo.activeSelf)
+            {
+                LiftState ls = playerRef.GetComponent<LiftState>();
+
+                if (ls.lifted != null && ls.lifted.isEnergyCell)
+                {
+                    psm.buttonInfo.SetActive(true);
+                }
+            }
         }
     }
 
@@ -109,6 +129,8 @@ public class EnergyStation : MonoBehaviour
             LiftState ls = playerRef.GetComponent<LiftState>();
 
             ls.closeStation = null;
+
+            psm.buttonInfo.SetActive(false);
         }
     }
 }

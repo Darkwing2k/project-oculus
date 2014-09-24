@@ -5,7 +5,7 @@ public class Liftable : Usable
 {
     public bool lifted;
 
-    public bool imAnEnergyCell;
+    public bool isEnergyCell;
 
     public override void use()
     {

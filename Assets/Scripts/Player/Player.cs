@@ -18,6 +18,7 @@ public class Player : MonoBehaviour
 
     public Checkpoint checkpoint;
 
+    public bool allowNoClip;
     public bool noClip;
     public bool tutorial;
 
@@ -65,13 +66,14 @@ public class Player : MonoBehaviour
             tutorial = false;
         }
 
-
-        //if (Input.GetKeyDown(KeyCode.Joystick1Button4) || Input.GetKeyDown(KeyCode.Space))
-        //{
-        //    noClip = !noClip;
-        //    this.gameObject.collider.enabled = !noClip;
-        //}
-        
+        if (allowNoClip)
+        {
+            if (Input.GetKeyDown(KeyCode.Joystick1Button4) || Input.GetKeyDown(KeyCode.Space))
+            {
+                noClip = !noClip;
+                this.gameObject.collider.enabled = !noClip;
+            }
+        }        
 
         if (Input.GetKeyDown(KeyCode.R))
         {

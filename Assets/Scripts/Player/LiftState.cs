@@ -45,7 +45,7 @@ public class LiftState : PlayerState
 
         lifted.prepareRelease();
 
-        if (closeStation != null && lifted.imAnEnergyCell)
+        if (closeStation != null && lifted.isEnergyCell)
         {
             closeStation.insertCell(lifted);
             closeStation.energyCell = lifted;
