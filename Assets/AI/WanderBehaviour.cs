@@ -25,7 +25,7 @@ public class WanderBehaviour : IBehaviour {
 	{
 		this.generalBehaviour = generalBehaviour;
 		this.pathSet = false;
-        generalBehaviour.agent.enabled = true;
+        //generalBehaviour.agent.enabled = true;
 	}
 
 	public void execute(float timePassed)
@@ -122,6 +122,10 @@ public class WanderBehaviour : IBehaviour {
 			if (posDelta.magnitude <= 2.0f)
 			{
 				nextPositionReached = true;
+                generalBehaviour.agent.Stop();
+                generalBehaviour.rigidbody.velocity = Vector3.zero;
+
+                generalBehaviour.anim.Stop();
 			}
 		}
 		return nextPositionReached;
@@ -129,8 +133,6 @@ public class WanderBehaviour : IBehaviour {
 
 	private void wait(float timePassed)
 	{
-        generalBehaviour.anim.Stop();
-
         generalBehaviour.soundSource.clip = generalBehaviour.walkSound;
         generalBehaviour.soundSource.loop = true;
         generalBehaviour.soundSource.Stop();

@@ -42,7 +42,7 @@ public class FollowBehaviour : IBehaviour {
             this.timer += timePassed;
             if (!pathSet)
             {
-                playerPosition.y = generalBehaviour.enemy.transform.position.y;
+                //playerPosition.y = generalBehaviour.enemy.transform.position.y;
                 generalBehaviour.agent.SetDestination(playerPosition);
                 pathSet = true;
             }

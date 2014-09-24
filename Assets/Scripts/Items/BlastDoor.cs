@@ -20,9 +20,9 @@ public class BlastDoor : Triggerable
             m_currentState = value;
             foreach (var link in relatedOffMeshLinks)
                 if (currentState == DoorState.OPEN)
-                    link.activated = true;
+                    link.gameObject.GetComponent<OffMeshLinkStatus>().traversable = true;
                 else
-                    link.activated = false;
+                    link.gameObject.GetComponent<OffMeshLinkStatus>().traversable = false;
         }
     }
 

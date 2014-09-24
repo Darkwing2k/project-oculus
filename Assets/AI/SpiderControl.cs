@@ -101,7 +101,7 @@ public class SpiderControl : MonoBehaviour {
 
             generalBehaviour.setCurrentRoom(testRoom.GetComponent<RoomInfo>());
 
-            WaitingOnCheckpoint = false;
+            WaitingOnCheckpoint = true;
 
             started = true;
             //InvokeRepeating("Execute", 0.0f, 0.05f);
@@ -285,10 +285,10 @@ public class SpiderControl : MonoBehaviour {
         //{
         //    this.DEBUG_FollowOnCommand = !this.DEBUG_FollowOnCommand;
         //}
-        //if (Input.GetKeyDown(KeyCode.G))
-        //{
-        //    this.gameObject.GetComponent<TriggerSpider>().trigger();
-        //}
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            this.gameObject.GetComponent<TriggerSpider>().trigger();
+        }
         /*
         if (generalBehaviour.currentBehaviour is FallDownAttackBehaviour)
         {
@@ -313,6 +313,7 @@ public class SpiderControl : MonoBehaviour {
         if (generalBehaviour.isFallDownFinished() && generalBehaviour.collisionWithObject)
         {
             generalBehaviour.agent.enabled = true;
+            generalBehaviour.enemy.rigidbody.useGravity = false;
             m_WaitingOnCheckpoint = false;
             generalBehaviour.updateDelegate -= waitUntilFallDownFinished;
         }

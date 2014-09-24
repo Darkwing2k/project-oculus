@@ -59,12 +59,7 @@ public class RoomInfo : MonoBehaviour {
         {
             if (control.generalBehaviour.currentBehaviour is WanderBehaviour)
             {
-                control.generalBehaviour.agent.Stop();
-                control.generalBehaviour.agent.enabled = false;
-                control.spiderEnemy.transform.position = spawnPoint.transform.position;
-                control.generalBehaviour.agent.enabled = true;
-                control.generalBehaviour.agent.Resume();
-                control.generalBehaviour.currentRoom = this;
+                control.generalBehaviour.spawnSpider(spawnPoint.transform.position, this, false);
             }
 
         }

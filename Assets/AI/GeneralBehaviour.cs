@@ -24,13 +24,18 @@ public class GeneralBehaviour : MonoBehaviour {
     public AudioClip jumpSound;
 
     public OffMeshLinkData currLinkData, nextLinkData;
+    public CustomOffMeshLinkMarker[] markerArray;
+    public Vector3 nextPosition;
+    public bool nextPositionSet = false;
+    public bool countUp;
+    public int currentIndexPosition;
     public bool processingOffMeshLink = false;
     public bool offMeshLinkStartPosReached = false;
     public bool reachingOffMeshLinkStartPos = false;
     public bool traversingOffMeshLink = false;
 
 	public static int OWN_LAYER_MASK = 1 << 9;
-    public int layerMaskToIgnore = ~OWN_LAYER_MASK & ~RoomInfo.ROOM_COLLIDER_LAYER_MASK;
+    public LayerMask layerMaskToIgnore;// = ~(RoomInfo.ROOM_COLLIDER_LAYER_MASK | OWN_LAYER_MASK);
 
 	public bool behaviourChangeLocked = false;
 
@@ -72,30 +77,25 @@ public class GeneralBehaviour : MonoBehaviour {
 	{
         this.anim = anim;
         updateDelegate = new executeInUpdateMethod(dummy);
+        updateDelegate += CheckForOffMeshLinks;
 
         this.soundSource = ss;
         this.walkSound = walk;
         this.jumpSound = jump;
 
+        layerMaskToIgnore = ~layerMaskToIgnore;
+
 		this.enemy = enemy;
 		this.player = player;
 		this.agent = enemyNavMeshAgent;
 		defaultNavMeshBaseOffset = enemyNavMeshAgent.baseOffset;
-        //enemyNavMeshAgent.autoTraverseOffMeshLink = true;
 	}
 
 	public void execute(float timePassed)
 	{
-        //Debug.Log(currentBehaviour.ToString());
+        Debug.Log(currentBehaviour.ToString());
 
 		currentBehaviour.execute(timePassed);
-
-        if (this.agent.enabled && this.agent.nextOffMeshLinkData.valid && !this.processingOffMeshLink)
-        {
-            nextLinkData = this.agent.nextOffMeshLinkData;
-            this.updateDelegate += ProcessOffMeshLink;
-            processingOffMeshLink = true;
-        }
 	}
 
 	public void setCurrentRoom(RoomInfo room)
@@ -111,17 +111,21 @@ public class GeneralBehaviour : MonoBehaviour {
 
     private void ProcessOffMeshLink()
     {
+        // if not already traversing and the right OffMeshLink is reached...
         if (!this.traversingOffMeshLink && this.agent.isOnOffMeshLink && this.agent.currentOffMeshLinkData.startPos.Equals(this.nextLinkData.startPos))
         {
             currLinkData = this.agent.currentOffMeshLinkData;
             if (currLinkData.valid)
             {
+                // ...if height difference is low...
                 if (Mathf.Abs(currLinkData.startPos.y - currLinkData.endPos.y) <= 1.0f)
                 {
+                    // ...get to the right start position of the OffMeshLink.
                     this.updateDelegate += ReachOffMeshLinkStartPos;
 
                     this.traversingOffMeshLink = true;
                 }
+                    // ...else complete the OffMeshLink with Unity's solution (custom solution still needed)
                 else
                 {
                     this.agent.CompleteOffMeshLink();
@@ -133,7 +137,13 @@ public class GeneralBehaviour : MonoBehaviour {
         }
         else if (offMeshLinkStartPosReached)
         {
-            Debug.Log("Curr Velocity: " + enemy.rigidbody.velocity);
+            if (!this.nextPositionSet)
+            {
+                Vector3 targetVel = (currLinkData.endPos - currLinkData.startPos).normalized * this.speed;
+                this.enemy.rigidbody.velocity = targetVel;
+                this.nextPositionSet = true;
+            }
+            // check if the end position of the link is reached and in this case, link is completed
             if (currLinkData.offMeshLink.endTransform.collider.bounds.Intersects(enemy.collider.bounds))
             {
                 traversingOffMeshLink = false;
@@ -143,34 +153,133 @@ public class GeneralBehaviour : MonoBehaviour {
                 this.agent.CompleteOffMeshLink();
                 reachingOffMeshLinkStartPos = false;
                 offMeshLinkStartPosReached = false;
+                this.nextPositionSet = false;
             }
         }
     }
 
     private void ReachOffMeshLinkStartPos()
     {
+        // if not already on the way to the start position, set the velocity to reach it
         if (!this.reachingOffMeshLinkStartPos)
         {
             Vector3 targetVel = (this.currLinkData.startPos - this.enemy.transform.position).normalized * this.speed;
 
             this.enemy.rigidbody.useGravity = false;
+            this.enemy.rigidbody.velocity = Vector3.zero;
             this.enemy.rigidbody.velocity = targetVel;
             reachingOffMeshLinkStartPos = true;
         }
+        // else check whether start position is reached and in this case, set the velocity to traverse the link
         else
         {
-            Debug.Log((this.currLinkData.startPos - this.enemy.transform.position).magnitude);
-            if ((this.currLinkData.startPos - this.enemy.transform.position).magnitude < 0.1f)
+            if (this.isPositionReached(this.currLinkData.startPos))
             {
                 offMeshLinkStartPosReached = true;
                 this.updateDelegate -= ReachOffMeshLinkStartPos;
-
-                Vector3 targetVel = (currLinkData.endPos - currLinkData.startPos).normalized * this.speed;
-                this.enemy.rigidbody.velocity = targetVel;
             }
         }
     }
 
+
+    private void ProcessCustomOffMeshLink()
+    {
+        if (!this.traversingOffMeshLink && this.agent.isOnOffMeshLink && this.agent.currentOffMeshLinkData.startPos.Equals(this.nextLinkData.startPos))
+        {
+            currLinkData = this.agent.currentOffMeshLinkData;
+            if (currLinkData.valid)
+            {
+                this.updateDelegate += ReachOffMeshLinkStartPos;
+                this.traversingOffMeshLink = true;
+
+                this.markerArray = currLinkData.offMeshLink.transform.parent.GetComponent<CustomOffMeshLinkContainer>().MarkerList;
+                this.currentIndexPosition = currLinkData.offMeshLink.gameObject.GetComponent<CustomOffMeshLinkMarker>().ID;
+                if (currentIndexPosition == 0)
+                {
+                    this.currentIndexPosition++;
+                    this.countUp = true;
+                }
+                else
+                {
+                    this.currentIndexPosition--;
+                    this.countUp = false;
+                }
+                this.nextPosition = markerArray[this.currentIndexPosition].transform.position;
+            }
+        }
+        else if (this.offMeshLinkStartPosReached)
+        {
+            if (!this.nextPositionSet)
+            {
+                Vector3 targetVel = (this.nextPosition - this.enemy.transform.position).normalized * this.speed;
+                this.enemy.rigidbody.velocity = Vector3.zero;
+                this.enemy.rigidbody.velocity = targetVel;
+                this.nextPositionSet = true;
+            }
+            else
+            {
+                //this.enemy.transform.LookAt(nextPosition);
+                if (isPositionReached(nextPosition))
+                {
+                    if (countUp)
+                        currentIndexPosition++;
+                    else
+                        currentIndexPosition--;
+
+                    if (currentIndexPosition < 0 || currentIndexPosition >= markerArray.Length)
+                    {
+                        traversingOffMeshLink = false;
+                        this.updateDelegate -= ProcessCustomOffMeshLink;
+                        processingOffMeshLink = false;
+                        this.enemy.rigidbody.useGravity = true;
+                        this.agent.CompleteOffMeshLink();
+                        reachingOffMeshLinkStartPos = false;
+                        offMeshLinkStartPosReached = false;
+                        this.nextPositionSet = false;
+                        this.agent.autoTraverseOffMeshLink = true;
+                    }
+                    else
+                    {
+                        this.nextPosition = markerArray[currentIndexPosition].transform.position;
+                        this.nextPositionSet = false;
+                    }
+                }
+            }
+        }
+
+    }
+
+
+
+    private void CheckForOffMeshLinks()
+    {
+        // check if current path leads through an OffMeshLink...
+        if (this.agent.enabled && this.agent.nextOffMeshLinkData.valid && !this.processingOffMeshLink)
+        {
+            // ...and process it in this case
+            nextLinkData = this.agent.nextOffMeshLinkData;
+            //this.enemy.rigidbody.useGravity = false;
+            if (nextLinkData.offMeshLink.tag.Equals("CustomOffMeshLink"))
+            {
+                this.agent.autoTraverseOffMeshLink = false;
+                Debug.Log("Now traverse " + nextLinkData.offMeshLink.gameObject.name);
+                this.updateDelegate += ProcessCustomOffMeshLink;
+                processingOffMeshLink = true;
+            }
+            else
+            {
+                if (nextLinkData.offMeshLink.gameObject.GetComponent<OffMeshLinkStatus>() != null && !nextLinkData.offMeshLink.gameObject.GetComponent<OffMeshLinkStatus>().traversable)
+                {
+                    Debug.Log("Reset Behaviour");
+                    System.Type[] types = { this.GetType() };
+                    object[] parameters = { this };
+                    this.changeBehaviour((IBehaviour)currentBehaviour.GetType().GetConstructor(types).Invoke(parameters));
+                }
+                //this.updateDelegate += ProcessOffMeshLink;
+            }
+            
+        }
+    }
 
     public void ProcessTurnWhileFalling()
     {
@@ -191,6 +300,7 @@ public class GeneralBehaviour : MonoBehaviour {
     {
         enemy.transform.position = DEBUG_startPos;
         agent.baseOffset = defaultNavMeshBaseOffset;
+        agent.enabled = true;
         changeBehaviour(new WanderBehaviour(this));
         this.behaviourChangeLocked = false;
     }
@@ -200,9 +310,10 @@ public class GeneralBehaviour : MonoBehaviour {
     {
         Ray ray = new Ray(enemy.transform.position, player.transform.position - enemy.transform.position);
         RaycastHit hit;
-
+        
         if (Physics.Raycast(ray, out hit, float.PositiveInfinity, layerMaskToIgnore))
         {
+            Debug.Log(hit.transform.gameObject.name + ", Layer: " + hit.transform.gameObject.layer);
             if (hit.collider.gameObject.tag.Equals("Player"))
             {
                 GeneralBehaviour.playerPositionKnown = true;
@@ -240,8 +351,9 @@ public class GeneralBehaviour : MonoBehaviour {
     {
         float heightDelta = System.Math.Abs(lastYPos - enemy.transform.position.y);
 
-        if (heightDelta < 0.05f && collisionWithObject)
+        if (heightDelta < 0.02f && collisionWithObject)
         {
+            Debug.Log("Fall Down Finished");
             return true;
         }
         //else if (collisionWithObject)
@@ -251,6 +363,39 @@ public class GeneralBehaviour : MonoBehaviour {
         lastYPos = enemy.transform.position.y;
         
         return false;
+    }
+
+    public bool isPositionReached(Vector3 position)
+    {
+        if ((position - this.enemy.transform.position).magnitude < 0.1f)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public void spawnSpider(Vector3 position, RoomInfo room, bool waitingOnCheckpoint)
+    {
+        if (agent.enabled)
+        {
+            Debug.Log("Disable agent");
+            agent.Stop();
+            agent.enabled = false;
+        }
+        enemy.transform.position = position;
+        this.changeBehaviour(new WanderBehaviour(this));
+
+        if (!waitingOnCheckpoint)
+        {
+            agent.enabled = true;
+            enemy.rigidbody.useGravity = false;
+            agent.Resume();
+        }
+        else
+        {
+            this.collisionWithObject = false;
+        }
+        currentRoom = room;
     }
 
 }

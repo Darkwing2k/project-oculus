@@ -54,6 +54,7 @@ public class ClimbUpNextWallBehaviour : IBehaviour {
 		else
 		{
 			Debug.Log ("NO CLIMBABLE WALL IN THIS ROOM");
+            generalBehaviour.agent.enabled = true;
 			generalBehaviour.changeBehaviour(new WanderBehaviour(generalBehaviour));
             generalBehaviour.behaviourChangeLocked = false;
 		}
