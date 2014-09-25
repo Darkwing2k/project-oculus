@@ -3,10 +3,6 @@ using System.Collections;
 
 public class ReallyUsable : Usable {
 	
-	// Update is called once per frame
-	void Update () {
-	
-	}
 
 	public override void use() {
 	}

@@ -6,6 +6,8 @@ public class Hackable : Usable
 {
     public List<Triggerable> objectsToTrigger;
 
+    public List<Cutable> cutablesToCut_fuckingHackForCityC;
+
     public bool pressed;
     public bool toggle;
 
@@ -15,6 +17,9 @@ public class Hackable : Usable
         {
             foreach (Triggerable t in objectsToTrigger)
                 t.trigger();
+
+            foreach (Cutable c in cutablesToCut_fuckingHackForCityC)
+                c.Cut();
 
             pressed = true;
         }

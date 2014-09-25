@@ -148,7 +148,10 @@ public class LaserState : PlayerState
                 laserSoundSrc.Play();
 
                 if (laserCanHitTarget)
+                {
                     timer += Time.deltaTime;
+                    currentTarget.interpolateMats(timer);
+                }
             }
             else
             {
@@ -159,7 +162,7 @@ public class LaserState : PlayerState
             // if the duration max is reached, the target is cut and the state will be changed to TARGETING
             if (timer > timerMax)
             {
-                currentTarget.GetComponent<Cutable>().Cut();
+                currentTarget.Cut();
 
                 possibleTargets.Remove(currentTarget);
 
