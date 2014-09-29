@@ -44,6 +44,8 @@ public class Player : MonoBehaviour
             {
                 c.gameObject.SetActive(true);
             }
+
+            this.GetComponent<AudioListener>().enabled = false;
         }
 	}
 
@@ -68,7 +70,7 @@ public class Player : MonoBehaviour
 
         if (allowNoClip)
         {
-            if (Input.GetKeyDown(KeyCode.Joystick1Button4) && Input.GetKeyDown(KeyCode.Joystick1Button5) || Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetKey(KeyCode.Joystick1Button4) && Input.GetKeyDown(KeyCode.Joystick1Button5) || Input.GetKeyDown(KeyCode.Space))
             {
                 noClip = !noClip;
                 this.gameObject.collider.enabled = !noClip;
